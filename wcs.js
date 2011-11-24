@@ -31,7 +31,16 @@
 		},
 		
 		proj_plane_to_spherical: function (x, y) {
+
+			var phi, theta, r;
 			
+			phi = Math.atan2(-y, x);
+			r = Math.sqrt(x*x + y*y);
+			
+			// Assuming only Gnomonic projects for now
+			theta = Math.atan(180 / Math.PI * r);
+			
+			return [phi, theta];
 		},
 		
 		spherical_to_celestial: function (phi, theta) {
