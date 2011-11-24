@@ -1,1 +1,7 @@
+.DS_Store
 *.pyc
+*.fits
+*.FITS
+*.fit
+*.FIT
+
