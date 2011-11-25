@@ -92,6 +92,22 @@ function rad_to_deg(radian) {
 			coords = this.to_celestial(coords[0], coords[1]);
 
 			return coords;
+		},
+		
+		dd_to_dms: function (dd) {
+			var d, m, s;
+			
+			d = Math.floor(dd);
+			m = Math.floor(60 * Math.abs(dd)) % 60;
+			s = (3600 * Math.abs(dd)) % 60;
+			s = Math.floor(s * 1000) / 1000;
+			return [d, m, s];
+		},
+		
+		dms_to_dd: function (d, m, s) {
+			var dd;
+			dd = d + m / 60 + s / 3600;
+			return dd;
 		}
 
 	};
