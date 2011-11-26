@@ -12,9 +12,16 @@ function rad_to_deg(radian) {
 	"use strict"
 	
 	var WCS = function (hdr) {
-
+		
+		var zenithal, projection;
+		
+		// Projections
+		zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'ZEA', 'ZPN'];
+		
+		
 		// Parse a JSON object for WCS data
 		this.wcsaxes = parseInt(hdr.wcsaxes);
+		this.naxis = [parseInt(hdr.naxis1), parseInt(hdr.naxis2)];
 		this.crpix = [parseFloat(hdr.crpix1) - 1, parseFloat(hdr.crpix2) - 1];
 		
 		// Check for the PC matrix
@@ -34,20 +41,84 @@ function rad_to_deg(radian) {
 		this.latpole = deg_to_rad(parseFloat(hdr.latpole));
 		this.date_obs = hdr.date_obs;
 		
-		// Check the projection and define the appropriate function
-		if (this.ctype[0].slice(5) === 'TAN' && this.ctype[1].slice(5) === 'TAN') {
+		// Check the projection
+		// TODO: Check that both (all) axes have the same projection
+		projection = this.ctype[0].slice(5);
+		
+		// Assign the native longitude and latitude of the fiducial point and the transformation to spherical coordinates
+		if (zenithal.indexOf(projection) > -1) {
+			this.phi_0 = 0;
+			this.theta_0 = Math.PI / 2;
+			
+			if (projection === 'AIR') {
+				
+				WCS.prototype.to_spherical = function (x, y) {
+					throw new Error('Sorry, not yet implemented!');
+				};
+				
+			} else if (projection === 'ARC') {
 
-			this.lat_0 = Math.PI / 2;
+				WCS.prototype.to_spherical = function (x, y) {
+					var r, theta, phi;
 
-			WCS.prototype.to_spherical = function (x, y) {
-				var r, theta, phi;
+					r = Math.sqrt(x*x + y*y);
+					theta = this.theta_0 - r;
+					phi = Math.atan2(x, -y)
 
-				r = Math.sqrt(x*x + y*y);
-				theta = this.lat_0 - Math.atan(r);
-				phi = Math.atan2(x, -y);
+					return [phi, theta];
+				};
 
-				return [phi, theta];
-			};
+			} else if (projection === 'AZP') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+					throw new Error('Sorry, not yet implemented!');
+				};
+
+			} else if (projection === 'NCP') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+					throw new Error('Sorry, not yet implemented!');
+				};
+
+			} else if (projection === 'SIN') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+
+					var r, theta, phi;
+					r = Math.sqrt(x*x + y*y);
+					theta = Math.acos(r);
+					phi = Math.atan2(x, -y);
+
+			        return [phi, theta]
+				};
+
+			} else if (projection === 'STG') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+					throw new Error('Sorry, not yet implemented!');
+				};
+
+			} else if (projection === 'SZP') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+					throw new Error('Sorry, not yet implemented!');
+				};
+
+			} else if (projection === 'TAN') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+					var r, theta, phi;
+
+					r = Math.sqrt(x*x + y*y);
+					theta = this.theta_0 - Math.atan(r);
+					phi = Math.atan2(x, -y);
+
+					return [phi, theta];
+				};
+
+			} else if (projection === 'ZEA') {
+			} else if (projection === 'ZPN') {
+			}
 		}
 	};
 	
@@ -86,7 +157,7 @@ function rad_to_deg(radian) {
 		
 		pix_to_sky: function (points) {
 			var coords;
-			
+
 			coords = this.to_intermediate(points);
 			coords = this.to_spherical(coords[0], coords[1]);
 			coords = this.to_celestial(coords[0], coords[1]);
