@@ -12,7 +12,7 @@ function rad_to_deg(radian) {
 	"use strict"
 	
 	var WCS = function (hdr) {
-		
+
 		// Parse a JSON object for WCS data
 		this.wcsaxes = parseInt(hdr.wcsaxes);
 		this.crpix = [parseFloat(hdr.crpix1) - 1, parseFloat(hdr.crpix2) - 1];
