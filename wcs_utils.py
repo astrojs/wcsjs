@@ -13,6 +13,10 @@ def wcs2json(in_file, out_file):
     wcs = pywcs.WCS(header)
     header_wcs = wcs.to_header()
     
+    # PyWCS omits NAXIS tags
+    header_wcs.update('NAXIS1', header['NAXIS1'])
+    header_wcs.update('NAXIS2', header['NAXIS2'])
+
     wcs_dict = {}
     print header_wcs
     for key in header_wcs.keys():
