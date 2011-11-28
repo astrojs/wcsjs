@@ -5,13 +5,103 @@ describe ("unit conversion", function () {
 	var value_rad = Math.PI;
 	
 	it ("converts degrees to radians", function () {
-		expect(deg_to_rad(value_deg)).toEqual(value_rad);
+		expect(value_deg * D2R).toEqual(value_rad);
 	});
 	
 	it ("converts radians to degrees", function () {
-		expect(rad_to_deg(value_rad)).toEqual(value_deg);
+		expect(value_rad * R2D).toEqual(value_deg);
 	});
 });
+
+describe ("Compute the cosine in units of degrees", function () {
+	var angle;
+	
+	it ("cosine of 0 degrees", function () {
+		angle = 0;
+		expect(cosd(angle)).toEqual(1);
+	});
+	
+	it ("cosine of 90 degrees", function () {
+		angle = 90;
+		expect(cosd(angle)).toEqual(0);
+	});
+	
+	it ("cosine of 180 degrees", function () {
+		angle = 180;
+		expect(cosd(angle)).toEqual(-1);
+	});
+	
+	it ("cosine of 270 degrees", function () {
+		angle = 270;
+		expect(cosd(angle)).toEqual(0);
+	});
+	
+	it ("cosine of angle in the first quadrant", function () {
+		angle = 45;
+		expect(cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+	});
+	
+	it ("cosine of angle in the second quadrant", function () {
+		angle = 135;
+		expect(cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+	});
+	
+	it ("cosine of angle in the third quadrant", function () {
+		angle = 225;
+		expect(cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+	});
+	
+	it ("cosine of angle in the fourth quadrant", function () {
+		angle = 315;
+		expect(cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+	});
+});
+
+
+describe ("Compute the sine in units of degrees", function () {
+	var angle;
+	
+	it ("sine of 0 degrees", function () {
+		angle = 0;
+		expect(sind(angle)).toEqual(0);
+	});
+	
+	it ("sine of 90 degrees", function () {
+		angle = 90;
+		expect(sind(angle)).toEqual(1);
+	});
+	
+	it ("sine of 180 degrees", function () {
+		angle = 180;
+		expect(sind(angle)).toEqual(0);
+	});
+	
+	it ("sine of 270 degrees", function () {
+		angle = 270;
+		expect(sind(angle)).toEqual(-1);
+	});
+	
+	it ("sine of angle in the first quadrant", function () {
+		angle = 45;
+		expect(sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+	});
+	
+	it ("sine of angle in the second quadrant", function () {
+		angle = 135;
+		expect(sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+	});
+	
+	it ("sine of angle in the third quadrant", function () {
+		angle = 225;
+		expect(sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+	});
+	
+	it ("sine of angle in the fourth quadrant", function () {
+		angle = 315;
+		expect(sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+	});
+});
+
 
 describe ("pixel to sky transformations", function () {
 
@@ -52,13 +142,22 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS(arc);
 		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
 	});
-	
+
 	it ("SIN Projection", function () {
 		var wcs, pix, sky;
 		pix = [0, 0];
 		sky = [269.39151, -73.90354];
 
 		wcs = new WCS(sin);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+	
+	it ("STG Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [269.37826, -73.25613];
+
+		wcs = new WCS(stg);
 		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
 	});	
 	
@@ -71,6 +170,13 @@ describe ("pixel to sky transformations", function () {
 		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
 	});
 
-	
+	it ("ZEA Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [268.89430, -73.57490];
+
+		wcs = new WCS(zea);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
 
 });
