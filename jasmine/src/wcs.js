@@ -242,7 +242,7 @@ function atan2d(y, x) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - r;
-					phi = Math.atan2(-y, x);
+					phi = Math.atan2(x, -y);
 
 					return [phi, theta];
 				};
@@ -266,7 +266,7 @@ function atan2d(y, x) {
 					var r, theta, phi;
 					r = Math.sqrt(x*x + y*y);
 					theta = acosd(Math.PI * r / 180);
-					phi = atan2d(-y, x);
+					phi = atan2d(x, -y);
 
 			        return [phi, theta]
 				};
@@ -278,7 +278,7 @@ function atan2d(y, x) {
 					var r, theta, phi;
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - 2 * atand(Math.PI * r / 360);
-					phi = atan2d(-y, x);
+					phi = atan2d(x, -y);
 
 			        return [phi, theta];
 					
@@ -297,7 +297,7 @@ function atan2d(y, x) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = atand(180 / (Math.PI * r));
-					phi = atan2d(-y, x);
+					phi = atan2d(x, -y);
 
 					return [phi, theta];
 				};
@@ -309,7 +309,7 @@ function atan2d(y, x) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - 2 * asind(Math.PI * r / 360);
-					phi = atan2d(-y, x);
+					phi = atan2d(x, -y);
 
 					return [phi, theta];
 				};
@@ -484,23 +484,30 @@ function atan2d(y, x) {
 
 			return proj;
 		},
-
+		
 		to_celestial: function (phi, theta) {
-			var alpha_p, delta_p, phi_p, alpha, delta, x, y;
-
-			alpha_p = this.alpha_p;
-			delta_p = this.delta_p;
-			phi_p = this.lonpole;
-
-			x = -1 * cosd(theta) * sind(phi - phi_p);
-			y = sind(theta) * cosd(delta_p) - cosd(theta) * sind(delta_p) * cosd(phi - phi_p);
+			// console.log(this.ctype[0].slice(5), "\t(phi, theta) = ", phi, theta);
 			
-			alpha = alpha_p + atan2d(y, x);
-			alpha += (2 * 180);
-			alpha = alpha % (2 * 180);
-			delta = asind(sind(theta) * sind(delta_p) + cosd(theta) * cosd(delta_p) * cosd(phi - phi_p));
-
-			return [alpha, delta];
+			var sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
+			var x_temp, y_temp, ra, dec;
+			
+			sin_theta = sind(theta);
+			cos_theta = cosd(theta);
+			
+			sin_dp = sind(this.delta_p);
+			cos_dp = cosd(this.delta_p);
+			
+			sin_dphi = sind(phi - this.lonpole);
+			cos_dphi = cosd(phi - this.lonpole);
+			
+			x_temp = sin_theta * cos_dp - cos_theta * sin_dp * cos_dphi;
+			y_temp = -cos_theta * sin_dphi;
+			ra = this.alpha_p + atan2d(y_temp, x_temp);
+			ra = (ra + 360) % 360;
+			dec = asind(sin_theta * sin_dp + cos_theta * cos_dp * cos_dphi);
+			
+			// console.log(this.ctype[0].slice(5), "\t(ra, dec) = ", ra, dec);
+	        return [ra, dec];
 		},
 		
 		pix_to_sky: function (points) {
