@@ -33,6 +33,6 @@ def process_wcs(directory):
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print "Usage: python %s [directory]" % inspect.getfile( inspect.currentframe() )
-        sys.quit()
+        sys.exit()
 
     process_wcs(sys.argv[1])

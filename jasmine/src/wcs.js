@@ -181,14 +181,22 @@ function atan2d(y, x) {
 	
 	var WCS = function (hdr) {
 		
-		var zenithal, cylindrical, projection;
+		// Yea, it's a self referential object
+		var self = this;
+		
+		// Check the header
+		verify_json(hdr);
+		
+		var zenithal, cylindrical, conic, poly_conic, quad_cube, projection;
 		
 		// Projections
 		zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'ZEA', 'ZPN'];
 		cylindrical = ['CYP', 'CEA', 'CAR', 'MER', 'SFL', 'PAR', 'MOL', 'AIT'];
-
+		conic = ['COP', 'COE', 'COD', 'COO'];
+		poly_conic = ['BON', 'PCO'];
+		quad_cube = ['TSC', 'CSC', 'QSC'];
+		
 		// Parse a JSON object for WCS data
-		this.wcsaxes = parseInt(hdr.wcsaxes);
 		this.naxis = [parseInt(hdr.naxis1), parseInt(hdr.naxis2)];
 		this.crpix = [parseFloat(hdr.crpix1) - 1, parseFloat(hdr.crpix2) - 1];
 		
@@ -464,6 +472,21 @@ function atan2d(y, x) {
 			}
 			
 			
+		}
+		
+		/**
+		 * Verify that the JSON passed to the WCS object contains the
+		 * appropriate keywords to compute celestial coordinates.
+		 */
+		function verify_json (json) {
+
+			self.wcsaxes = typeof(json.wcsaxes) != 'undefined' ? parseInt(json.wcsaxes) : 2;
+			self.naxis = [parseInt(json.naxis1), parseInt(json.naxis2)];
+			self.crpix = [parseFloat(json.crpix1) - 1, parseFloat(json.crpix2) - 1];
+			
+			if (typeof(json.blah) === 'undefined') {
+				throw new Error('blah');
+			}
 		}
 	};
 	
