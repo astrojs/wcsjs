@@ -323,8 +323,7 @@ function atan2d(y, x) {
 			}
 		} else if (cylindrical.indexOf(projection) > -1) {
 			
-			var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2;
-			var sol1, sol2, dist1, dist2;
+			var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2, sol1, sol2, dist1, dist2;
 			
 			// Cylindrical Projections
 			this.phi_0 = 0;
@@ -375,10 +374,11 @@ function atan2d(y, x) {
 
 			if (projection === 'CYP') {
 				
-				// Set additional projection parameters
-				this.mu = hdr.pv2_1;
-				this.lambda = hdr.pv2_2;
+				// Set projection parameters
+				this.mu = parseFloat(hdr.pv2_1);
+				this.lambda = parseFloat(hdr.pv2_2);
 				
+				// FIXME: Test is failing
 				WCS.prototype.to_spherical = function (x, y) {
 					var nu, theta, phi;
 
@@ -391,16 +391,66 @@ function atan2d(y, x) {
 				
 			} else if (projection === 'CEA') {
 				
+				// Set projection parameters
+				this.lambda = parseFloat(hdr.pv2_1);
+				
+				WCS.prototype.to_spherical = function (x, y) {
+					var theta, phi;
+
+					theta = asind(Math.PI * this.lambda * y / 180);
+					phi = x;
+
+					return [phi, theta];
+				}
+				
 			} else if (projection === 'CAR') {
 				
+				WCS.prototype.to_spherical = function (x, y) {
+					return [x, y];
+				}
+				
 			} else if (projection === 'MER') {
+
+				WCS.prototype.to_spherical = function (x, y) {
+					var theta;
+
+					theta = 2 * atand(Math.exp(y * Math.PI / 180)) - 90;
+					return [x, theta];
+				}
 				
 			} else if (projection === 'SFL') {
-				
+
+				WCS.prototype.to_spherical = function (x, y) {
+					var phi;
+
+					phi = x / cosd(y);
+					return [phi, y];
+				}
+
 			} else if (projection === 'PAR') {
 				
-			} else if (projection === 'MOL') {
+				// FIXME: Both RA and Dec transformations are failing
+				WCS.prototype.to_spherical = function (x, y) {
+					var theta, phi;
+
+					theta = 3 * asind(y / 180);
+					phi = (180 / Math.PI) * x / (1 - 4 * Math.pow(y / 180, 2));
+
+					return [phi, theta];
+				}
 				
+			} else if (projection === 'MOL') {
+
+				// FIXME: Too much rounding error with these formulas
+				WCS.prototype.to_spherical = function (x, y) {
+					var theta, phi;
+
+					theta = asind(asind(Math.PI * y / (180 * Math.sqrt(2))) / 90) + y / 180 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2));
+					phi = Math.PI * x / (2 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)));
+
+					return [phi, theta];
+				}
+
 			} else if (projection === 'AIT') {
 
 				WCS.prototype.to_spherical = function (x, y) {

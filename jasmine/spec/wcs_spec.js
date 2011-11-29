@@ -127,6 +127,9 @@ describe ("pixel to sky transformations", function () {
 					actual = Math.round(this.actual[i] * multiplier);
 					expected_elem = Math.round(expected[i] * multiplier);
 					state = expected_elem == actual;
+					if (!state) {
+						return state;
+					}
 				}
 
 				return state;
@@ -194,7 +197,61 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS(cyp);
 		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
 	});
-	
+
+	it ("CEA Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [268.44085, -73.37969];
+		
+		wcs = new WCS(cea);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+
+	it ("CAR Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [268.47851, -73.37997];
+		
+		wcs = new WCS(car);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+
+	it ("MER Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [268.51628, -73.38024];
+		
+		wcs = new WCS(mer);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+
+	it ("SFL Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [268.46738, -73.50406];
+		
+		wcs = new WCS(sfl);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+
+	it ("PAR Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [269.47944, -73.49563];
+		
+		wcs = new WCS(par);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+
+	it ("MOL Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [270.72846, -74.16980];
+		
+		wcs = new WCS(mol);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+
 	it ("AIT Projection", function () {
 		var wcs, pix, sky;
 		pix = [0, 0];
