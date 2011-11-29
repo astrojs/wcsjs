@@ -242,7 +242,7 @@ function atan2d(y, x) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - r;
-					phi = Math.atan2(x, -y);
+					phi = atan2d(x, -y);
 
 					return [phi, theta];
 				};
@@ -378,11 +378,10 @@ function atan2d(y, x) {
 				this.mu = parseFloat(hdr.pv2_1);
 				this.lambda = parseFloat(hdr.pv2_2);
 				
-				// FIXME: Test is failing
 				WCS.prototype.to_spherical = function (x, y) {
 					var nu, theta, phi;
 
-					nu = (Math.PI * y) / (180 * this.mu + this.lambda);
+					nu = (Math.PI * y) / (180 * (this.mu + this.lambda));
 					theta = atan2d(nu, 1) + asind(nu * this.mu / Math.sqrt(nu * nu + 1));
 					phi = x / this.lambda;
 
@@ -428,13 +427,12 @@ function atan2d(y, x) {
 				}
 
 			} else if (projection === 'PAR') {
-				
-				// FIXME: Both RA and Dec transformations are failing
+
 				WCS.prototype.to_spherical = function (x, y) {
 					var theta, phi;
 
 					theta = 3 * asind(y / 180);
-					phi = (180 / Math.PI) * x / (1 - 4 * Math.pow(y / 180, 2));
+					phi = x / (1 - 4 * Math.pow(y / 180, 2));
 
 					return [phi, theta];
 				}
