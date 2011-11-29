@@ -157,7 +157,7 @@ function atand(v) {
 	return Math.atan(v) * R2D;
 }
 
-function atan2d(x, y) {
+function atan2d(y, x) {
 	if (y === 0) {
 		if (x >= 0) {
 			return 0;
@@ -172,50 +172,8 @@ function atan2d(x, y) {
 		}
 	}	
 
-	return Math.atan2(x, y) * R2D;
+	return Math.atan2(y, x) * R2D;
 }
-
-
-
-/*
-(function () {
-	"use strict"
-	
-	var Projection () {
-		var i;
-		
-		this.flag = 0;
-		this.code = "   ";
-		this.pv = [];
-		this.pv[0] = 0;
-		this.pv[1] = undefined;
-		this.pv[2] = undefined;
-		this.pv[3] = undefined;
-		for (i = 4; i < PVN; i += 1) {
-			this.pv[i] = 0;
-		}
-		this.r0 = 0;
-		this.phi0 = undefined;
-		this.theta0 = undefined;
-		this.bounds = 1;
-		this.category = 0;
-		this.pvrange = 0;
-		this.simplezen = 0;
-		this.equiareal = 0;
-		this.conformal = 0;
-		this.global = 0;
-		this.divergent = 0;
-		this.x0 = 0;
-		this.y0 = 0;
-		this.w = [];
-		for (i = 0; i < 10; i += 1) {
-			this.w[i] = 0;
-		}
-		this.m = 0;
-		this.n = 0;
-	};
-}());
-*/
 
 
 (function () {
@@ -259,6 +217,8 @@ function atan2d(x, y) {
 			// Zenithal Projections
 			this.phi_0 = 0;
 			this.theta_0 = 90;
+			this.alpha_p = this.crval[0];
+			this.delta_p = this.crval[1];
 			
 			if (projection === 'AIR') {
 				var r, theta, phi, eta, eta_b;
@@ -282,7 +242,7 @@ function atan2d(x, y) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - r;
-					phi = Math.atan2(x, -y);
+					phi = Math.atan2(-y, x);
 
 					return [phi, theta];
 				};
@@ -306,7 +266,7 @@ function atan2d(x, y) {
 					var r, theta, phi;
 					r = Math.sqrt(x*x + y*y);
 					theta = acosd(Math.PI * r / 180);
-					phi = atan2d(x, -y);
+					phi = atan2d(-y, x);
 
 			        return [phi, theta]
 				};
@@ -318,7 +278,7 @@ function atan2d(x, y) {
 					var r, theta, phi;
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - 2 * atand(Math.PI * r / 360);
-					phi = atan2d(x, -y);
+					phi = atan2d(-y, x);
 
 			        return [phi, theta];
 					
@@ -337,7 +297,7 @@ function atan2d(x, y) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = atand(180 / (Math.PI * r));
-					phi = atan2d(x, -y);
+					phi = atan2d(-y, x);
 
 					return [phi, theta];
 				};
@@ -349,7 +309,7 @@ function atan2d(x, y) {
 
 					r = Math.sqrt(x*x + y*y);
 					theta = this.theta_0 - 2 * asind(Math.PI * r / 360);
-					phi = atan2d(x, -y);
+					phi = atan2d(-y, x);
 
 					return [phi, theta];
 				};
@@ -362,12 +322,73 @@ function atan2d(x, y) {
 
 			}
 		} else if (cylindrical.indexOf(projection) > -1) {
-
+			
+			var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2;
+			var sol1, sol2, dist1, dist2;
+			
 			// Cylindrical Projections
 			this.phi_0 = 0;
 			this.theta_0 = 0;
+			
+			alpha_0 = this.crval[0];
+			delta_0 = this.crval[1];
+			phi_p = this.lonpole;
+			theta_p = this.latpole;
+			
+			// Compute delta_p
+			delta_p1 = atan2d(sind(this.theta_0), cosd(this.theta_0 * cosd(phi_p - this.phi_0)));
+			delta_p2 = acosd(sind(delta_0) / Math.sqrt(1 - Math.pow(cosd(this.theta_0), 2) * Math.pow(sind(phi_p - this.phi_0), 2)));
+			
+			// Choose the appropriate solution for delta_p
+			// Either	(1) Two solutions in range [-90, 90]
+			//			(2) One solution in range [-90, 90]
+			//			(3) No solutions in range [-90, 90]
+			sol1 = sol2 = false;
+			if (delta_p1 + delta_p2 >= -90 && delta_p1 + delta_p2 <= 90 ) {
+				sol1 = true;
+			}
+			if (delta_p1 - delta_p2 >= -90 && delta_p1 - delta_p2 <= 90 ) {
+				sol2 = true;
+			}
+			if (sol1 && sol2) {
+				dist1 = Math.abs(delta_p1 + delta_p2 - theta_p);
+				dist2 = Math.abs(delta_p1 - delta_p2 - theta_p);
+				if (dist1 < dist2) {
+					this.delta_p = delta_p1 + delta_p2;
+				} else {
+					this.delta_p = delta_p1 - delta_p2;
+				}
+			} else if (sol1) {
+				this.delta_p = delta_p1 + delta_p2;
+			} else if (sol2) {
+				this.delta_p = delta_p1 - delta_p2;
+			} else {
+				this.delta_p = theta_p;
+			}
+			
+			// Compute alpha_p
+			if (Math.abs(delta_0) === 90) {
+				this.alpha_p = alpha_0;
+			} else {
+				this.alpha_p = alpha_0 - asind(sind(phi_p - this.phi_0) * cosd(this.theta_0) / cosd(delta_0));
+			}
 
 			if (projection === 'CYP') {
+				
+				// Set additional projection parameters
+				this.mu = hdr.pv2_1;
+				this.lambda = hdr.pv2_2;
+				
+				WCS.prototype.to_spherical = function (x, y) {
+					var nu, theta, phi;
+
+					nu = (Math.PI * y) / (180 * this.mu + this.lambda);
+					theta = atan2d(nu, 1) + asind(nu * this.mu / Math.sqrt(nu * nu + 1));
+					phi = x / this.lambda;
+
+					return [phi, theta];
+				}
+				
 			} else if (projection === 'CEA') {
 				
 			} else if (projection === 'CAR') {
@@ -381,11 +402,17 @@ function atan2d(x, y) {
 			} else if (projection === 'MOL') {
 				
 			} else if (projection === 'AIT') {
-				
+
 				WCS.prototype.to_spherical = function (x, y) {
-					var z;
+					var z, x_z, y_z, theta, phi;
 					
-					// z = Math.sqrt(1 - (Math.pi * x))
+					x_z = Math.pow((Math.PI * x) / (4 * 180), 2);
+					y_z = Math.pow((Math.PI * y) / (2 * 180), 2);
+					z = Math.sqrt(1 - x_z - y_z);
+					theta = asind(Math.PI * y * z / 180);
+					phi = 2 * atan2d(Math.PI * z * x / (2 * 180), 2 * z * z - 1);
+
+					return [phi, theta];
 				};
 			}
 			
@@ -410,14 +437,15 @@ function atan2d(x, y) {
 
 		to_celestial: function (phi, theta) {
 			var alpha_p, delta_p, phi_p, alpha, delta, x, y;
-			alpha_p = this.crval[0];
-			delta_p = this.crval[1];
+
+			alpha_p = this.alpha_p;
+			delta_p = this.delta_p;
 			phi_p = this.lonpole;
 
 			x = -1 * cosd(theta) * sind(phi - phi_p);
 			y = sind(theta) * cosd(delta_p) - cosd(theta) * sind(delta_p) * cosd(phi - phi_p);
 			
-			alpha = alpha_p + atan2d(x, y);
+			alpha = alpha_p + atan2d(y, x);
 			alpha += (2 * 180);
 			alpha = alpha % (2 * 180);
 			delta = asind(sind(theta) * sind(delta_p) + cosd(theta) * cosd(delta_p) * cosd(phi - phi_p));

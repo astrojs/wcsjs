@@ -1,0 +1,1 @@
+{"naxis2": 192, "crval2": -90, "crpix1": -246.555149428, "crpix2": 3.32293776965, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--PAR", "ctype1": "RA---PAR", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0}
