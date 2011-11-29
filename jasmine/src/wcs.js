@@ -439,12 +439,11 @@ function atan2d(y, x) {
 				
 			} else if (projection === 'MOL') {
 
-				// FIXME: Too much rounding error with these formulas
 				WCS.prototype.to_spherical = function (x, y) {
 					var theta, phi;
-
-					theta = asind(asind(Math.PI * y / (180 * Math.sqrt(2))) / 90) + y / 180 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2));
-					phi = Math.PI * x / (2 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)));
+					
+					theta = asind(asind((Math.PI * y) / (180 * Math.sqrt(2))) / 90 + (y / 180) * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)))
+					phi = (Math.PI * x) / (2 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)));
 
 					return [phi, theta];
 				}
