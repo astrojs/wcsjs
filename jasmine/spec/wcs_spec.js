@@ -133,7 +133,11 @@ describe ("pixel to sky transformations", function () {
 			}
 		});
 	});
-
+	
+	//
+	// Zenithal Projections
+	//
+	
 	it ("ARC Projection", function() {
 		var wcs, pix, sky;
 		pix = [0, 0];
@@ -179,4 +183,24 @@ describe ("pixel to sky transformations", function () {
 		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
 	});
 
+	//
+	// Cylindrical Projections
+	//
+	it ("CYP Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [263.69301, -75.95480];
+		
+		wcs = new WCS(cyp);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
+	
+	it ("AIT Projection", function () {
+		var wcs, pix, sky;
+		pix = [0, 0];
+		sky = [268.56814, -73.49846];
+
+		wcs = new WCS(ait);
+		expect(wcs.pix_to_sky(pix)).toBeCloseToElementwise(sky, 5);
+	});
 });
