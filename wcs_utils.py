@@ -81,6 +81,49 @@ def wcs2json(in_file, out_file):
     f.close()
 
 
+def avm2json(avm_file, out_file):
+    """
+    Extract WCS related metadata from an AVM tagged PR image, and convert to JSON.
+    """
+    try:
+        from pyavm import AVM, NoAVMPresent
+    except ImportError:
+        print "Function needs the PyAVM library."
+        print "Run: easy_install pyavm"
+    
+    try:
+        avm = AVM(avm_file)
+    except NoAVMPresent:
+        return False
+        
+    # Short cut the spatial info
+    spatial = avm.Spatial
+    
+    # Check Spatial.Quality
+    if spatial.__dict__.has_key('Quality'):
+        if spatial.__dict__['Quality'].lower() == 'full':
+            wcs_dict = {}
+            wcs_dict['radecsys'] = spatial.CoordinateFrame
+            wcs_dict['crpix'] = spatial.ReferencePixel
+            wcs_dict['equinox'] = spatial.Equinox
+            wcs_dict['cd'] = spatial.CDMatrix
+            wcs_dict['crval'] = spatial.ReferenceValue
+            wcs_dict['naxis'] = spatial.ReferenceDimension
+            wcs_dict['cdelt'] = spatial.Scale
+            wcs_dict['ctype'] = ["RA---"+ spatial.CoordsystemProjection, "DEC--" + spatial.CoordsystemProjection]
+            wcs_dict['crota2'] = spatial.Rotation
+            
+            f = open(out_file, 'w')
+            json = JSONEncoder().encode(wcs_dict)
+            f.write(json)
+            f.close()
+            return True
+
+    return False
+        
+    
+    
+
 if __name__ == '__main__':
 
     if len(sys.argv) != 3:
