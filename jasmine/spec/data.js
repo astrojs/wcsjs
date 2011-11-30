@@ -6,34 +6,34 @@ var ait, car, cea, cyp, mer, mol, par, sfl;
 //
 
 // Airy
-air = {"naxis2": 192, "crval2": -90, "crpix1": -234.754501084, "crpix2": 8.33933082442, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 45, "cunit1": "deg", "ctype2": "DEC--AIR", "ctype1": "RA---AIR", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "restwav": 0};
+air = {"crpix": [-234.754501084, 8.33933082442], "equinox": 2000, "pv": [45], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AIR", "DEC--AIR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Zenithal Equidistant
-arc = {"naxis2": 192, "crval2": -90, "crpix1": -246.941901905, "crpix2": 5.08227445044, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--ARC", "ctype1": "RA---ARC", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "restwav": 0};
+arc = {"crpix": [-246.941901905, 5.08227445044], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ARC", "DEC--ARC"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Zenithal perspective
-azp = {"naxis2": 192, "crval2": -90, "crpix1": -254.110084878, "crpix2": -11.3494854253, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 2, "cunit1": "deg", "ctype2": "DEC--AZP", "ctype1": "RA---AZP", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "pv2_2": 30, "restwav": 0};
+azp = {"crpix": [-254.110084878, -11.3494854253], "equinox": 2000, "pv": [2, 30], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AZP", "DEC--AZP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // North Celestial Pole (SIN special case)
-ncp = {"naxis2": 192, "crval2": -90, "crpix1": -237.189543154, "crpix2": 7.68857200935, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 0, "cunit1": "deg", "ctype2": "DEC--SIN", "ctype1": "RA---SIN", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "pv2_2": -1.21679644751e-08, "restwav": 0};
+ncp = {"crpix": [-237.189543154, 7.68857200935], "equinox": 2000, "pv": [0, -1.21679644751e-08], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SIN", "DEC--SIN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Generalized orthographic
-sin = {"naxis2": 192, "crval2": -90, "crpix1": -237.189543154, "crpix2": 7.68857112488, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 0, "cunit1": "deg", "ctype2": "DEC--SIN", "ctype1": "RA---SIN", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "pv2_2": 0, "restwav": 0};
+sin = {"crpix": [-237.189543154, 7.68857112488], "equinox": 2000, "pv": [0, 0], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SIN", "DEC--SIN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Stereographic
-stg = {"naxis2": 192, "crval2": -90, "crpix1": -251.945990929, "crpix2": 3.74494253774, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--STG", "ctype1": "RA---STG", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "restwav": 0};
+stg = {"crpix": [-251.945990929, 3.74494253774], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---STG", "DEC--STG"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Slant zenithal perspective
-szp = {"pv2_3": 60, "crval2": -90, "crpix1": -247.865697278, "crpix2": -22.6205195637, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 2, "cunit1": "deg", "ctype2": "DEC--SZP", "ctype1": "RA---SZP", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "naxis2": 192, "pv2_2": 180, "restwav": 0};
+szp = {"crpix": [-247.865697278, -22.6205195637], "equinox": 2000, "pv": [2, 180, 60], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SZP", "DEC--SZP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Gnomonic
-tan = {"naxis2": 192, "crval2": -90, "crpix1": -268.065808712, "crpix2": -0.563043720109, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--TAN", "ctype1": "RA---TAN", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "restwav": 0};
+tan = {"crpix": [-268.065808712, -0.563043720109], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---TAN", "DEC--TAN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Zenithal equal area
-zea = {"naxis2": 192, "crval2": -90, "crpix1": -244.488069036, "crpix2": 5.73805594999, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--ZEA", "ctype1": "RA---ZEA", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": -90, "restwav": 0};
+zea = {"crpix": [-244.488069036, 5.73805594999], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ZEA", "DEC--ZEA"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 // Zenithal polynomial
-zpn = {"naxis2": 192, "equinox": 2000, "crpix1": -183.293725563, "crpix2": 22.0921112058, "lonpole": 180, "ctype2": "DEC--ZPN", "ctype1": "RA---ZPN", "pv2_8": 0, "pv2_9": 0, "pv2_0": 0.05, "wcsaxes": 2, "pv2_2": -0.807, "pv2_3": 0.337, "pv2_4": -0.065, "pv2_5": 0.01, "pv2_6": 0.003, "pv2_7": -0.001, "pv2_12": 0, "pv2_13": 0, "pv2_10": 0, "pv2_11": 0, "pv2_16": 0, "pv2_17": 0, "pv2_14": 0, "pv2_15": 0, "restfrq": 1420405750, "pv2_18": 0, "pv2_19": 0, "restwav": 0, "crval2": -90, "crval1": 0, "cunit1": "deg", "cunit2": "deg", "cdelt1": -0.0666666666667, "cdelt2": 0.0666666666667, "naxis1": 192, "pv2_1": 0.975, "latpole": -90};
+zpn = {"crpix": [-183.293725563, 22.0921112058], "equinox": 2000, "pv": [0.05, 0.975, -0.807, 0.337, -0.065, 0.01, 0.003, -0.001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ZPN", "DEC--ZPN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
 
 
 //
@@ -41,25 +41,25 @@ zpn = {"naxis2": 192, "equinox": 2000, "crpix1": -183.293725563, "crpix2": 22.09
 //
 
 // Hammer-Aitoff
-ait = {"naxis2": 192, "crval2": -90, "crpix1": -246.231711628, "crpix2": 7.11585002705, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--AIT", "ctype1": "RA---AIT", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+ait = {"crpix": [-246.231711628, 7.11585002705], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AIT", "DEC--AIT"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Plate Carrée
-car = {"naxis2": 192, "crval2": -90, "crpix1": -248.217381441, "crpix2": 7.52703819975, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--CAR", "ctype1": "RA---CAR", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+car = {"crpix": [-248.217381441, 7.52703819975], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---CAR", "DEC--CAR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Cylindrical Equal Area
-cea = {"naxis2": 192, "crval2": -90, "crpix1": -248.217381441, "crpix2": 7.68857112488, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 1, "cunit1": "deg", "ctype2": "DEC--CEA", "ctype1": "RA---CEA", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+cea = {"crpix": [-248.217381441, 7.68857112488], "equinox": 2000, "pv": [1], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---CEA", "DEC--CEA"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Cylindrical Perspective
-cyp = {"naxis2": 192, "crval2": -90, "crpix1": -147.105551401, "crpix2": 20.5609993928, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "pv2_1": 1, "cunit1": "deg", "ctype2": "DEC--CYP", "ctype1": "RA---CYP", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "pv2_2": 0.707106781187, "restwav": 0};
+cyp = {"crpix": [-147.105551401, 20.5609993928], "equinox": 2000, "pv": [1, 0.707106781187], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---CYP", "DEC--CYP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Mercator
-mer = {"naxis2": 192, "crval2": -90, "crpix1": -248.217381441, "crpix2": 7.36497841286, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--MER", "ctype1": "RA---MER", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+mer = {"crpix": [-248.217381441, 7.36497841286], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---MER", "DEC--MER"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Mollweide
-mol = {"naxis2": 192, "crval2": -90, "crpix1": -212.76559475, "crpix2": -2.31067099452, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--MOL", "ctype1": "RA---MOL", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+mol = {"crpix": [-212.76559475, -2.31067099452], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---MOL", "DEC--MOL"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Parabolic
-par = {"naxis2": 192, "crval2": -90, "crpix1": -246.555149428, "crpix2": 3.32293776965, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--PAR", "ctype1": "RA---PAR", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+par = {"crpix": [-246.555149428, 3.32293776965], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---PAR", "DEC--PAR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
 
 // Sanson-Flamsteed
-sfl = {"naxis2": 192, "crval2": -90, "crpix1": -246.348308624, "crpix2": 7.52703819975, "crval1": 0, "naxis1": 192, "wcsaxes": 2, "cdelt2": 0.0666666666667, "cunit2": "deg", "lonpole": 180, "cunit1": "deg", "ctype2": "DEC--SFL", "ctype1": "RA---SFL", "cdelt1": -0.0666666666667, "restfrq": 1420405750, "equinox": 2000, "latpole": 0, "restwav": 0};
+sfl = {"crpix": [-246.348308624, 7.52703819975], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SFL", "DEC--SFL"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0}
