@@ -550,7 +550,6 @@ function dms_to_dd(d, m, s) {
 		},
 		
 		to_celestial: function (phi, theta) {
-			// console.log(this.ctype[0].slice(5), "\t(phi, theta) = ", phi, theta);
 			
 			var sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
 			var x_temp, y_temp, ra, dec;
@@ -570,7 +569,6 @@ function dms_to_dd(d, m, s) {
 			ra = (ra + 360) % 360;
 			dec = asind(sin_theta * sin_dp + cos_theta * cos_dp * cos_dphi);
 			
-			// console.log(this.ctype[0].slice(5), "\t(ra, dec) = ", ra, dec);
 	        return [ra, dec];
 		},
 		
