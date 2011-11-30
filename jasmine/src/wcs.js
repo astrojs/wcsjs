@@ -205,7 +205,7 @@ function dms_to_dd(d, m, s) {
 		verify_json(hdr);
 		
 		// Set the projection
-		set_projection();
+		set_projection(hdr);
 		
 		/**
 		 * Verify that the JSON passed to the WCS object contains the
@@ -214,20 +214,20 @@ function dms_to_dd(d, m, s) {
 		 * TODO: Handle CROTA and CD keywords, derive PC matrix from these
 		 */
 		function verify_json (json) {
-			var i, unit, type;
+			var i, unit, type, crota2, lambda, cd_det, cd_sign;
 			
 			// Assume 2 dimensional image if WCSAXES not given
 			self.wcsaxes = typeof(json.wcsaxes) != 'undefined' ? parseInt(json.wcsaxes) : 2;
 			
 			// Check that values exist in JSON object
 			if (typeof(json.naxis) === 'undefined') {
-				throw new Error("Not Enough Information to Compute WCS");
+				throw new Error("Not enough information to compute WCS");
 			}
 			if (typeof(json.crpix) === 'undefined') {
-				throw new Error("Not Enough Information to Compute WCS");
+				throw new Error("Not enough information to compute WCS");
 			}
 			if (typeof(json.cdelt) === 'undefined') {
-				throw new Error("Not Enough Information to Compute WCS");
+				throw new Error("Not enough information to compute WCS");
 			}
 			if (typeof(json.cunit) === 'undefined') {
 				console.log("Assuming units of degrees");
@@ -236,7 +236,10 @@ function dms_to_dd(d, m, s) {
 				console.log("Assuming a Gnomonic (TAN) projection");
 			}
 			if (typeof(json.crval) === 'undefined') {
-				throw new Error("Not Enough Information to Compute WCS");
+				throw new Error("Not enough information to compute WCS");
+			}
+			if (typeof(json.equinox) === 'undefined') {
+				console.log("Assuming 2000");
 			}
 			
 			self.naxis = [];
@@ -255,10 +258,34 @@ function dms_to_dd(d, m, s) {
 				self.ctype.push(type);
 				self.crval.push(json.crval[i]);
 			}
-			self.pc = typeof(json.pc) != 'undefined' ? [ [parseFloat(json.pc[0]), parseFloat(json.pc[1])], [parseFloat(json.pc[2]), parseFloat(json.pc[3])] ] : [ [1, 0], [0, 1]];
+			
+			// PC Matrix
+			// TODO: Compute from CD matrix if given.
+			if (typeof(json.pc) != 'undefined') {
+				self.pc = [ [parseFloat(json.pc[0]), parseFloat(json.pc[1])], [parseFloat(json.pc[2]), parseFloat(json.pc[3])] ];
+			} else {
+				// Check for CROTA2
+				if (typeof(json.crota2) === 'undefined') {
+					if (typeof(json.cd) != 'undefined') {
+						// Compute CROTA2 from the CD matrix
+						cd_det = parseFloat(json.cd[0]) * parseFloat(json.cd[1]) - parseFloat(json.cd[2]) * parseFloat(json.cd[3]);
+						cd_sign = cd_det < 0 ? -1 : 1;
+						self.cdelt[0] = Math.sqrt(Math.abs(cd_det)) * cd_sign;
+						self.cdelt[1] = Math.sqrt(Math.abs(cd_det));
+						crota2 = atand2(-1 * parseFloat(json.cd[1]), parseFloat(json.cd[3]));
+						lambda = self.cdelt[1] / self.cdelt[0];
+						self.pc = [ [cosd(crota2), -1 * lambda * sind(crota2)], [sind(crota2) / lambda, cosd(crota2)] ];
+					} else {
+						// Assume the PC matrix to be identity
+						self.pc = [ [1, 0], [0, 1] ];
+					}
+				}
+			}
+
 			// TODO: Check the default values for lonpole and latpole ... will depend on the projection
 			self.lonpole = typeof(json.lonpole) != 'undefined' ? json.lonpole : 0;
 			self.latpole = typeof(json.latpole) != 'undefined' ? json.latpole : 0;
+			self.equinox = typeof(json.equinox) != 'undefined' ? json.equinox : 2000;
 			self.date_obs = typeof(json.date_obs) != 'undefined' ? json.date_obs : "";
 		}
 		
@@ -267,7 +294,7 @@ function dms_to_dd(d, m, s) {
 		 * 
 		 * TODO: Clean up the variables, some object attributes are not needed.
 		 */
-		function set_projection () {
+		function set_projection (json) {
 			var zenithal, cylindrical, conic, poly_conic, quad_cube, projection;
 
 			// Projections
@@ -292,7 +319,7 @@ function dms_to_dd(d, m, s) {
 					var r, theta, phi, eta, eta_b;
 
 					// Airy projection requires an additional parameter from the FITS header
-					self.theta_b = parseFloat(hdr.pv2_1);
+					self.theta_b = parseFloat(json.pv2_1);
 
 					eta = (self.theta_0 - theta) / 2;
 					eta_b = (self.theta_0 - theta_b) / 2;
@@ -443,8 +470,8 @@ function dms_to_dd(d, m, s) {
 				if (projection === 'CYP') {
 
 					// Set projection parameters assuming Gall's stereographic projection if parameters are undefined
-					self.mu = typeof(hdr.pv) != 'undefined' ? hdr.pv.length == 2 ? parseFloat(hdr.pv[0]) : 1 : 1;
-					self.lambda = typeof(hdr.pv) != 'undefined' ? hdr.pv.length == 2 ? parseFloat(hdr.pv[1]) : 1 / Math.sqrt(2) : 1 / Math.sqrt(2);
+					self.mu = typeof(json.pv) != 'undefined' ? json.pv.length == 2 ? parseFloat(json.pv[0]) : 1 : 1;
+					self.lambda = typeof(json.pv) != 'undefined' ? json.pv.length == 2 ? parseFloat(json.pv[1]) : 1 / Math.sqrt(2) : 1 / Math.sqrt(2);
 
 					WCS.prototype.to_spherical = function (x, y) {
 						var nu, theta, phi;
@@ -459,7 +486,7 @@ function dms_to_dd(d, m, s) {
 				} else if (projection === 'CEA') {
 
 					// Set projection parameters assuming Lambert's equal area projection if parameter is undefined
-					self.lambda = typeof(hdr.pv) != 'undefined' ? hdr.pv.length == 1 ? parseFloat(hdr.pv[0]) : 1 : 1;
+					self.lambda = typeof(json.pv) != 'undefined' ? json.pv.length == 1 ? parseFloat(json.pv[0]) : 1 : 1;
 
 					WCS.prototype.to_spherical = function (x, y) {
 						var theta, phi;
