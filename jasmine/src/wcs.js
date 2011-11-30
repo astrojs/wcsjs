@@ -442,9 +442,9 @@ function dms_to_dd(d, m, s) {
 
 				if (projection === 'CYP') {
 
-					// Set projection parameters
-					self.mu = parseFloat(hdr.pv[0]);
-					self.lambda = parseFloat(hdr.pv[1]);
+					// Set projection parameters assuming Gall's stereographic projection if parameters are undefined
+					self.mu = typeof(hdr.pv) != 'undefined' ? hdr.pv.length == 2 ? parseFloat(hdr.pv[0]) : 1 : 1;
+					self.lambda = typeof(hdr.pv) != 'undefined' ? hdr.pv.length == 2 ? parseFloat(hdr.pv[1]) : 1 / Math.sqrt(2) : 1 / Math.sqrt(2);
 
 					WCS.prototype.to_spherical = function (x, y) {
 						var nu, theta, phi;
@@ -458,8 +458,8 @@ function dms_to_dd(d, m, s) {
 
 				} else if (projection === 'CEA') {
 
-					// Set projection parameters
-					self.lambda = parseFloat(hdr.pv[0]);
+					// Set projection parameters assuming Lambert's equal area projection if parameter is undefined
+					self.lambda = typeof(hdr.pv) != 'undefined' ? hdr.pv.length == 1 ? parseFloat(hdr.pv[0]) : 1 : 1;
 
 					WCS.prototype.to_spherical = function (x, y) {
 						var theta, phi;
