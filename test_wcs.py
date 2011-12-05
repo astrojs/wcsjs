@@ -2,7 +2,7 @@ import os
 import numpy
 import pyfits
 import pywcs
-from celwcs import celwcs
+# from celwcs import celwcs
 
 def test_wcs():
     """
@@ -15,19 +15,19 @@ def test_wcs():
     
     # Initialize the WCS objects
     wcs_pywcs = pywcs.WCS(header)
-    wcs_celwcs = celwcs(header)
+    # wcs_celwcs = celwcs(header)
     
     # Set the pixel coordinate
     pixel = numpy.array([0, 0])
     
     # Apply tranformations
     sky_pywcs = wcs_pywcs.wcs_pix2sky([pixel], 0)[0]
-    sky_celwcs = wcs_celwcs.frompixel(pixel)
+    # sky_celwcs = wcs_celwcs.frompixel(pixel)
     
     # Feedback
     print "Transforming(%.1f, %.1f) to sky ...\n" % (pixel[0], pixel[1])
     print "PyWCS Coordinate:\t%.5f %.5f" % (sky_pywcs[0], sky_pywcs[1])
-    print "CelWCS Coordinate:\t%.5f %.5f" % (sky_celwcs[0], sky_celwcs[1])
+    # print "CelWCS Coordinate:\t%.5f %.5f" % (sky_celwcs[0], sky_celwcs[1])
 
 
 def generate_test_coordinates():

@@ -442,4 +442,55 @@ describe ("pixel to sky transformations", function () {
 			expect(wcs.pix_to_sky(pixels[i])).toBeCloseToElementwise(sky[i], 8);
 		}
 	});
+	
+	//
+	// Conic Projections
+	//
+	it ("COP Projection", function () {
+		var wcs, pixels, sky, i;
+		pixels = [];
+		sky = [];
+
+		pixels.push([0.0, 0.0]);
+		pixels.push([191.0, 0.0]);
+		pixels.push([0.0, 191.0]);
+		pixels.push([191.0, 191.0]);
+		pixels.push([95.5, 95.5]);
+
+		sky.push([266.18968688018, -74.06989101020]);
+		sky.push([267.67691932876, -60.11053528952]);
+		sky.push([309.80345421720, -69.59935740589]);
+		sky.push([294.34194790408, -57.41606027287]);
+		sky.push([284.89656549659, -66.31056875328]);
+
+		wcs = new WCS(cop);
+		for (i = 0; i < pixels.length; i += 1) {
+			expect(wcs.pix_to_sky(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+		}
+	});
+	
+	it ("COD Projection", function () {
+		var wcs, pixels, sky, i;
+		pixels = [];
+		sky = [];
+
+		pixels.push([0.0, 0.0]);
+		pixels.push([191.0, 0.0]);
+		pixels.push([0.0, 191.0]);
+		pixels.push([191.0, 191.0]);
+		pixels.push([95.5, 95.5]);
+
+		sky.push([267.30957853599, -74.13710817538]);
+		sky.push([269.35196969676, -60.38022869447]);
+		sky.push([307.69256427630, -69.93150666907]);
+		sky.push([294.13212798941, -57.41928223106]);
+		sky.push([284.89946477515, -66.31058316212]);
+
+		wcs = new WCS(cod);
+		for (i = 0; i < pixels.length; i += 1) {
+			expect(wcs.pix_to_sky(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+		}
+	});	
+	
+	
 });

@@ -418,54 +418,8 @@ function dms_to_dd(d, m, s) {
 				}
 			} else if (cylindrical.indexOf(projection) > -1) {
 
-				var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2, sol1, sol2, dist1, dist2;
-
 				// Cylindrical Projections
-				self.phi_0 = 0;
-				self.theta_0 = 0;
-
-				alpha_0 = self.crval[0];
-				delta_0 = self.crval[1];
-				phi_p = self.lonpole;
-				theta_p = self.latpole;
-
-				// Compute delta_p
-				delta_p1 = atan2d(sind(self.theta_0), cosd(self.theta_0 * cosd(phi_p - self.phi_0)));
-				delta_p2 = acosd(sind(delta_0) / Math.sqrt(1 - Math.pow(cosd(self.theta_0), 2) * Math.pow(sind(phi_p - self.phi_0), 2)));
-
-				// Choose the appropriate solution for delta_p
-				// Either	(1) Two solutions in range [-90, 90]
-				//			(2) One solution in range [-90, 90]
-				//			(3) No solutions in range [-90, 90]
-				sol1 = sol2 = false;
-				if (delta_p1 + delta_p2 >= -90 && delta_p1 + delta_p2 <= 90 ) {
-					sol1 = true;
-				}
-				if (delta_p1 - delta_p2 >= -90 && delta_p1 - delta_p2 <= 90 ) {
-					sol2 = true;
-				}
-				if (sol1 && sol2) {
-					dist1 = Math.abs(delta_p1 + delta_p2 - theta_p);
-					dist2 = Math.abs(delta_p1 - delta_p2 - theta_p);
-					if (dist1 < dist2) {
-						self.delta_p = delta_p1 + delta_p2;
-					} else {
-						self.delta_p = delta_p1 - delta_p2;
-					}
-				} else if (sol1) {
-					self.delta_p = delta_p1 + delta_p2;
-				} else if (sol2) {
-					self.delta_p = delta_p1 - delta_p2;
-				} else {
-					self.delta_p = theta_p;
-				}
-
-				// Compute alpha_p
-				if (Math.abs(delta_0) === 90) {
-					self.alpha_p = alpha_0;
-				} else {
-					self.alpha_p = alpha_0 - asind(sind(phi_p - self.phi_0) * cosd(self.theta_0) / cosd(delta_0));
-				}
+				compute_celestial_parameters(0, 0);
 
 				if (projection === 'CYP') {
 
@@ -557,8 +511,121 @@ function dms_to_dd(d, m, s) {
 						return [phi, theta];
 					};
 				}
+			} else if (conic.indexOf(projection) > -1) {
+
+				// Conic Projections
+				
+				// Determine theta_0 from PV parameters
+				if (typeof(json.pv) != 'undefined') {
+					compute_celestial_parameters(0, parseFloat(json.pv[0]));
+				} else {
+					throw new Error("Not enough information to compute WCS");
+				}
+
+				// Eta defaults to zero if not given
+				self.eta = typeof(json.pv[1]) != 'undefined' ? parseFloat(json.pv[1]) : 0;
+				
+				// Compute theta_1 and theta_2
+				self.theta_1 = self.theta_0 - self.eta;
+				self.theta_2 = self.theta_0 + self.eta;
+
+				if (projection === 'COP') {
+
+					self.C = sind(self.theta_0);
+					self.Y_0 = 180 * cosd(self.eta) / (Math.PI * tand(self.theta_0));
+
+					WCS.prototype.to_spherical = function (x, y) {
+						var r, theta_a_sign;
+
+						theta_a_sign = self.theta_0 < 0 ? -1 : 1; 
+						r = theta_a_sign * Math.sqrt(x*x + Math.pow(self.Y_0 - y, 2));
+						phi = atan2d(x / r , (self.Y_0 - y) / r) / self.C;
+						theta = self.theta_0 + atand(1 / atand(self.theta_0) - (Math.PI * r) / (180 * cosd(self.eta)));
+						console.log(phi, theta);
+						return [phi, theta];
+					}
+
+				} else if (projection === 'COE') {					
+					WCS.prototype.to_spherical = function (x, y) {
+						throw new Error('Sorry, not yet implemented!');
+					};
+				} else if (projection === 'COD') {
+					
+					self.C = (180 / Math.PI) * sind(self.theta_0) * sind(self.eta) / self.eta;
+					self.Y_0 = self.eta * (1 / tand(self.eta)) * (1 / tand(self.theta_0));
+					
+					WCS.prototype.to_spherical = function (x, y) {
+						var r, theta_a_sign;
+
+						theta_a_sign = self.theta_0 < 0 ? -1 : 1; 
+						r = theta_a_sign * Math.sqrt(x*x + Math.pow(self.Y_0 - y, 2));
+
+						phi = atan2d(x / r , (self.Y_0 - y) / r) / self.C;
+						theta = self.theta_0 + self.eta * (1 / tand(self.eta)) * (1 / tand(self.theta_0));
+
+						return [phi, theta];
+					};
+				} else if (projection === 'COO') {
+					WCS.prototype.to_spherical = function (x, y) {
+						throw new Error('Sorry, not yet implemented!');
+					};
+				}
+			} // Put check for Polyconic and pseudoconic projections here
+		}
+		
+		/**
+		 * Determine alpha_p and delta_p for correct rotation from spherical to celestial frame
+		 */
+		function compute_celestial_parameters(phi_0, theta_0) {
+			var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2, sol1, sol2, dist1, dist2, alpha_p, delta_p;
+			
+			self.phi_0 = phi_0;
+			self.theta_0 = theta_0;
+
+			alpha_0 = self.crval[0];
+			delta_0 = self.crval[1];
+			phi_p = self.lonpole;
+			theta_p = self.latpole;
+
+			// Compute delta_p
+			delta_p1 = atan2d(sind(self.theta_0), cosd(self.theta_0 * cosd(phi_p - self.phi_0)));
+			delta_p2 = acosd(sind(delta_0) / Math.sqrt(1 - Math.pow(cosd(self.theta_0), 2) * Math.pow(sind(phi_p - self.phi_0), 2)));
+
+			// Choose the appropriate solution for delta_p
+			// Either	(1) Two solutions in range [-90, 90]
+			//			(2) One solution in range [-90, 90]
+			//			(3) No solutions in range [-90, 90]
+			sol1 = sol2 = false;
+			if (delta_p1 + delta_p2 >= -90 && delta_p1 + delta_p2 <= 90 ) {
+				sol1 = true;
+			}
+			if (delta_p1 - delta_p2 >= -90 && delta_p1 - delta_p2 <= 90 ) {
+				sol2 = true;
+			}
+			if (sol1 && sol2) {
+				dist1 = Math.abs(delta_p1 + delta_p2 - theta_p);
+				dist2 = Math.abs(delta_p1 - delta_p2 - theta_p);
+				if (dist1 < dist2) {
+					self.delta_p = delta_p1 + delta_p2;
+				} else {
+					self.delta_p = delta_p1 - delta_p2;
+				}
+			} else if (sol1) {
+				self.delta_p = delta_p1 + delta_p2;
+			} else if (sol2) {
+				self.delta_p = delta_p1 - delta_p2;
+			} else {
+				self.delta_p = theta_p;
+			}
+
+			// Compute alpha_p
+			if (Math.abs(delta_0) === 90) {
+				self.alpha_p = alpha_0;
+			} else {
+				self.alpha_p = alpha_0 - asind(sind(phi_p - self.phi_0) * cosd(self.theta_0) / cosd(delta_0));
 			}
 		}
+		
 	};
 	
 	WCS.prototype = {
@@ -577,7 +644,7 @@ function dms_to_dd(d, m, s) {
 		},
 		
 		to_celestial: function (phi, theta) {
-			
+
 			var sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
 			var x_temp, y_temp, ra, dec;
 			
