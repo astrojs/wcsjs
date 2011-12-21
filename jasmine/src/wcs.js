@@ -281,6 +281,9 @@ function dms_to_dd(d, m, s) {
 					}
 				}
 			}
+			
+			// Inverse PC Matrix
+			self.pc_inv = self.matrixInverse(self.pc);
 
 			// TODO: Check the default values for lonpole and latpole ... will depend on the projection
 			self.lonpole = typeof(json.lonpole) != 'undefined' ? json.lonpole : 0;
@@ -395,6 +398,16 @@ function dms_to_dd(d, m, s) {
 						phi = atan2d(x, -y);
 
 						return [phi, theta];
+					};
+					
+					WCS.prototype.from_spherical = function (phi, theta) {
+						var r, x, y;
+
+						r = 180 / (Math.PI * tand(theta));
+						x = r * sind(phi);
+						y = -r * cosd(phi);
+
+						return [x, y];
 					};
 
 				} else if (projection === 'ZEA') {
@@ -541,7 +554,7 @@ function dms_to_dd(d, m, s) {
 						r = theta_a_sign * Math.sqrt(x*x + Math.pow(self.Y_0 - y, 2));
 						phi = atan2d(x / r , (self.Y_0 - y) / r) / self.C;
 						theta = self.theta_0 + atand(1 / atand(self.theta_0) - (Math.PI * r) / (180 * cosd(self.eta)));
-						console.log(phi, theta);
+
 						return [phi, theta];
 					}
 
@@ -638,10 +651,25 @@ function dms_to_dd(d, m, s) {
 				proj[i] = 0;
 				points[i] -= this.crpix[i];
 				for (j = 0; j < this.wcsaxes; j += 1) {
-					proj[i] += this.cdelt[i] * (this.pc[i][j] * points[j]);
+					proj[i] += this.cdelt[i] * this.pc[i][j] * points[j];
 				}
 			}
 			return proj;
+		},
+		
+		
+		from_intermediate: function (proj) {
+			var i, j, points;
+			points = [];
+			
+			for (i = 0; i < this.wcsaxes; i += 1) {
+				points[i] = 0;
+				for (j = 0; j < this.wcsaxes; j += 1) {
+					points[i] += this.pc_inv[i][j] * proj[j] / this.cdelt[i];
+				}
+				points[i] += this.crpix[i];
+			}
+			return points
 		},
 		
 		
@@ -668,6 +696,28 @@ function dms_to_dd(d, m, s) {
 	        return [ra, dec];
 		},
 		
+		
+		from_celestial: function (ra, dec) {
+			
+			var sin_delta, cos_delta, sin_dp, cos_dp, sin_d_alpha, cos_d_alpha, x_temp, y_temp, phi, theta;
+
+			sin_delta = sind(dec);
+			cos_delta = cosd(dec);
+			sin_dp = sind(this.delta_p);
+			cos_dp = cosd(this.delta_p);
+			sin_d_alpha = sind(ra - this.alpha_p);
+			cos_d_alpha = cosd(ra - this.alpha_p);
+			
+			x_temp = sin_delta * cos_dp - cos_delta * sin_dp * cos_d_alpha;
+			y_temp = -cos_delta * sin_d_alpha;
+
+			phi = this.lonpole + atan2d(y_temp, x_temp);
+			theta = asind(sin_delta * sin_dp + cos_delta * cos_dp * cos_d_alpha);
+
+			return [phi, theta];
+		},
+		
+		
 		pixelToCoordinate: function () {
 			var coords;
 			
@@ -678,20 +728,105 @@ function dms_to_dd(d, m, s) {
 			return {ra: coords[0], dec: coords[1]};
 		},
 		
-		from_intermediate: function () {
-			var x1, x2, p1, p2;
-			x1 = arguments[0];
-			x2 = arguments[1];
-		},
-		
-		from_celestial: function (points) {
-			
-		},
 		
 		coordinateToPixel: function () {
+			var coords;
 			
-		}
+			coords = this.from_celestial(arguments[0], arguments[1]);
+			coords = this.from_spherical(coords[0], coords[1]);
+			coords = this.from_intermediate(coords);
+			
+			return {x: coords[0], y: coords[1]};
+		},
 		
+		
+		matrixInverse: function (mat) {
+			var w, h, I, inv, temp, i, j;
+			w = mat[0].length;
+			h = mat.length;
+			I = new Array(h);
+			inv = new Array(h);
+			temp = [];
+			
+			// Initialize an identity matrix of the correct dimensions
+			for (j = 0; j < h; j +=1 ) {
+				I[j] = new Array(w);
+				inv[j] = new Array(w);
+				for (i = 0; i < w; i += 1) {
+					I[j][i] = i === j ? 1 : 0;
+				}
+				
+				// Append the identity matrix to the original matrix
+				temp[j] = mat[j].concat(I[j]);
+			}
+			
+			// Gauss-Jordan
+			this.gaussJordan(mat);
+			
+			for (j = 0; j < h; j += 1) {
+				inv[j] = temp[j].slice(w, 2*w);
+			}
+			return inv;
+		},
+		
+		
+		gaussJordan: function (m, eps) {
+			if (!eps) eps = 1e-10;
+			var h, w, y, y2, x, maxrow, tmp, c;
+			h = m.length;
+			w = m[0].length;
+			y = -1;
+			
+			while (++y < h) {
+				maxrow = y;
+		
+				// Find max pivot.
+				y2 = y;
+				while (++y2 < h) {
+					if (Math.abs(m[y2][y]) > Math.abs(m[maxrow][y]))
+						maxrow = y2;
+				}
+		
+				// Swap.
+				tmp = m[y];
+				m[y] = m[maxrow];
+				m[maxrow] = tmp;
+		
+				// Singular?
+				if (Math.abs(m[y][y]) <= eps)
+					return false;
+		
+				// Eliminate column y.
+				y2 = y;
+				while (++y2 < h) {
+					c = m[y2][y] / m[y][y];
+					x = y - 1;
+					while (++x < w) {
+						m[y2][x] -= m[y][x] * c;
+					}
+				}
+			}
+			
+			// Backsubstitute.
+			y = h;
+			while (--y >= 0) {
+				c = m[y][y];
+				y2 = -1;
+				while (++y2 < y) {
+					x = w;
+					while (--x >= y) {
+						m[y2][x] -=  m[y][x] * m[y2][y] / c;
+					}
+				}
+				m[y][y] /= c;
+				// Normalize row y.
+				x = h - 1;
+				while (++x < w) {
+					m[y][x] /= c;
+				}
+			}
+			return true;
+		}
 	};
 
 	self.WCS = WCS;

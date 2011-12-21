@@ -102,6 +102,60 @@ describe ("Compute the sine in units of degrees", function () {
 	});
 });
 
+describe ("pixels to projection plane coordinates and back", function () {
+	
+	it ("pixels to projection plane", function () {
+		var pixels;
+		pixels = [50, 40];
+		
+		wcs = new WCS(tan);
+		proj = wcs.to_intermediate(pixels);
+		expect(proj[0]).toBeCloseTo(-21.271053914143966, 8);
+		expect(proj[1]).toBeCloseTo(2.7708695813419855, 8);
+	});
+	
+	it ("projection plane to pixels", function () {
+		var proj;
+		proj = [-21.271053914143966, 2.7708695813419855];
+		wcs = new WCS(tan);
+		pixels = wcs.from_intermediate(proj);
+		expect(pixels[0]).toBeCloseTo(50, 8);
+		expect(pixels[1]).toBeCloseTo(40, 8);
+	});
+
+});
+
+describe ("sky to pixel transformations", function () {
+	
+	//
+	// Zenithal Projections
+	//
+	it ("TAN Projection", function () {
+		var wcs, pixels, sky, i, coords;
+		pixels = [];
+		sky = [];
+
+		pixels.push([0.0, 0.0]);
+		pixels.push([191.0, 0.0]);
+		pixels.push([0.0, 191.0]);
+		pixels.push([191.0, 191.0]);
+		pixels.push([95.5, 95.5]);
+		
+		sky.push([270.33283605009, -72.61583231845]);
+		sky.push([270.19465794261, -61.83923481247]);
+		sky.push([305.59026284675, -68.94388297928]);
+		sky.push([292.71201278074, -59.87298900275]);
+		sky.push([284.90874458094, -66.30003124798]);
+
+		wcs = new WCS(tan);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
+			expect(coords.y).toBeCloseTo(pixels[i][1], 8);
+		}
+	});
+	
+});
 
 describe ("pixel to sky transformations", function () {
 
