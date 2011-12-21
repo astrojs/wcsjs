@@ -666,15 +666,26 @@ function dms_to_dd(d, m, s) {
 	        return [ra, dec];
 		},
 		
-		pix_to_sky: function (points) {
+		pixelToCoordinate: function (points) {
+			
 			var coords;
-
+		
 			coords = this.to_intermediate(points);
 			coords = this.to_spherical(coords[0], coords[1]);
 			coords = this.to_celestial(coords[0], coords[1]);
-
+		
 			return coords;
-		}
+		},
+		
+		// pixelToCoordinate: function () {
+		// 	var coords;
+		// 	
+		// 	coords = this.to_intermediate(arguments[0], arguments[1]);
+		// 	coords = this.to_spherical(coords[0], coords[1]);
+		// 	coords = this.to_celestial(coords[0], coords[1]);
+		// 	
+		// 	return {ra: coords[0], dec: coords[1]};
+		// }
 	};
 
 	self.WCS = WCS;
