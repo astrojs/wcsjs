@@ -160,15 +160,14 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(arc);
 		for (i = 0; i < pixels.length; i += 1) {
-			// coords = wcs.pixelToCoordinate(pixels[i]);
-			// expect(coords.ra).toBeCloseTo(sky[i][0], 5);
-			// expect(coords.ra).toBeCloseTo(sky[i][1], 5);
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 5);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("SIN Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -186,12 +185,14 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(sin);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 	
 	it ("STG Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -209,12 +210,14 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(stg);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});	
 	
 	it ("TAN Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -232,12 +235,14 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(tan);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("ZEA Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -255,7 +260,9 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(zea);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
@@ -263,7 +270,7 @@ describe ("pixel to sky transformations", function () {
 	// Cylindrical Projections
 	//
 	it ("CYP Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -281,12 +288,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(cyp);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("CEA Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -304,12 +313,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(cea);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("CAR Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -327,12 +338,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(car);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("MER Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -350,12 +363,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(mer);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("SFL Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -373,12 +388,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(sfl);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("PAR Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -396,12 +413,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(par);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("MOL Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -419,12 +438,14 @@ describe ("pixel to sky transformations", function () {
 		
 		wcs = new WCS(mol);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 
 	it ("AIT Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -442,7 +463,9 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(ait);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 	
@@ -450,7 +473,7 @@ describe ("pixel to sky transformations", function () {
 	// Conic Projections
 	//
 	it ("COP Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -468,12 +491,14 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(cop);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
 	
 	it ("COD Projection", function () {
-		var wcs, pixels, sky, i;
+		var wcs, pixels, sky, i, coords;
 		pixels = [];
 		sky = [];
 
@@ -491,9 +516,10 @@ describe ("pixel to sky transformations", function () {
 
 		wcs = new WCS(cod);
 		for (i = 0; i < pixels.length; i += 1) {
-			expect(wcs.pixelToCoordinate(pixels[i])).toBeCloseToElementwise(sky[i], 8);
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
+			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});	
-	
 	
 });

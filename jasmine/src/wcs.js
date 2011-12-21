@@ -319,7 +319,7 @@ function dms_to_dd(d, m, s) {
 					var r, theta, phi, eta, eta_b;
 
 					// Airy projection requires an additional parameter from the FITS header
-					self.theta_b = parseFloat(json.pv2_1);
+					self.theta_b = parseFloat(json.pv[3]);
 
 					eta = (self.theta_0 - theta) / 2;
 					eta_b = (self.theta_0 - theta_b) / 2;
@@ -631,17 +631,19 @@ function dms_to_dd(d, m, s) {
 	WCS.prototype = {
 		
 		to_intermediate: function (points) {
-			var i, proj;
+			var i, j, proj;
+			proj = [];
 
 			for (i = 0; i < this.wcsaxes; i += 1) {
+				proj[i] = 0;
 				points[i] -= this.crpix[i];
+				for (j = 0; j < this.wcsaxes; j += 1) {
+					proj[i] += this.cdelt[i] * (this.pc[i][j] * points[j]);
+				}
 			}
-			proj = [];
-			proj.push(this.cdelt[0] * (this.pc[0][0] * points[0] + this.pc[0][1] * points[1]));
-			proj.push(this.cdelt[1] * (this.pc[1][0] * points[0] + this.pc[1][1] * points[1]));
-
 			return proj;
 		},
+		
 		
 		to_celestial: function (phi, theta) {
 
@@ -666,26 +668,30 @@ function dms_to_dd(d, m, s) {
 	        return [ra, dec];
 		},
 		
-		pixelToCoordinate: function (points) {
-			
+		pixelToCoordinate: function () {
 			var coords;
-		
-			coords = this.to_intermediate(points);
+			
+			coords = this.to_intermediate(arguments[0], arguments[1]);
 			coords = this.to_spherical(coords[0], coords[1]);
 			coords = this.to_celestial(coords[0], coords[1]);
-		
-			return coords;
+			
+			return {ra: coords[0], dec: coords[1]};
 		},
 		
-		// pixelToCoordinate: function () {
-		// 	var coords;
-		// 	
-		// 	coords = this.to_intermediate(arguments[0], arguments[1]);
-		// 	coords = this.to_spherical(coords[0], coords[1]);
-		// 	coords = this.to_celestial(coords[0], coords[1]);
-		// 	
-		// 	return {ra: coords[0], dec: coords[1]};
-		// }
+		from_intermediate: function () {
+			var x1, x2, p1, p2;
+			x1 = arguments[0];
+			x2 = arguments[1];
+		},
+		
+		from_celestial: function (points) {
+			
+		},
+		
+		coordinateToPixel: function () {
+			
+		}
+		
 	};
 
 	self.WCS = WCS;
