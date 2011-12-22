@@ -1,0 +1,1 @@
+{"crpix": [0, 0], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [1, 1], "naxis": [4096, 4096], "pc": [-5.55708330831e-05, 1.11959582126e-08, 9.18369938606e-09, 5.55720401646e-05], "ctype": ["RA---TAN-SIP", "DEC--TAN-SIP"], "crval": [22.1138832621, -0.113243269967], "restfrq": 0, "cunit": ["deg", "deg"], "latpole": -0.113243269967, "radesys": "FK5", "restwav": 0}

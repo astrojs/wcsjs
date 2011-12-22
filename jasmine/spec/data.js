@@ -1,4 +1,4 @@
-var air, arc, azp, ncp, sin, stg, szp, tan, zea, zpn;
+var air, arc, azp, ncp, sin, stg, szp, tan, tan_sip, zea, zpn;
 var ait, car, cea, cyp, mer, mol, par, sfl;
 var cop;
 
@@ -31,6 +31,8 @@ szp = {"crpix": [-247.865697278, -22.6205195637], "equinox": 2000, "pv": [2, 180
 tan = {"crpix": [-268.065808712, -0.563043720109], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---TAN", "DEC--TAN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
 
 tan_flat = {"CRPIX1": -268.065808712, "CRPIX2": -0.563043720109, "EQUINOX": 2000, "WCSAXES": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS": 2, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---TAN", "CTYPE2": "DEC--TAN", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0}
+
+tan_sip = {"crpix": [0, 0], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [1, 1], "naxis": [4096, 4096], "pc": [-5.55708330831e-05, 1.11959582126e-08, 9.18369938606e-09, 5.55720401646e-05], "ctype": ["RA---TAN-SIP", "DEC--TAN-SIP"], "crval": [22.1138832621, -0.113243269967], "restfrq": 0, "cunit": ["deg", "deg"], "latpole": -0.113243269967, "radesys": "FK5", "restwav": 0}
 
 // Zenithal equal area
 zea = {"crpix": [-244.488069036, 5.73805594999], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ZEA", "DEC--ZEA"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
