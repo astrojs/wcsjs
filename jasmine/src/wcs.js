@@ -45,6 +45,21 @@
 	
 	WCS.Mapper = function (hdr) {
 		
+<<<<<<< HEAD
+		// Yea, it's a self referential object
+		var self = this;
+       
+        var wcsobj = {};
+        // WCS object to hold FITS keywords relevant to WCS
+        WCS.prototype.wcsobj = wcsobj;
+		
+		// Parse a JSON object for WCS data
+		verify_json(wcsobj, hdr);
+		
+		// Set the projection
+		set_projection(wcsobj, hdr);
+		
+=======
 		// Create reference to the Mapper object
 		var obj = this;		
 		
@@ -53,6 +68,7 @@
 
 		// Set the projection
 		set_projection(hdr);
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 
 		/**
 		 * Verify that the JSON passed to the WCS object contains the
@@ -60,8 +76,67 @@
 		 * 
 		 * TODO: Handle CROTA and CD keywords, derive PC matrix from these
 		 */
-		function verify_json (json) {
+		function verify_json (wcsobj, json) {
 			var i, unit, type, crota2, lambda, cd_det, cd_sign;
+<<<<<<< HEAD
+			
+            // FITS single keywords to copy
+            var singlekw = ['NAXIS', 'RADESYS'];
+            // Required FITS single keywords
+            var singlekw_req = ['NAXIS']
+            
+            // FITS Axis keywords to copy (1 keyword per axis, eg: CTYPE1, CTYPE2, ...
+            var axiskw = ['NAXIS', 'CTYPE', 'CDELT', 'CRPIX', 'CRVAL', 'CUNIT'];
+            // Required FITS axis keywords
+            var axiskw_req = ['NAXIS', 'CTYPE', 'CDELT', 'CRPIX', 'CRVAL', 'CUNIT'];
+
+
+        	// Check for REQUIRED single keywords, error if not found.
+            for (var i=0; i<singlekw_req.length; i++) {
+                var k = singlekw_req[i];
+                if (!json.hasOwnProperty(k)) {
+                    throw new Error("Not enough information to compute WCS: missing required keyword: " + k);
+                }
+            }
+
+            // Copy single keywords
+            for (var i=0; i<singlekw.length; i++) {
+                var k = singlekw[i];
+                if (json.hasOwnProperty(k)) {
+                    wcsobj[k] = json[k];
+                }
+            }
+
+
+            // Check for REQUIRED axis keywords, error if not found
+            for (var axis=1; axis<=wcsobj.NAXIS; axis++) {
+                for (var i=0; i<axiskw_req.length; i++) {
+                    var k = axiskw_req[i] + axis;
+                    if (!json.hasOwnProperty(k)) {
+                        throw new Error("Not enough information to compute WCS: missing required keyword: " + k);
+                    }
+                }
+            }
+
+            // Copy axis keywords to wcsobj
+            for (var axis=1; axis<=wcsobj.NAXIS; axis++) {
+                for (var i=0; i<axiskw.length; i++) {
+                    var k = axiskw[i] + axis;
+                    if (json.hasOwnProperty(k)) {
+                        wcsobj[k] = json[k];
+                    }
+                    // Adds to array in wcsobj with lowercase name
+                    var arrayname = axiskw[i].toLowerCase();
+                    if (!wcsobj.hasOwnProperty(arrayname)) {
+                        wcsobj[arrayname] = [];
+                    }
+                    wcsobj[arrayname].push(json[k]);
+                }
+            }
+            
+            /*
+             * The following errors are for axis keywords, I just made them required.
+=======
 
 			// Assume 2 dimensional image if WCSAXES not given
 			obj.wcsaxes = typeof(json.wcsaxes) != 'undefined' ? parseInt(json.wcsaxes) : 2;
@@ -76,18 +151,42 @@
 			if (typeof(json.cdelt) === 'undefined') {
 				throw new Error("Not enough information to compute WCS");
 			}
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 			if (typeof(json.cunit) === 'undefined') {
 				console.log("Assuming units of degrees");
 			}
 			if (typeof(json.ctype) === 'undefined') {
 				console.log("Assuming a Gnomonic (TAN) projection");
 			}
-			if (typeof(json.crval) === 'undefined') {
-				throw new Error("Not enough information to compute WCS");
-			}
-			if (typeof(json.equinox) === 'undefined') {
+            */
+
+			if (typeof(json.EQUINOX) === 'undefined') {
 				console.log("Assuming 2000");
 			}
+<<<<<<< HEAD
+	
+            // TODO: Check the default values for lonpole and latpole ... will depend on the projection
+			wcsobj.LONPOLE = typeof(json.LONPOLE) != 'undefined' ? json.LONPOLE : 0;
+			wcsobj.LATPOLE = typeof(json.LATPOLE) != 'undefined' ? json.LATPOLE : 0;
+			wcsobj.EQUINOX = typeof(json.EQUINOX) != 'undefined' ? json.EQUINOX : 2000;
+			wcsobj.DATE_OBS = typeof(json.DATE_OBS) != 'undefined' ? json.DATE_OBS : "";
+		
+            /* TODO: assume "deg" if cunit not given? Now CUNIT is required.
+            unit = typeof(json.cunit[i]) != 'undefined' ? json.cunit[i] : "deg";
+            */
+            
+            /* TODO: assume ra, dec, tan if ctype not given? Now CTYPE is required.
+			type = typeof(json.ctype) != 'undefined' ? json.ctype[i] : i === 0 ? "RA---TAN" : "DEC--TAN";
+			self.ctype.push(type);
+			self.crval.push(json.crval[i]);
+			*/
+
+            // TODO: Fix so PC and CD values can be parsed from flat header object
+			// PC Matrix
+			// TODO: Compute from CD matrix if given.
+			if (typeof(json.pc) != 'undefined') {
+				wcsobj.pc = [ [parseFloat(json.pc[0]), parseFloat(json.pc[1])], [parseFloat(json.pc[2]), parseFloat(json.pc[3])] ];
+=======
 
 			obj.naxis = [];
 			obj.crpix = [];
@@ -110,6 +209,7 @@
 			// TODO: Compute from CD matrix if given.
 			if (typeof(json.pc) != 'undefined') {
 				obj.pc = [ [parseFloat(json.pc[0]), parseFloat(json.pc[1])], [parseFloat(json.pc[2]), parseFloat(json.pc[3])] ];
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 			} else {
 				// Check for CROTA2
 				if (typeof(json.crota2) === 'undefined') {
@@ -117,6 +217,16 @@
 						// Compute CROTA2 from the CD matrix
 						cd_det = parseFloat(json.cd[0]) * parseFloat(json.cd[1]) - parseFloat(json.cd[2]) * parseFloat(json.cd[3]);
 						cd_sign = cd_det < 0 ? -1 : 1;
+<<<<<<< HEAD
+						wcsobj.cdelt[0] = Math.sqrt(Math.abs(cd_det)) * cd_sign;
+						wcsobj.cdelt[1] = Math.sqrt(Math.abs(cd_det));
+						crota2 = atand2(-1 * parseFloat(json.cd[1]), parseFloat(json.cd[3]));
+						lambda = wcsobj.cdelt[1] / wcsobj.cdelt[0];
+						wcsobj.pc = [ [cosd(crota2), -1 * lambda * sind(crota2)], [sind(crota2) / lambda, cosd(crota2)] ];
+					} else {
+						// Assume the PC matrix to be identity
+						wcsobj.pc = [ [1, 0], [0, 1] ];
+=======
 						obj.cdelt[0] = Math.sqrt(Math.abs(cd_det)) * cd_sign;
 						obj.cdelt[1] = Math.sqrt(Math.abs(cd_det));
 						crota2 = atand2(-1 * parseFloat(json.cd[1]), parseFloat(json.cd[3]));
@@ -125,11 +235,16 @@
 					} else {
 						// Assume the PC matrix to be identity
 						obj.pc = [ [1, 0], [0, 1] ];
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 					}
 				}
 			}
 
 			// Inverse PC Matrix
+<<<<<<< HEAD
+			wcsobj.pc_inv = self.matrixInverse(wcsobj.pc);
+
+=======
 			obj.pc_inv = WCS.Math.matrixInverse(obj.pc);
 
 			// TODO: Check the default values for lonpole and latpole ... will depend on the projection
@@ -137,6 +252,7 @@
 			obj.latpole = typeof(json.latpole) != 'undefined' ? json.latpole : 0;
 			obj.equinox = typeof(json.equinox) != 'undefined' ? json.equinox : 2000;
 			obj.date_obs = typeof(json.date_obs) != 'undefined' ? json.date_obs : "";
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 		}
 
 		/**
@@ -144,7 +260,7 @@
 		 * 
 		 * TODO: Clean up the variables, some object attributes are not needed.
 		 */
-		function set_projection (json) {
+		function set_projection (wcsobj, json) {
 			var zenithal, cylindrical, conic, poly_conic, quad_cube, projection;
 
 			// Projections
@@ -155,6 +271,17 @@
 			quad_cube = ['TSC', 'CSC', 'QSC'];
 
 			// Store the projection
+<<<<<<< HEAD
+			projection = wcsobj.ctype[0].slice(5);
+			
+			if (zenithal.indexOf(projection) > -1) {
+
+				// Zenithal Projections
+				self.phi_0 = 0;
+				self.theta_0 = 90;
+				self.alpha_p = wcsobj.crval[0];
+				self.delta_p = wcsobj.crval[1];
+=======
 			projection = obj.ctype[0].slice(5);
 
 			if (zenithal.indexOf(projection) > -1) {
@@ -164,6 +291,7 @@
 				obj.theta_0 = 90;
 				obj.alpha_p = obj.crval[0];
 				obj.delta_p = obj.crval[1];
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 
 				if (projection === 'AIR') {
 					var r, theta, phi, eta, eta_b;
@@ -449,6 +577,12 @@
 		function compute_celestial_parameters(phi_0, theta_0) {
 			var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2, sol1, sol2, dist1, dist2, alpha_p, delta_p;
 
+<<<<<<< HEAD
+			alpha_0 = wcsobj.crval[0];
+			delta_0 = wcsobj.crval[1];
+			phi_p = wcsobj.LONPOLE;
+			theta_p = wcsobj.LATPOLE;
+=======
 			obj.phi_0 = phi_0;
 			obj.theta_0 = theta_0;
 
@@ -456,6 +590,7 @@
 			delta_0 = obj.crval[1];
 			phi_p = obj.lonpole;
 			theta_p = obj.latpole;
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 
 			// Compute delta_p
 			delta_p1 = WCS.Math.atan2d(WCS.Math.sind(obj.theta_0), WCS.Math.cosd(obj.theta_0 * WCS.Math.cosd(phi_p - obj.phi_0)));
@@ -502,12 +637,14 @@
 		to_intermediate: function (points) {
 			var i, j, proj;
 			proj = [];
-
-			for (i = 0; i < this.wcsaxes; i += 1) {
+            var wcsobj = this.wcsobj;
+			
+            for (i = 0; i < wcsobj.NAXIS; i += 1) {
 				proj[i] = 0;
-				points[i] -= this.crpix[i];
-				for (j = 0; j < this.wcsaxes; j += 1) {
-					proj[i] += this.cdelt[i] * this.pc[i][j] * points[j];
+                // -1 to make 0-based index
+				points[i] -= wcsobj.crpix[i] - 1;
+				for (j = 0; j < wcsobj.NAXIS; j += 1) {
+					proj[i] += wcsobj.cdelt[i] * wcsobj.pc[i][j] * points[j];
 				}
 			}
 			return proj;
@@ -517,13 +654,20 @@
 		from_intermediate: function (proj) {
 			var i, j, points;
 			points = [];
+<<<<<<< HEAD
+            var wcsobj = this.wcsobj;
+			
+            for (i = 0; i < wcsobj.NAXIS; i += 1) {
+=======
 
 			for (i = 0; i < this.wcsaxes; i += 1) {
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 				points[i] = 0;
-				for (j = 0; j < this.wcsaxes; j += 1) {
-					points[i] += this.pc_inv[i][j] * proj[j] / this.cdelt[i];
+				for (j = 0; j < wcsobj.NAXIS; j += 1) {
+					points[i] += wcsobj.pc_inv[i][j] * proj[j] / wcsobj.cdelt[i];
 				}
-				points[i] += this.crpix[i];
+                // -1 to make 0-based index
+				points[i] += wcsobj.crpix[i] - 1;
 			}
 			return points
 		},
@@ -533,6 +677,19 @@
 
 			var sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
 			var x_temp, y_temp, ra, dec;
+<<<<<<< HEAD
+            var wcsobj = this.wcsobj;
+			
+			sin_theta = sind(theta);
+			cos_theta = cosd(theta);
+			
+			sin_dp = sind(this.delta_p);
+			cos_dp = cosd(this.delta_p);
+			
+			sin_dphi = sind(phi - wcsobj.LONPOLE);
+			cos_dphi = cosd(phi - wcsobj.LONPOLE);
+			
+=======
 
 			sin_theta = WCS.Math.sind(theta);
 			cos_theta = WCS.Math.cosd(theta);
@@ -543,6 +700,7 @@
 			sin_dphi = WCS.Math.sind(phi - this.lonpole);
 			cos_dphi = WCS.Math.cosd(phi - this.lonpole);
 
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 			x_temp = sin_theta * cos_dp - cos_theta * sin_dp * cos_dphi;
 			y_temp = -cos_theta * sin_dphi;
 			ra = this.alpha_p + WCS.Math.atan2d(y_temp, x_temp);
@@ -556,6 +714,7 @@
 		from_celestial: function (ra, dec) {
 
 			var sin_delta, cos_delta, sin_dp, cos_dp, sin_d_alpha, cos_d_alpha, x_temp, y_temp, phi, theta;
+            var wcsobj = this.wcsobj;
 
 			sin_delta = WCS.Math.sind(dec);
 			cos_delta = WCS.Math.cosd(dec);
@@ -567,8 +726,13 @@
 			x_temp = sin_delta * cos_dp - cos_delta * sin_dp * cos_d_alpha;
 			y_temp = -cos_delta * sin_d_alpha;
 
+<<<<<<< HEAD
+			phi = wcsobj.LONPOLE + atan2d(y_temp, x_temp);
+			theta = asind(sin_delta * sin_dp + cos_delta * cos_dp * cos_d_alpha);
+=======
 			phi = this.lonpole + WCS.Math.atan2d(y_temp, x_temp);
 			theta = WCS.Math.asind(sin_delta * sin_dp + cos_delta * cos_dp * cos_d_alpha);
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
 
 			return [phi, theta];
 		},
@@ -595,5 +759,10 @@
 			return {x: coords[0], y: coords[1]};
 		},
 
+<<<<<<< HEAD
+	self.WCS = WCS;
+}());
+=======
 	};
 }).call(this);
+>>>>>>> bea9b0fe2bd2c1686c20f1ec69bff57cd4fd2f3a
