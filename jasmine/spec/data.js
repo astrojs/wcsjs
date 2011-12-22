@@ -28,7 +28,7 @@ stg = {"crpix": [-251.945990929, 3.74494253774], "equinox": 2000, "wcsaxes": 2, 
 szp = {"crpix": [-247.865697278, -22.6205195637], "equinox": 2000, "pv": [2, 180, 60], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SZP", "DEC--SZP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
 
 // Gnomonic
-tan = {"crpix": [-268.065808712, -0.563043720109], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---TAN", "DEC--TAN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
+tan = {"crpix": [-268.065808712, -0.563043720109], "equinox": 2000, "naxis": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---TAN", "DEC--TAN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
 
 tan_flat = {"CRPIX1": -268.065808712, "CRPIX2": -0.563043720109, "EQUINOX": 2000, "WCSAXES": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS": 2, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---TAN", "CTYPE2": "DEC--TAN", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0};
 
