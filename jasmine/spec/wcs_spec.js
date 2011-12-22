@@ -1,15 +1,24 @@
 
+describe ("initialize WCS Mapper object", function () {
+	
+	it ("should initialize a WCS Mapper object", function () {
+		var wcs;
+		wcs = new WCS.Mapper(tan);
+		console.log(wcs);
+	});
+});
+
 describe ("unit conversion", function () {
 
 	var value_deg = 180;
 	var value_rad = Math.PI;
 	
 	it ("converts degrees to radians", function () {
-		expect(value_deg * D2R).toEqual(value_rad);
+		expect(value_deg * WCS.Math.D2R).toEqual(value_rad);
 	});
 	
 	it ("converts radians to degrees", function () {
-		expect(value_rad * R2D).toEqual(value_deg);
+		expect(value_rad * WCS.Math.R2D).toEqual(value_deg);
 	});
 });
 
@@ -18,42 +27,42 @@ describe ("Compute the cosine in units of degrees", function () {
 	
 	it ("cosine of 0 degrees", function () {
 		angle = 0;
-		expect(cosd(angle)).toEqual(1);
+		expect(WCS.Math.cosd(angle)).toEqual(1);
 	});
 	
 	it ("cosine of 90 degrees", function () {
 		angle = 90;
-		expect(cosd(angle)).toEqual(0);
+		expect(WCS.Math.cosd(angle)).toEqual(0);
 	});
 	
 	it ("cosine of 180 degrees", function () {
 		angle = 180;
-		expect(cosd(angle)).toEqual(-1);
+		expect(WCS.Math.cosd(angle)).toEqual(-1);
 	});
 	
 	it ("cosine of 270 degrees", function () {
 		angle = 270;
-		expect(cosd(angle)).toEqual(0);
+		expect(WCS.Math.cosd(angle)).toEqual(0);
 	});
 	
 	it ("cosine of angle in the first quadrant", function () {
 		angle = 45;
-		expect(cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+		expect(WCS.Math.cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
 	});
 	
 	it ("cosine of angle in the second quadrant", function () {
 		angle = 135;
-		expect(cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+		expect(WCS.Math.cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
 	});
 	
 	it ("cosine of angle in the third quadrant", function () {
 		angle = 225;
-		expect(cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+		expect(WCS.Math.cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
 	});
 	
 	it ("cosine of angle in the fourth quadrant", function () {
 		angle = 315;
-		expect(cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+		expect(WCS.Math.cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
 	});
 });
 
@@ -63,42 +72,42 @@ describe ("Compute the sine in units of degrees", function () {
 	
 	it ("sine of 0 degrees", function () {
 		angle = 0;
-		expect(sind(angle)).toEqual(0);
+		expect(WCS.Math.sind(angle)).toEqual(0);
 	});
 	
 	it ("sine of 90 degrees", function () {
 		angle = 90;
-		expect(sind(angle)).toEqual(1);
+		expect(WCS.Math.sind(angle)).toEqual(1);
 	});
 	
 	it ("sine of 180 degrees", function () {
 		angle = 180;
-		expect(sind(angle)).toEqual(0);
+		expect(WCS.Math.sind(angle)).toEqual(0);
 	});
 	
 	it ("sine of 270 degrees", function () {
 		angle = 270;
-		expect(sind(angle)).toEqual(-1);
+		expect(WCS.Math.sind(angle)).toEqual(-1);
 	});
 	
 	it ("sine of angle in the first quadrant", function () {
 		angle = 45;
-		expect(sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+		expect(WCS.Math.sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
 	});
 	
 	it ("sine of angle in the second quadrant", function () {
 		angle = 135;
-		expect(sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+		expect(WCS.Math.sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
 	});
 	
 	it ("sine of angle in the third quadrant", function () {
 		angle = 225;
-		expect(sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+		expect(WCS.Math.sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
 	});
 	
 	it ("sine of angle in the fourth quadrant", function () {
 		angle = 315;
-		expect(sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+		expect(WCS.Math.sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
 	});
 });
 
@@ -108,7 +117,7 @@ describe ("pixels to projection plane coordinates and back", function () {
 		var pixels;
 		pixels = [50, 40];
 		
-		wcs = new WCS(tan);
+		wcs = new WCS.Mapper(tan);
 		proj = wcs.to_intermediate(pixels);
 		expect(proj[0]).toBeCloseTo(-21.271053914143966, 8);
 		expect(proj[1]).toBeCloseTo(2.7708695813419855, 8);
@@ -117,7 +126,7 @@ describe ("pixels to projection plane coordinates and back", function () {
 	it ("projection plane to pixels", function () {
 		var proj;
 		proj = [-21.271053914143966, 2.7708695813419855];
-		wcs = new WCS(tan);
+		wcs = new WCS.Mapper(tan);
 		pixels = wcs.from_intermediate(proj);
 		expect(pixels[0]).toBeCloseTo(50, 8);
 		expect(pixels[1]).toBeCloseTo(40, 8);
@@ -130,6 +139,31 @@ describe ("sky to pixel transformations", function () {
 	//
 	// Zenithal Projections
 	//
+	it ("ARC Projection", function() {
+		var wcs, pixels, sky, i, coords;
+		pixels = [];
+		sky = [];
+		
+		pixels.push([0.0, 0.0]);
+		pixels.push([191.0, 0.0]);
+		pixels.push([0.0, 191.0]);
+		pixels.push([191.0, 191.0]);
+		pixels.push([95.5, 95.5]);
+
+		sky.push([269.05673077774, -73.46829958535]);
+		sky.push([269.46714963295, -60.73594102637]);
+		sky.push([307.01180433182, -69.29965938607]);
+		sky.push([293.06610193764, -58.19446383811]);
+		sky.push([284.90543739577, -66.30663097651]);
+
+		wcs = new WCS.Mapper(arc);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
+			expect(coords.y).toBeCloseTo(pixels[i][1], 8);
+		}
+	});
+	
 	it ("TAN Projection", function () {
 		var wcs, pixels, sky, i, coords;
 		pixels = [];
@@ -147,7 +181,7 @@ describe ("sky to pixel transformations", function () {
 		sky.push([292.71201278074, -59.87298900275]);
 		sky.push([284.90874458094, -66.30003124798]);
 
-		wcs = new WCS(tan);
+		wcs = new WCS.Mapper(tan);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
 			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
@@ -212,7 +246,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.06610193764, -58.19446383811]);
 		sky.push([284.90543739577, -66.30663097651]);
 
-		wcs = new WCS(arc);
+		wcs = new WCS.Mapper(arc);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -237,7 +271,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.24065113325, -57.07877059966]);
 		sky.push([284.90376923726, -66.31039234200]);
 
-		wcs = new WCS(sin);
+		wcs = new WCS.Mapper(sin);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -262,7 +296,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([292.97934645515, -58.65820590407]);
 		sky.push([284.90625709548, -66.30490865995]);
 
-		wcs = new WCS(stg);
+		wcs = new WCS.Mapper(stg);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -287,7 +321,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([292.71201278074, -59.87298900275]);
 		sky.push([284.90874458094, -66.30003124798]);
 
-		wcs = new WCS(tan);
+		wcs = new WCS.Mapper(tan);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -312,7 +346,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.10932896827, -57.94570137254]);
 		sky.push([284.90502664962, -66.30752029696]);
 
-		wcs = new WCS(zea);
+		wcs = new WCS.Mapper(zea);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -340,7 +374,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([294.10767800687, -55.63518650347]);
 		sky.push([284.89605048654, -66.32061940296]);
 		
-		wcs = new WCS(cyp);
+		wcs = new WCS.Mapper(cyp);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -365,7 +399,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([294.13191054912, -58.36209566279]);
 		sky.push([284.90109941802, -66.30599022330]);
 		
-		wcs = new WCS(cea);
+		wcs = new WCS.Mapper(cea);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -390,7 +424,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.97962362308, -58.39244690857]);
 		sky.push([284.90153565747, -66.30594750654]);
 		
-		wcs = new WCS(car);
+		wcs = new WCS.Mapper(car);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -415,7 +449,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.83175889043, -58.42169429877]);
 		sky.push([284.90196957302, -66.30590501598]);
 		
-		wcs = new WCS(mer);
+		wcs = new WCS.Mapper(mer);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -440,7 +474,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.61495994868, -57.87845261548]);
 		sky.push([284.90245830848, -66.30746896901]);
 		
-		wcs = new WCS(sfl);
+		wcs = new WCS.Mapper(sfl);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -465,7 +499,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.18212343779, -58.05648713597]);
 		sky.push([284.90591012398, -66.30689603965]);
 		
-		wcs = new WCS(par);
+		wcs = new WCS.Mapper(par);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -490,7 +524,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([292.26796386222, -57.66494958439]);
 		sky.push([284.91211049555, -66.30961122414]);
 		
-		wcs = new WCS(mol);
+		wcs = new WCS.Mapper(mol);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -515,7 +549,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([293.58502491896, -57.98593060648]);
 		sky.push([284.90284110443, -66.30720454723]);
 
-		wcs = new WCS(ait);
+		wcs = new WCS.Mapper(ait);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -543,7 +577,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([294.34194790408, -57.41606027287]);
 		sky.push([284.89656549659, -66.31056875328]);
 
-		wcs = new WCS(cop);
+		wcs = new WCS.Mapper(cop);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
@@ -568,7 +602,7 @@ describe ("pixel to sky transformations", function () {
 		sky.push([294.13212798941, -57.41928223106]);
 		sky.push([284.89946477515, -66.31058316212]);
 
-		wcs = new WCS(cod);
+		wcs = new WCS.Mapper(cod);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
 			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
