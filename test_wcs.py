@@ -21,7 +21,7 @@ def test_wcs():
     pixel = numpy.array([0, 0])
     
     # Apply tranformations
-    sky_pywcs = wcs_pywcs.wcs_pix2sky([pixel], 0)[0]
+    sky_pywcs = wcs_pywcs.all_pix2sky([pixel], 0)[0]
     # sky_celwcs = wcs_celwcs.frompixel(pixel)
     
     # Feedback

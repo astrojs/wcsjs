@@ -148,7 +148,7 @@
 			var zenithal, cylindrical, conic, poly_conic, quad_cube, projection;
 
 			// Projections
-			zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'ZEA', 'ZPN'];
+			zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN'];
 			cylindrical = ['CYP', 'CEA', 'CAR', 'MER', 'SFL', 'PAR', 'MOL', 'AIT'];
 			conic = ['COP', 'COE', 'COD', 'COO'];
 			poly_conic = ['BON', 'PCO'];
@@ -265,6 +265,58 @@
 						y = -r * WCS.Math.cosd(phi);
 
 						return [x, y];
+					};
+					
+				} else if (projection === 'TAN-SIP') {
+
+					obj.to_spherical = function (x, y) {
+						var r, theta, phi;
+
+						r = Math.sqrt(x*x + y*y);
+						theta = WCS.Math.atand(180 / (Math.PI * r));
+						phi = WCS.Math.atan2d(x, -y);
+
+						return [phi, theta];
+					};
+
+					obj.from_spherical = function (phi, theta) {
+						var r, x, y;
+
+						r = 180 / (Math.PI * WCS.Math.tand(theta));
+						x = r * WCS.Math.sind(phi);
+						y = -r * WCS.Math.cosd(phi);
+
+						return [x, y];
+					};
+					
+					obj.to_intermediate = function (points) {
+						console.log('in SIP');
+						var i, j, proj;
+						proj = [];
+
+						for (i = 0; i < this.wcsaxes; i += 1) {
+							proj[i] = 0;
+							points[i] -= this.crpix[i];
+							for (j = 0; j < this.wcsaxes; j += 1) {
+								proj[i] += this.cdelt[i] * this.pc[i][j] * points[j];
+							}
+						}
+						return proj;
+					};
+
+					obj.from_intermediate = function (proj) {
+						console.log('in SIP');
+						var i, j, points;
+						points = [];
+
+						for (i = 0; i < this.wcsaxes; i += 1) {
+							points[i] = 0;
+							for (j = 0; j < this.wcsaxes; j += 1) {
+								points[i] += this.pc_inv[i][j] * proj[j] / this.cdelt[i];
+							}
+							points[i] += this.crpix[i];
+						}
+						return points
 					};
 
 				} else if (projection === 'ZEA') {
