@@ -146,7 +146,8 @@
 		 */
 		function set_projection (json) {
 			var zenithal, cylindrical, conic, poly_conic, quad_cube, projection;
-
+			var i;
+			
 			// Projections
 			zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN'];
 			cylindrical = ['CYP', 'CEA', 'CAR', 'MER', 'SFL', 'PAR', 'MOL', 'AIT'];
@@ -268,6 +269,19 @@
 					};
 					
 				} else if (projection === 'TAN-SIP') {
+					
+					var key;
+					console.log('here');
+					// SIP requires A_ORDER and B_ORDER to define the degree of the polynomial
+					obj.a_order = json.A_ORDER;
+					obj.b_order = json.B_ORDER;
+					console.log(obj.a_order, obj.b_order);
+					for (i = 0; i <= obj.a_order; i += 1) {
+						for (j = 0; j <= obj.a_order; j += 1) {
+							key = 'A_' + i + '_' + j;
+							console.log(json[key]);
+						}
+					}
 
 					obj.to_spherical = function (x, y) {
 						var r, theta, phi;
