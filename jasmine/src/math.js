@@ -167,6 +167,66 @@ WCS.Math.dms_to_dd = function (d, m, s) {
 	return dd;
 };
 
+WCS.Math.toRightTriangular = function (mat) {
+
+	var els, n, k, i, np, kp, p, j, multiplier;
+	
+	n = mat.length;
+	k = n;
+	kp = mat[0].length;
+	
+	do {
+		i = k - n;
+		if (mat[i][i] === 0) {
+			for (j = i + 1; j < k; j += 1) {
+				if (mat[j][i] != 0) {
+					els = [];
+					np = kp;
+					do {
+						p = kp - np;
+						els.push(mat[i][p] + mat[j][p]);
+					} while (--np);
+					mat[i] = els;
+					break;
+				}
+			}
+		}
+		if (mat[i][i] != 0) {
+			for (j = i + 1; j < k; j += 1) {
+				multiplier = mat[j][i] / mat[i][i];
+				els = [];
+				np = kp;
+				do {
+					p = kp - np;
+					els.push(p <= i ? 0 : mat[j][p] - mat[i][p] * multiplier);
+				} while (--np);
+				mat[j] = els;
+			}
+		}
+	} while (--n);
+	
+	return mat;
+};
+
+
+WCS.Math.determinant = function (mat) {
+	var m, det, n, k, i;
+	
+	m = WCS.Math.toRightTriangular(mat);
+	det = m[0][0];
+	n = m.length - 1;
+	k = n;
+	i;
+	
+	do {
+		i = k - n + 1;
+		det = det * m[i][i];
+	} while (--n);
+	
+	return det;	
+};
+
+
 WCS.Math.matrixInverse = function (mat) {
 	var w, h, I, inv, temp, i, j;
 	w = mat[0].length;

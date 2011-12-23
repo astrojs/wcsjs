@@ -165,7 +165,7 @@
 					lambda = 1;
 				} else {
 					// TODO: Generalize for larger matrices
-					cd_det = cd[0][0] * cd[1][1] - cd[0][1] * cd[1][0];
+					cd_det = WCS.Math.determinant(cd);
 					cd_sign = cd_det < 0 ? -1 : 1;
 					self.wcsobj.cdelt[0] = Math.sqrt(Math.abs(cd_det)) * cd_sign;
 					self.wcsobj.cdelt[1] = Math.sqrt(Math.abs(cd_det));
