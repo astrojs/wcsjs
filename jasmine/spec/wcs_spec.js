@@ -22,6 +22,25 @@ describe ("unit conversion", function () {
 	});
 });
 
+describe ("compute the determinant", function () {
+	var mat2d, mat3d, mat4d;
+	mat2d = [[1, 2], [3, 4]];
+	mat3d = [[1, 2, 3], [4, 5, 60], [7, 8, 9]];
+	mat4d = [[1, 2, 3, 4], [5, 60, 7, 8], [9, 10, 11, 120], [13, 14, 15, 16]];
+	
+	it ("should compute the determinant of a 2 by 2 matrix", function () {
+		expect(WCS.Math.determinant(mat2d)).toEqual(-2);
+	});
+	
+	it ("should compute the determinant of a 3 by 3 matrix", function () {
+		expect(WCS.Math.determinant(mat3d)).toEqual(324);
+	});
+	
+	it ("should compute the determinant of a 4 by 4 matrix", function () {
+		expect(WCS.Math.determinant(mat4d)).toEqual(139968);
+	});
+});
+
 describe ("Compute the cosine in units of degrees", function () {
 	var angle;
 	
