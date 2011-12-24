@@ -1,1 +1,1 @@
-{"crpix": [-244.488069036, 5.73805594999], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ZEA", "DEC--ZEA"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}
+{"EQUINOX": 2000.0, "CRPIX1": -244.4880690361, "CRPIX2": 5.738055949994, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--ZEA", "CTYPE1": "RA---ZEA", "CRVAL2": -90.0, "LATPOLE": -90.0}
