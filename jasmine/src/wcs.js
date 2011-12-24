@@ -117,6 +117,9 @@
 			// Attempt to derive the PC matrix when not given, otherwise default to identity
 			self.wcsobj.pc = check_card(json, 'PC', naxis) || derive_pc(json);
 			
+			// Store the CD matrix if given
+			self.wcsobj.cd = check_card(json, 'CD', naxis);
+			
 			// Inverse PC Matrix
 			self.wcsobj.pc_inv = WCS.Math.matrixInverse(self.wcsobj.pc);
 		}
@@ -128,19 +131,21 @@
 		 * e.g. For NAXIS = 2 and the PC matrix, the header should contain:
 		 * 
 		 * PC1_1, PC1_2, PC2_1, PC2_2
+		 * 
 		 */
 		function check_card(header, key, dimensions) {
 			var i, j, full_key, obj;
-			
+
+			// console.log(header, key, dimensions, offset);
 			obj = [];
 			for (i = 1; i <= dimensions; i += 1) {
-				obj.push([]);
-				for (j = 1; i <= dimensions; j += 1) {
+				obj[i-1] = [];
+				for (j = 1; j <= dimensions; j += 1) {
 					full_key = key + i + '_' + j;
 					if (!header.hasOwnProperty(full_key)) {
 						return;
 					} else {
-						obj[i].push(header[full_key]);
+						obj[i-1].push(header[full_key]);
 					}
 				}
 			}
@@ -169,8 +174,8 @@
 					cd_sign = cd_det < 0 ? -1 : 1;
 					self.wcsobj.cdelt[0] = Math.sqrt(Math.abs(cd_det)) * cd_sign;
 					self.wcsobj.cdelt[1] = Math.sqrt(Math.abs(cd_det));
-					crota = atand2(-1 * cd[0][1], cd[1][1]);
-					lambda = wcsobj.cdelt[1] / wcsobj.cdelt[0];		
+					crota = WCS.Math.atan2d(-1 * cd[0][1], cd[1][1]);
+					lambda = self.wcsobj.cdelt[1] / self.wcsobj.cdelt[0];		
 				}
 			}
 
@@ -312,20 +317,117 @@
 					};
 					
 				} else if (projection === 'TAN-SIP') {
-					
-					var key;
-					console.log('here');
-					// SIP requires A_ORDER and B_ORDER to define the degree of the polynomial
-					self.wcsobj.a_order = json.A_ORDER;
-					self.wcsobj.b_order = json.B_ORDER;
-					console.log(self.wcsobj.a_order, self.wcsobj.b_order);
-					for (i = 0; i <= self.wcsobj.a_order; i += 1) {
-						for (j = 0; j <= self.wcsobj.a_order; j += 1) {
-							key = 'A_' + i + '_' + j;
-							console.log(json[key]);
+
+					self.get_sip_coefficients = function (header) {
+						
+						var sip, i, j, key;
+						sip = {};
+						
+						// Get the order of the polynomials
+						if (!header.hasOwnProperty('A_ORDER') || !header.hasOwnProperty('B_ORDER')) {
+							throw new Error("What's the polynomial order, man!");
 						}
-					}
-	
+						sip.a_order = header.A_ORDER;
+						sip.b_order = header.B_ORDER;
+						
+						// Get the coefficients from the header
+						// Coefficients are stored in a 2D array with indexing
+						// A_i_j => a_coeffs[i][j]
+						sip.a_coeffs = [];
+						sip.b_coeffs = [];
+						for (i = 0; i <= sip.a_order; i += 1) {
+							sip.a_coeffs[i] = [];
+							for (j = 0; j <= sip.a_order; j += 1) {
+								key = 'A_' + i + '_' + j;
+								sip.a_coeffs[i][j] = header[key] || 0;
+							}
+						}
+						for (i = 0; i <= sip.b_order; i += 1) {
+							sip.b_coeffs[i] = [];
+							for (j = 0; j <= sip.b_order; j += 1) {
+								key = 'B_' + i + '_' + j;
+								sip.b_coeffs[i][j] = header[key] || 0;
+							}
+						}
+						
+						if (!sip.a_coeffs || !sip.b_coeffs) {
+							throw new Error("Where are the coeffs, dude!");
+						}
+						
+						return sip;
+					};					
+					
+					self.wcsobj.sip = self.get_sip_coefficients(json);
+					self.f = function (u, v, coeffs) {
+						var p, q, value, order;
+						
+						value = 0;
+						order = coeffs[0].length - 1;
+
+						// Compute sum
+						for (p = 0; p <= order; p += 1) {
+							for (q = 0; q <= order; q += 1) {
+								value += coeffs[p][q] * Math.pow(u, p) * Math.pow(v, q);
+							}
+						}
+
+						return value;
+					};
+					
+					// TODO: Increase precision ...
+					self.to_intermediate = function (points) {
+						var i, j, proj, u, v;
+						proj = [];
+						
+						// u = points[0] - self.wcsobj.crpix[0] - 1;
+						// v = points[1] - self.wcsobj.crpix[1] - 1;
+						// 
+						// points[0] = points[0] + self.f(u, v, self.wcsobj.sip.a_coeffs);
+						// points[1] = points[1] + self.f(u, v, self.wcsobj.sip.b_coeffs);
+						// 
+						// proj[0] = self.wcsobj.cd[0][0] * points[0] + self.wcsobj.cd[0][1] * points[1];
+						// proj[1] = self.wcsobj.cd[1][0] * points[0] + self.wcsobj.cd[1][1] * points[1];
+						// 
+						// proj[0] = -1 * proj[0];
+						// proj[1] = -1 * proj[1];
+						// return proj
+						
+						points[0] -= self.wcsobj.crpix[0] - 1;
+						points[1] -= self.wcsobj.crpix[1] - 1;
+						
+						u = points[0];
+						v = points[1];
+						points[0] += self.f(u, v, self.wcsobj.sip.a_coeffs);
+						points[1] += self.f(u, v, self.wcsobj.sip.b_coeffs);
+						
+						for (i = 0; i < self.wcsobj.naxis; i += 1) {
+							proj[i] = 0;
+							for (j = 0; j < self.wcsobj.naxis; j += 1) {
+								proj[i] += self.wcsobj.cd[i][j] * points[j];
+							}
+						}
+						
+						// FIXME: Find out why each is off by a factor of -1
+						proj[0] = -1 * proj[0];
+						proj[1] = -1 * proj[1];
+						return proj;
+					};
+						
+					// self.from_intermediate = function (proj) {
+					// 	console.log('in SIP');
+					// 	var i, j, points;
+					// 	points = [];
+					// 	
+					// 	for (i = 0; i < self.wcsobj.naxis; i += 1) {
+					// 		points[i] = 0;
+					// 		for (j = 0; j < self.wcsobj.naxis; j += 1) {
+					// 			points[i] += self.wcsobj.pc_inv[i][j] * proj[j] / self.wcsobj.cdelt[i];
+					// 		}
+					// 		points[i] += self.wcsobj.crpix[i];
+					// 	}
+					// 	return points
+					// };
+					
 					self.to_spherical = function (x, y) {
 						var r, theta, phi;
 	
@@ -344,36 +446,6 @@
 						y = -r * WCS.Math.cosd(phi);
 	
 						return [x, y];
-					};
-					
-					self.to_intermediate = function (points) {
-						console.log('in SIP');
-						var i, j, proj;
-						proj = [];
-	
-						for (i = 0; i < this.wcsaxes; i += 1) {
-							proj[i] = 0;
-							points[i] -= this.crpix[i];
-							for (j = 0; j < this.wcsaxes; j += 1) {
-								proj[i] += this.cdelt[i] * this.pc[i][j] * points[j];
-							}
-						}
-						return proj;
-					};
-	
-					self.from_intermediate = function (proj) {
-						console.log('in SIP');
-						var i, j, points;
-						points = [];
-	
-						for (i = 0; i < this.wcsaxes; i += 1) {
-							points[i] = 0;
-							for (j = 0; j < this.wcsaxes; j += 1) {
-								points[i] += this.pc_inv[i][j] * proj[j] / this.cdelt[i];
-							}
-							points[i] += this.crpix[i];
-						}
-						return points
 					};
 	
 				} else if (projection === 'ZEA') {
@@ -617,15 +689,15 @@
 			var wcsobj, i, j, proj;
 			wcsobj = this.wcsobj;
 			proj = [];
-			
-            for (i = 0; i < wcsobj.naxis; i += 1) {
+			for (i = 0; i < wcsobj.naxis; i += 1) {
 				proj[i] = 0;
-                // -1 to make 0-based index
+				// -1 to make 0-based index
 				points[i] -= wcsobj.crpix[i] - 1;
 				for (j = 0; j < wcsobj.naxis; j += 1) {
 					proj[i] += wcsobj.cdelt[i] * wcsobj.pc[i][j] * points[j];
 				}
 			}
+
 			return proj;
 		},
 
