@@ -379,8 +379,8 @@
 						var i, j, proj, u, v;
 						proj = [];
 						
-						// u = points[0] - self.wcsobj.crpix[0] - 1;
-						// v = points[1] - self.wcsobj.crpix[1] - 1;
+						// u = points[0] - self.wcsobj.crpix[0];
+						// v = points[1] - self.wcsobj.crpix[1];
 						// 
 						// points[0] = points[0] + self.f(u, v, self.wcsobj.sip.a_coeffs);
 						// points[1] = points[1] + self.f(u, v, self.wcsobj.sip.b_coeffs);
@@ -392,8 +392,8 @@
 						// proj[1] = -1 * proj[1];
 						// return proj
 						
-						points[0] -= self.wcsobj.crpix[0] - 1;
-						points[1] -= self.wcsobj.crpix[1] - 1;
+						points[0] -= self.wcsobj.crpix[0];
+						points[1] -= self.wcsobj.crpix[1];
 						
 						u = points[0];
 						v = points[1];
@@ -692,7 +692,7 @@
 			for (i = 0; i < wcsobj.naxis; i += 1) {
 				proj[i] = 0;
 				// -1 to make 0-based index
-				points[i] -= wcsobj.crpix[i] - 1;
+				points[i] -= wcsobj.crpix[i];
 				for (j = 0; j < wcsobj.naxis; j += 1) {
 					proj[i] += wcsobj.cdelt[i] * wcsobj.pc[i][j] * points[j];
 				}
@@ -713,7 +713,7 @@
 					points[i] += wcsobj.pc_inv[i][j] * proj[j] / wcsobj.cdelt[i];
 				}
                 // -1 to make 0-based index
-				points[i] += wcsobj.crpix[i] - 1;
+				points[i] += wcsobj.crpix[i];
 			}
 			return points
 		},

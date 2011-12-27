@@ -1,13 +1,4 @@
 
-describe ("initialize WCS Mapper object", function () {
-	
-	it ("should initialize a WCS Mapper object", function () {
-		var wcs;
-		wcs = new WCS.Mapper(tan_flat);
-		console.log(wcs);
-	});
-});
-
 describe ("unit conversion", function () {
 
 	var value_deg = 180;
@@ -21,6 +12,7 @@ describe ("unit conversion", function () {
 		expect(value_rad * WCS.Math.R2D).toEqual(value_deg);
 	});
 });
+
 
 describe ("compute the determinant", function () {
 	var mat2d, mat3d, mat4d;
@@ -40,6 +32,7 @@ describe ("compute the determinant", function () {
 		expect(WCS.Math.determinant(mat4d)).toEqual(139968);
 	});
 });
+
 
 describe ("Compute the cosine in units of degrees", function () {
 	var angle;
@@ -130,11 +123,12 @@ describe ("Compute the sine in units of degrees", function () {
 	});
 });
 
+
 describe ("pixels to projection plane coordinates and back", function () {
 	
 	it ("pixels to projection plane", function () {
 		var pixels;
-		pixels = [50, 40];
+		pixels = [51, 41];
 		
 		wcs = new WCS.Mapper(tan_flat);
 		proj = wcs.to_intermediate(pixels);
@@ -147,27 +141,32 @@ describe ("pixels to projection plane coordinates and back", function () {
 		proj = [-21.271053914143966, 2.7708695813419855];
 		wcs = new WCS.Mapper(tan_flat);
 		pixels = wcs.from_intermediate(proj);
-		expect(pixels[0]).toBeCloseTo(50, 8);
-		expect(pixels[1]).toBeCloseTo(40, 8);
+		expect(pixels[0]).toBeCloseTo(51, 8);
+		expect(pixels[1]).toBeCloseTo(41, 8);
 	});
 
 });
 
+
 describe ("sky to pixel transformations", function () {
+	var wcs, pixels, sky, i, coords;
+	
+	beforeEach(function () {
+		pixels = [];
+		sky = [];
+		
+		pixels.push([1.0, 1.0]);
+		pixels.push([192.0, 1.0]);
+		pixels.push([1.0, 192.0]);
+		pixels.push([192.0, 192.0]);
+		pixels.push([96.5, 96.5]);
+	});
+	
 	
 	//
 	// Zenithal Projections
 	//
 	it ("ARC Projection", function() {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-		
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 	
 		sky.push([269.05673077774, -73.46829958535]);
 		sky.push([269.46714963295, -60.73594102637]);
@@ -184,15 +183,6 @@ describe ("sky to pixel transformations", function () {
 	});
 	
 	it ("TAN Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([270.33283605009, -72.61583231845]);
 		sky.push([270.19465794261, -61.83923481247]);
@@ -208,65 +198,20 @@ describe ("sky to pixel transformations", function () {
 		}
 	});
 	
-	// it ("TAN-SIP Projection", function () {
-	// 	var wcs, pixels, sky, i, coords;
-	// 	pixels = [];
-	// 	sky = [];
-	// 
-	// 	pixels.push([0.0, 0.0]);
-	// 	pixels.push([191.0, 0.0]);
-	// 	pixels.push([0.0, 191.0]);
-	// 	pixels.push([191.0, 191.0]);
-	// 	pixels.push([95.5, 95.5]);
-	// 	
-	// 	sky.push([22.11382770238, -0.11318768874]);
-	// 	sky.push([22.10321365267, -0.11318593269]);
-	// 	sky.push([22.11382984083, -0.10257342920]);
-	// 	sky.push([22.10321579501, -0.10257167333]);
-	// 	sky.push([22.10852174767, -0.10787968141]);
-	// 
-	// 	wcs = new WCS.Mapper(tan_sip);
-	// 	for (i = 0; i < pixels.length; i += 1) {
-	// 		coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
-	// 		expect(coords.x).toBeCloseTo(pixels[i][0], 8);
-	// 		expect(coords.y).toBeCloseTo(pixels[i][1], 8);
-	// 	}
-	// });
-	
 });
 
 describe ("pixel to sky transformations", function () {
-
+	var wcs, pixels, sky, i, coords;
+	
 	beforeEach(function () {
-
-		this.addMatchers ({
-			toBeCloseToElementwise: function (expected, precision) {
-				if (!(precision === 0)) {
-					precision = precision || 2;
-				}
-				var state, multiplier, length, i, actual, expected_elem;
-				
-				// Check that the array lengths are the same
-				if (expected.length != this.actual.length) {
-					throw new Error('Arrays are not the same length');
-				}
-				
-				state = true;
-				multiplier = Math.pow(10, precision);
-				length = expected.length;
-
-				for (i = 0; i < length; i += 1) {
-					actual = Math.round(this.actual[i] * multiplier);
-					expected_elem = Math.round(expected[i] * multiplier);
-					state = expected_elem == actual;
-					if (!state) {
-						return state;
-					}
-				}
-
-				return state;
-			}
-		});
+		pixels = [];
+		sky = [];
+		
+		pixels.push([1.0, 1.0]);
+		pixels.push([192.0, 1.0]);
+		pixels.push([1.0, 192.0]);
+		pixels.push([192.0, 192.0]);
+		pixels.push([96.5, 96.5]);
 	});
 	
 	//
@@ -274,15 +219,6 @@ describe ("pixel to sky transformations", function () {
 	//
 	
 	it ("ARC Projection", function() {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-		
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 
 		sky.push([269.05673077774, -73.46829958535]);
 		sky.push([269.46714963295, -60.73594102637]);
@@ -299,15 +235,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("SIN Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 
 		sky.push([268.39150699215, -73.90353552624]);
 		sky.push([269.10716399624, -60.03668870909]);
@@ -324,15 +251,6 @@ describe ("pixel to sky transformations", function () {
 	});
 	
 	it ("STG Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([269.37825680266, -73.25613046025]);
 		sky.push([269.64574155082, -61.03602098451]);
@@ -349,15 +267,6 @@ describe ("pixel to sky transformations", function () {
 	});	
 	
     it ("TAN Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([270.33283605009, -72.61583231845]);
 		sky.push([270.19465794261, -61.83923481247]);
@@ -375,15 +284,6 @@ describe ("pixel to sky transformations", function () {
 	
 	// FIXME: This test passes only when dropping the precision to 6 decimals places
 	it ("TAN-SIP Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([22.11382770238, -0.11318768874]);
 		sky.push([22.10321365267, -0.11318593269]);
@@ -401,15 +301,6 @@ describe ("pixel to sky transformations", function () {
 	
 
 	it ("ZEA Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 
 		sky.push([268.89429694488, -73.57489559933]);
 		sky.push([269.37808163249, -60.57684091173]);
@@ -429,15 +320,6 @@ describe ("pixel to sky transformations", function () {
 	// Cylindrical Projections
 	//
 	it ("CYP Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([263.69300640788, -75.95480262512]);
 		sky.push([267.11650280878, -57.99620775699]);
@@ -454,15 +336,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("CEA Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([268.44085265462, -73.37969380549]);
 		sky.push([269.09024385942, -60.64908874812]);
@@ -479,15 +352,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("CAR Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([268.47850587888, -73.37997130772]);
 		sky.push([269.11222126114, -60.64923604906]);
@@ -504,16 +368,7 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("MER Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
 
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
-		
 		sky.push([268.51628090050, -73.38024288395]);
 		sky.push([269.13426924501, -60.64938020277]);
 		sky.push([307.13073648219, -69.48077163725]);
@@ -529,15 +384,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("SFL Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([268.46737987111, -73.50405652146]);
 		sky.push([269.10879603428, -60.77298321216]);
@@ -554,15 +400,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("PAR Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([269.47944138196, -73.49563038873]);
 		sky.push([269.69722708408, -60.76256251520]);
@@ -579,15 +416,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("MOL Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([270.72846180802, -74.16980073050]);
 		sky.push([270.39774981058, -60.02718873940]);
@@ -604,15 +432,6 @@ describe ("pixel to sky transformations", function () {
 	});
 
 	it ("AIT Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 		
 		sky.push([268.56813922636, -73.49845984257]);
 		sky.push([269.17359044102, -60.70174516331]);
@@ -632,15 +451,6 @@ describe ("pixel to sky transformations", function () {
 	// Conic Projections
 	//
 	it ("COP Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 
 		sky.push([266.18968688018, -74.06989101020]);
 		sky.push([267.67691932876, -60.11053528952]);
@@ -657,15 +467,6 @@ describe ("pixel to sky transformations", function () {
 	});
 	
 	it ("COD Projection", function () {
-		var wcs, pixels, sky, i, coords;
-		pixels = [];
-		sky = [];
-
-		pixels.push([0.0, 0.0]);
-		pixels.push([191.0, 0.0]);
-		pixels.push([0.0, 191.0]);
-		pixels.push([191.0, 191.0]);
-		pixels.push([95.5, 95.5]);
 
 		sky.push([267.30957853599, -74.13710817538]);
 		sky.push([269.35196969676, -60.38022869447]);
@@ -680,6 +481,5 @@ describe ("pixel to sky transformations", function () {
 			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
 		}
 	});
-	
 	
 });
