@@ -5,3 +5,5 @@
 *.fit
 *.FIT
 data/
+wcslib.py
+wcslib.pyc
