@@ -456,6 +456,8 @@ class WcsSipProjection(WcsTanProjection):
             coef = self.b.get((i, j), 0.0)
             dy += coef * (u ** i) * (v ** j)
         
+        print px + dx
+        print py + dy
         return px + dx, py + dy
 
     def _reverseTransformPoint(self, px, py):

@@ -127,7 +127,7 @@ describe ("Compute the sine in units of degrees", function () {
 describe ("pixels to projection plane coordinates and back", function () {
 	
 	it ("pixels to projection plane", function () {
-		var pixels;
+		var wcs, pixels, proj;
 		pixels = [51, 41];
 		
 		wcs = new WCS.Mapper(tan_flat);
@@ -137,14 +137,37 @@ describe ("pixels to projection plane coordinates and back", function () {
 	});
 	
 	it ("projection plane to pixels", function () {
-		var proj;
+		var wcs, pixels, proj;
 		proj = [-21.271053914143966, 2.7708695813419855];
+		
 		wcs = new WCS.Mapper(tan_flat);
 		pixels = wcs.from_intermediate(proj);
 		expect(pixels[0]).toBeCloseTo(51, 8);
 		expect(pixels[1]).toBeCloseTo(41, 8);
 	});
 
+	it ("pixels to projection plane (SIP)", function () {
+		var wcs, pixels, foc, proj, i;
+		pixels = [];
+		foc = [];
+		
+		// Testing two corners of the image
+		pixels.push([1, 1]);
+		pixels.push([4096, 4096]);
+		
+		foc.push([1.0000000109043361, 1.0000000017147388])
+		foc.push([4096.1829444005243, 4096.0287685424582]);
+		// foc.push([0.000055559967585012026, -0.00005558155393776887]);
+		// foc.push([0.22758243971434963, -0.22766229335397184]);
+		
+		wcs = new WCS.Mapper(tan_sip);
+		for (i = 0; i < pixels.length; i += 1) {
+			proj = wcs.to_intermediate(pixels[i]);
+			expect(proj[0]).toBeCloseTo(foc[i][0], 8);
+			expect(proj[1]).toBeCloseTo(foc[i][1], 8);			
+		}
+	});
+	
 });
 
 
@@ -191,6 +214,22 @@ describe ("sky to pixel transformations", function () {
 		sky.push([284.90874458094, -66.30003124798]);
 
 		wcs = new WCS.Mapper(tan_flat);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
+			expect(coords.y).toBeCloseTo(pixels[i][1], 8);
+		}
+	});
+	
+	it ("TAN-SIP Projection", function () {
+		pixels = [];
+		pixels.push([1, 1]);
+		pixels.push([4096, 4096]);
+		
+		sky.push([22.11382770237584, -0.11318768874317654]);
+		sky.push([21.886303362025174, 0.11441692268249258]);
+
+		wcs = new WCS.Mapper(tan_sip);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
 			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
