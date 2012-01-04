@@ -119,7 +119,7 @@
 			
 			// Store the CD matrix if given
 			self.wcsobj.cd = check_card(json, 'CD', naxis);
-			
+
 			// Inverse PC Matrix
 			self.wcsobj.pc_inv = WCS.Math.matrixInverse(self.wcsobj.pc);
 		}
@@ -374,43 +374,30 @@
 						return value;
 					};
 					
-					// TODO: Increase precision ...
-					self.to_intermediate = function (points) {
-						var i, j, proj, u, v;
+					self.to_foc = function (points) {
+						var i, j, proj, u, v, dx, dy;
 						proj = [];
 						
-						// u = points[0] - self.wcsobj.crpix[0];
-						// v = points[1] - self.wcsobj.crpix[1];
-						// 
-						// points[0] = points[0] + self.f(u, v, self.wcsobj.sip.a_coeffs);
-						// points[1] = points[1] + self.f(u, v, self.wcsobj.sip.b_coeffs);
+						u = points[0] - self.wcsobj.crpix[0];
+						v = points[1] - self.wcsobj.crpix[1];
+						
+						dx = dy = 0;
+						dx = self.f(u, v, self.wcsobj.sip.a_coeffs);
+						dy = self.f(u, v, self.wcsobj.sip.b_coeffs);
+						
+						points[0] = points[0] + dx;
+						points[1] = points[1] + dy;
+
+						return points;
+						
+						// proj[0] = proj[1] = 0;
+						// points[0] -= self.wcsobj.crpix[0];
+						// points[1] -= self.wcsobj.crpix[1];
 						// 
 						// proj[0] = self.wcsobj.cd[0][0] * points[0] + self.wcsobj.cd[0][1] * points[1];
 						// proj[1] = self.wcsobj.cd[1][0] * points[0] + self.wcsobj.cd[1][1] * points[1];
 						// 
-						// proj[0] = -1 * proj[0];
-						// proj[1] = -1 * proj[1];
-						// return proj
-						
-						points[0] -= self.wcsobj.crpix[0];
-						points[1] -= self.wcsobj.crpix[1];
-						
-						u = points[0];
-						v = points[1];
-						points[0] += self.f(u, v, self.wcsobj.sip.a_coeffs);
-						points[1] += self.f(u, v, self.wcsobj.sip.b_coeffs);
-						
-						for (i = 0; i < self.wcsobj.naxis; i += 1) {
-							proj[i] = 0;
-							for (j = 0; j < self.wcsobj.naxis; j += 1) {
-								proj[i] += self.wcsobj.cd[i][j] * points[j];
-							}
-						}
-						
-						// FIXME: Find out why each is off by a factor of -1
-						proj[0] = -1 * proj[0];
-						proj[1] = -1 * proj[1];
-						return proj;
+						// return proj;
 					};
 						
 					// self.from_intermediate = function (proj) {
@@ -689,6 +676,22 @@
 			var wcsobj, i, j, proj;
 			wcsobj = this.wcsobj;
 			proj = [];
+			
+			if (wcsobj.sip) {
+				points = this.to_foc(points);
+				
+				for (i = 0; i < wcsobj.naxis; i += 1) {
+					proj[i] = 0;
+					// -1 to make 0-based index
+					points[i] -= wcsobj.crpix[i];
+					for (j = 0; j < wcsobj.naxis; j += 1) {
+						proj[i] += wcsobj.cd[i][j] * points[j];
+					}
+				}
+				return proj;
+			}
+				
+			
 			for (i = 0; i < wcsobj.naxis; i += 1) {
 				proj[i] = 0;
 				// -1 to make 0-based index
