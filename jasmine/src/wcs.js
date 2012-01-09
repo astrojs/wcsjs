@@ -209,7 +209,12 @@
 				self.wcsobj.theta_0 = 90;
 				self.wcsobj.alpha_p = self.wcsobj.crval[0];
 				self.wcsobj.delta_p = self.wcsobj.crval[1];
-	
+
+				if (self.wcsobj.crval[1] >= self.wcsobj.theta_0)
+					self.wcsobj.lonpole = 0;
+				else
+					self.wcsobj.lonpole = 180;
+				
 				if (projection === 'AIR') {
 					var r, theta, phi, eta, eta_b;
 	
@@ -374,8 +379,9 @@
 						return value;
 					};
 					
-					self.to_foc = function (points) {
-						var i, j, proj, u, v, dx, dy;
+					self.to_intermediate = function (points) {
+						var wcsobj, i, j, u, v, dx, dy, proj;
+						wcsobj = this.wcsobj;
 						proj = [];
 						
 						u = points[0] - self.wcsobj.crpix[0];
@@ -388,16 +394,15 @@
 						points[0] = points[0] + dx;
 						points[1] = points[1] + dy;
 
-						return points;
-						
-						// proj[0] = proj[1] = 0;
-						// points[0] -= self.wcsobj.crpix[0];
-						// points[1] -= self.wcsobj.crpix[1];
-						// 
-						// proj[0] = self.wcsobj.cd[0][0] * points[0] + self.wcsobj.cd[0][1] * points[1];
-						// proj[1] = self.wcsobj.cd[1][0] * points[0] + self.wcsobj.cd[1][1] * points[1];
-						// 
-						// return proj;
+						for (i = 0; i < wcsobj.naxis; i += 1) {
+							proj[i] = 0;
+							points[i] -= wcsobj.crpix[i];
+							for (j = 0; j < wcsobj.naxis; j += 1) {
+								proj[i] += wcsobj.cd[i][j] * points[j];
+							}
+						}
+
+						return proj;
 					};
 						
 					// self.from_intermediate = function (proj) {
@@ -676,22 +681,7 @@
 			var wcsobj, i, j, proj;
 			wcsobj = this.wcsobj;
 			proj = [];
-			
-			if (wcsobj.sip) {
-				points = this.to_foc(points);
-				
-				for (i = 0; i < wcsobj.naxis; i += 1) {
-					proj[i] = 0;
-					// -1 to make 0-based index
-					points[i] -= wcsobj.crpix[i];
-					for (j = 0; j < wcsobj.naxis; j += 1) {
-						proj[i] += wcsobj.cd[i][j] * points[j];
-					}
-				}
-				return proj;
-			}
-				
-			
+						
 			for (i = 0; i < wcsobj.naxis; i += 1) {
 				proj[i] = 0;
 				// -1 to make 0-based index
@@ -722,29 +712,61 @@
 		},
 
 
+		// to_celestial: function (phi, theta) {
+		// 	
+		// 	var wcsobj, sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
+		// 	var x_temp, y_temp, ra, dec;
+		//             wcsobj = this.wcsobj;
+		// 
+		// 	sin_theta = WCS.Math.sind(theta);
+		// 	cos_theta = WCS.Math.cosd(theta);
+		// 	
+		// 	sin_dp = WCS.Math.sind(wcsobj.delta_p);
+		// 	cos_dp = WCS.Math.cosd(wcsobj.delta_p);
+		// 	
+		// 	sin_dphi = WCS.Math.sind(phi - wcsobj.lonpole);
+		// 	cos_dphi = WCS.Math.cosd(phi - wcsobj.lonpole);
+		// 
+		// 	x_temp = sin_theta * cos_dp - cos_theta * sin_dp * cos_dphi;
+		// 	y_temp = -cos_theta * sin_dphi;
+		// 	
+		// 	ra = wcsobj.alpha_p + WCS.Math.atan2d(y_temp, x_temp);
+		// 	ra = (ra + 360) % 360;
+		// 	dec = WCS.Math.asind(sin_theta * sin_dp + cos_theta * cos_dp * cos_dphi);
+		// 
+		// 	        return [ra, dec];
+		// },
+
+		
 		to_celestial: function (phi, theta) {
 			
-			var wcsobj, sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
-			var x_temp, y_temp, ra, dec;
-            wcsobj = this.wcsobj;
-
+			var wcsobj, sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dec_p, cos_dec_p, x_temp, y_temp, z_temp, ra, dec;
+			wcsobj = this.wcsobj;
+			
 			sin_theta = WCS.Math.sind(theta);
 			cos_theta = WCS.Math.cosd(theta);
-			
-			sin_dp = WCS.Math.sind(wcsobj.delta_p);
-			cos_dp = WCS.Math.cosd(wcsobj.delta_p);
-			
 			sin_dphi = WCS.Math.sind(phi - wcsobj.lonpole);
 			cos_dphi = WCS.Math.cosd(phi - wcsobj.lonpole);
-
-			x_temp = sin_theta * cos_dp - cos_theta * sin_dp * cos_dphi;
+			sin_dec_p = WCS.Math.sind(wcsobj.delta_p);
+			cos_dec_p = WCS.Math.cosd(wcsobj.delta_p);
+			
+			console.log("sin_theta\t", sin_theta);
+			console.log("cos_theta\t", cos_theta);
+			console.log("sin_dphi\t", sin_dphi);
+			console.log("cos_dphi\t", cos_dphi);
+			console.log("sin_dec_p\t", sin_dec_p);
+			console.log("cos_dec_p\t", cos_dec_p);
+			
+			x_temp = sin_theta * cos_dec_p - cos_theta * sin_dec_p * cos_dphi;
 			y_temp = -cos_theta * sin_dphi;
 			
-			ra = wcsobj.alpha_p + WCS.Math.atan2d(y_temp, x_temp);
+			ra = WCS.Math.atan2d(y_temp, x_temp) + wcsobj.alpha_p;
 			ra = (ra + 360) % 360;
-			dec = WCS.Math.asind(sin_theta * sin_dp + cos_theta * cos_dp * cos_dphi);
-
-	        return [ra, dec];
+			
+			z_temp = sin_theta * sin_dec_p + cos_theta * cos_dec_p * cos_dphi;
+			dec = WCS.Math.asind(z_temp);
+			
+			return [ra, dec];
 		},
 
 
