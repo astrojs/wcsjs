@@ -145,28 +145,6 @@ describe ("pixels to projection plane coordinates and back", function () {
 		expect(pixels[0]).toBeCloseTo(51, 8);
 		expect(pixels[1]).toBeCloseTo(41, 8);
 	});
-
-	it ("pixels to projection plane (SIP)", function () {
-		var wcs, pixels, foc, proj, i;
-		pixels = [];
-		foc = [];
-		
-		// Testing two corners of the image
-		pixels.push([1, 1]);
-		pixels.push([4096, 4096]);
-		
-		foc.push([1.0000000109043361, 1.0000000017147388])
-		foc.push([4096.1829444005243, 4096.0287685424582]);
-		// foc.push([0.000055559967585012026, -0.00005558155393776887]);
-		// foc.push([0.22758243971434963, -0.22766229335397184]);
-		
-		wcs = new WCS.Mapper(tan_sip);
-		for (i = 0; i < pixels.length; i += 1) {
-			proj = wcs.to_intermediate(pixels[i]);
-			expect(proj[0]).toBeCloseTo(foc[i][0], 8);
-			expect(proj[1]).toBeCloseTo(foc[i][1], 8);			
-		}
-	});
 	
 });
 
