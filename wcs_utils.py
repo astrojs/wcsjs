@@ -13,7 +13,7 @@ def wcs2json(in_file, out_file, string = False):
     # Keywords relavant to WCS
     wcs_single_keywords = ['NAXIS', 'WCSAXES', 'LONPOLE', 'LATPOLE', 'EQUINOX', 'RADESYS']
     wcs_axis_keywords = ['NAXIS', 'CRVAL', 'CRPIX', 'CDELT', 'CTYPE']
-    wcs_matrix_keywords = ['PC', 'CD']
+    wcs_matrix_keywords = ['PC', 'CD', 'PV']
     sip_single_keywords = ['A_ORDER', 'B_ORDER']
     sip_multivalued_keywords = ['A', 'B']
 
