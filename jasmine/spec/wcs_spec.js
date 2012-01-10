@@ -1,3 +1,4 @@
+var precision = 8;
 
 describe ("unit conversion", function () {
 
@@ -132,8 +133,8 @@ describe ("pixels to projection plane coordinates and back", function () {
 		
 		wcs = new WCS.Mapper(tan);
 		proj = wcs.to_intermediate(pixels);
-		expect(proj[0]).toBeCloseTo(-21.271053914143966, 8);
-		expect(proj[1]).toBeCloseTo(2.7708695813419855, 8);
+		expect(proj[0]).toBeCloseTo(-21.271053914143966, precision);
+		expect(proj[1]).toBeCloseTo(2.7708695813419855, precision);
 	});
 	
 	it ("projection plane to pixels", function () {
@@ -142,8 +143,8 @@ describe ("pixels to projection plane coordinates and back", function () {
 		
 		wcs = new WCS.Mapper(tan);
 		pixels = wcs.from_intermediate(proj);
-		expect(pixels[0]).toBeCloseTo(51, 8);
-		expect(pixels[1]).toBeCloseTo(41, 8);
+		expect(pixels[0]).toBeCloseTo(51, precision);
+		expect(pixels[1]).toBeCloseTo(41, precision);
 	});
 	
 });
@@ -178,8 +179,8 @@ describe ("sky to pixel transformations", function () {
 		wcs = new WCS.Mapper(arc);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
-			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
-			expect(coords.y).toBeCloseTo(pixels[i][1], 8);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
 		}
 	});
 	
@@ -194,8 +195,8 @@ describe ("sky to pixel transformations", function () {
 		wcs = new WCS.Mapper(tan);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
-			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
-			expect(coords.y).toBeCloseTo(pixels[i][1], 8);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
 		}
 	});
 	
@@ -210,8 +211,8 @@ describe ("sky to pixel transformations", function () {
 		wcs = new WCS.Mapper(tan_sip);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
-			expect(coords.x).toBeCloseTo(pixels[i][0], 8);
-			expect(coords.y).toBeCloseTo(pixels[i][1], 8);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
 		}
 	});
 	
@@ -246,8 +247,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(arc);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -262,8 +263,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(sin);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 	
@@ -278,8 +279,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(stg);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});	
 	
@@ -294,8 +295,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(tan);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 	
@@ -328,8 +329,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(zea);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -347,8 +348,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(cyp);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -363,8 +364,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(cea);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -379,8 +380,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(car);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -395,8 +396,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(mer);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -411,8 +412,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(sfl);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -427,8 +428,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(par);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -443,8 +444,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(mol);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 
@@ -459,8 +460,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(ait);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 	
@@ -478,8 +479,24 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(cop);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
+		}
+	});
+	
+	it ("COE Projection", function () {
+		
+		sky.push([271.44128301857, -73.70751697051]);
+		sky.push([268.76574791137, -60.13167786929]);
+		sky.push([308.21225420950, -69.76392246655]);
+		sky.push([292.58828377403, -58.33066976145]);
+		sky.push([284.91215318896, -66.30650273043]);
+		
+		wcs = new WCS.Mapper(coe);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.pixelToCoordinate(pixels[i]);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 	
@@ -494,8 +511,8 @@ describe ("pixel to sky transformations", function () {
 		wcs = new WCS.Mapper(cod);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.pixelToCoordinate(pixels[i]);
-			expect(coords.ra).toBeCloseTo(sky[i][0], 8);
-			expect(coords.dec).toBeCloseTo(sky[i][1], 8);
+			expect(coords.ra).toBeCloseTo(sky[i][0], precision);
+			expect(coords.dec).toBeCloseTo(sky[i][1], precision);
 		}
 	});
 	

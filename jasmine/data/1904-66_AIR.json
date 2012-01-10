@@ -1,1 +1,0 @@
-{"crpix": [-234.754501084, 8.33933082442], "equinox": 2000, "pv": [45], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AIR", "DEC--AIR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0}

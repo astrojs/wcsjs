@@ -589,24 +589,37 @@
 	
 				} else if (projection === 'COE') {
 					
+					self.wcsobj.gamma = WCS.Math.sind(self.wcsobj.theta_1) + WCS.Math.sind(self.wcsobj.theta_2);
+					self.wcsobj.Y_0 = (180 * 2) / (Math.PI * self.wcsobj.gamma) * Math.sqrt(1 + WCS.Math.sind(self.wcsobj.theta_1) * WCS.Math.sind(self.wcsobj.theta_2) - self.wcsobj.gamma * WCS.Math.sind((self.wcsobj.theta_1 + self.wcsobj.theta_2) / 2));
+					self.wcsobj.C = self.wcsobj.gamma / 2;
+					
 					self.to_spherical = function (x, y) {
-						throw new Error('Sorry, not yet implemented!');
+						var r, theta_a_sign, sin_theta_1, sin_theta_2;
+						
+						theta_a_sign = self.theta_a < 0 ? -1 : 1;
+						sin_theta_1 = WCS.Math.sind(self.wcsobj.theta_1);
+						sin_theta_2 = WCS.Math.sind(self.wcsobj.theta_2);
+						
+						r = theta_a_sign * Math.sqrt(x * x + Math.pow(self.wcsobj.Y_0 - y, 2));
+						phi = WCS.Math.atan2d(x / r , (self.wcsobj.Y_0 - y) / r) / self.wcsobj.C;
+						theta = WCS.Math.asind(1 / self.wcsobj.gamma + sin_theta_1 * sin_theta_2 / self.wcsobj.gamma - self.wcsobj.gamma * Math.pow(Math.PI * r / 360, 2));
+						throw new Error('Sorry, projection is not yet implemented');
+						return [phi, theta];
 					};
 					
 				} else if (projection === 'COD') {
 	
-					self.wcsobj.C = (180 / Math.PI) * WCS.Math.sind(self.theta_0) * WCS.Math.sind(self.eta) / self.eta;
-					self.wcsobj.Y_0 = self.eta * (1 / WCS.Math.tand(self.eta)) * (1 / WCS.Math.tand(self.theta_0));
-
+					self.wcsobj.C = (180 / Math.PI) * WCS.Math.sind(self.wcsobj.theta_a) * WCS.Math.sind(self.wcsobj.eta) / self.wcsobj.eta;
+					self.wcsobj.Y_0 = self.wcsobj.eta * (1 / WCS.Math.tand(self.wcsobj.eta)) * (1 / WCS.Math.tand(self.wcsobj.theta_a));
+					
 					self.to_spherical = function (x, y) {
 						var r, theta_a_sign;
 	
-						theta_a_sign = self.theta_0 < 0 ? -1 : 1; 
-						r = theta_a_sign * Math.sqrt(x*x + Math.pow(self.Y_0 - y, 2));
-						console.log(self.wcsobj.Y_0);
-						phi = WCS.Math.atan2d(x / r , (self.Y_0 - y) / r) / self.C;
-						theta = self.theta_0 + self.eta * (1 / WCS.Math.tand(self.eta)) * (1 / WCS.Math.tand(self.theta_0));
-	
+						theta_a_sign = self.theta_a < 0 ? -1 : 1; 
+						r = theta_a_sign * Math.sqrt(x * x + Math.pow(self.wcsobj.Y_0 - y, 2));
+						phi = WCS.Math.atan2d(x / r , (self.wcsobj.Y_0 - y) / r) / self.wcsobj.C;
+						theta = self.wcsobj.theta_a + self.wcsobj.eta * (1 / WCS.Math.tand(self.wcsobj.eta)) * (1 / WCS.Math.tand(self.wcsobj.theta_a)) - r;
+
 						return [phi, theta];
 					};
 				} else if (projection === 'COO') {
