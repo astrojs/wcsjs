@@ -710,33 +710,7 @@
 			}
 			return points
 		},
-
-
-		// to_celestial: function (phi, theta) {
-		// 	
-		// 	var wcsobj, sin_theta, cos_theta, sin_dphi, cos_dphi, sin_dp, cos_dp;
-		// 	var x_temp, y_temp, ra, dec;
-		//             wcsobj = this.wcsobj;
-		// 
-		// 	sin_theta = WCS.Math.sind(theta);
-		// 	cos_theta = WCS.Math.cosd(theta);
-		// 	
-		// 	sin_dp = WCS.Math.sind(wcsobj.delta_p);
-		// 	cos_dp = WCS.Math.cosd(wcsobj.delta_p);
-		// 	
-		// 	sin_dphi = WCS.Math.sind(phi - wcsobj.lonpole);
-		// 	cos_dphi = WCS.Math.cosd(phi - wcsobj.lonpole);
-		// 
-		// 	x_temp = sin_theta * cos_dp - cos_theta * sin_dp * cos_dphi;
-		// 	y_temp = -cos_theta * sin_dphi;
-		// 	
-		// 	ra = wcsobj.alpha_p + WCS.Math.atan2d(y_temp, x_temp);
-		// 	ra = (ra + 360) % 360;
-		// 	dec = WCS.Math.asind(sin_theta * sin_dp + cos_theta * cos_dp * cos_dphi);
-		// 
-		// 	        return [ra, dec];
-		// },
-
+		
 		
 		to_celestial: function (phi, theta) {
 			
@@ -749,13 +723,6 @@
 			cos_dphi = WCS.Math.cosd(phi - wcsobj.lonpole);
 			sin_dec_p = WCS.Math.sind(wcsobj.delta_p);
 			cos_dec_p = WCS.Math.cosd(wcsobj.delta_p);
-			
-			console.log("sin_theta\t", sin_theta);
-			console.log("cos_theta\t", cos_theta);
-			console.log("sin_dphi\t", sin_dphi);
-			console.log("cos_dphi\t", cos_dphi);
-			console.log("sin_dec_p\t", sin_dec_p);
-			console.log("cos_dec_p\t", cos_dec_p);
 			
 			x_temp = sin_theta * cos_dec_p - cos_theta * sin_dec_p * cos_dphi;
 			y_temp = -cos_theta * sin_dphi;

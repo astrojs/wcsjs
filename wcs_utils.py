@@ -5,7 +5,7 @@ import pyfits
 import pywcs
 
 
-def wcs2json(in_file, out_file):
+def wcs2json(in_file, out_file, string = False):
     """
     Constructs a JSON file containing FITS keywords relevant to world coordinate system.
     """
@@ -60,14 +60,17 @@ def wcs2json(in_file, out_file):
             for i in xrange(0, wcs['A_ORDER'] + 1):
                 for j in xrange(0, wcs['B_ORDER'] + 1):
                     full_key = "%s_%d_%d" % (key, i, j)
-                    print full_key
                     if (header.has_key(full_key)):
                         wcs[full_key] = header[full_key]
 
-    f = open(out_file, 'w')    
-    json = JSONEncoder().encode(wcs)
-    f.write(json)
-    f.close()
+
+    json = JSONEncoder().encode(wcs)    
+    if string:
+        return "var %s = %s;" % (wcs['CTYPE1'].lower()[5:].replace('-', '_'), json)
+    else :
+        f = open(out_file, 'w')    
+        f.write( "var %s = %s;" % (wcs['CTYPE1'].lower()[5:], json) )
+        f.close()
 
 
 def avm2json(avm_file, out_file):
@@ -109,8 +112,6 @@ def avm2json(avm_file, out_file):
             return True
 
     return False
-        
-    
     
 
 if __name__ == '__main__':
