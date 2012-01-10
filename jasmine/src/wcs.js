@@ -559,32 +559,31 @@
 				// Conic Projections
 	
 				// Determine theta_0 from PV parameters
-				if (typeof(json.pv) != 'undefined') {
-					compute_celestial_parameters(0, parseFloat(json.pv[0]));
-				} else {
-					throw new Error("Not enough information to compute WCS");
-				}
+				self.wcsobj.phi_0 = json.PV1_1 | 0;
+				self.wcsobj.theta_0 = json.PV1_2 | 0;
+				compute_celestial_parameters(self.wcsobj.phi_0, self.wcsobj.theta_0);
+				
+				// Conic parameters
+				self.wcsobj.theta_a = json.PV2_1;
+				self.wcsobj.eta = json.PV2_2 | 0;
 	
-				// Eta defaults to zero if not given
-				self.eta = typeof(json.pv[1]) != 'undefined' ? parseFloat(json.pv[1]) : 0;
-	
-				// Compute theta_1 and theta_2
-				self.theta_1 = self.theta_0 - self.eta;
-				self.theta_2 = self.theta_0 + self.eta;
+				// Compute theta_1 and theta_2 from conic parameters
+				self.wcsobj.theta_1 = self.wcsobj.theta_a - self.wcsobj.eta;
+				self.wcsobj.theta_2 = self.wcsobj.theta_a + self.wcsobj.eta;
 	
 				if (projection === 'COP') {
 	
-					self.C = WCS.Math.sind(self.theta_0);
-					self.Y_0 = 180 * WCS.Math.cosd(self.eta) / (Math.PI * WCS.Math.tand(self.theta_0));
+					self.wcsobj.C = WCS.Math.sind(self.wcsobj.theta_a);
+					self.wcsobj.Y_0 = 180 * WCS.Math.cosd(self.wcsobj.eta) / (Math.PI * WCS.Math.tand(self.wcsobj.theta_a));
 	
 					self.to_spherical = function (x, y) {
 						var r, theta_a_sign;
-	
-						theta_a_sign = self.theta_0 < 0 ? -1 : 1; 
-						r = theta_a_sign * Math.sqrt(x*x + Math.pow(self.Y_0 - y, 2));
-						phi = WCS.Math.atan2d(x / r , (self.Y_0 - y) / r) / self.C;
-						theta = self.theta_0 + WCS.Math.atand(1 / WCS.Math.atand(self.theta_0) - (Math.PI * r) / (180 * WCS.Math.cosd(self.eta)));
-	
+						
+						theta_a_sign = self.theta_a < 0 ? -1 : 1;
+						r = theta_a_sign * Math.sqrt(x * x + Math.pow(self.wcsobj.Y_0 - y, 2));
+						phi = WCS.Math.atan2d(x / r , (self.wcsobj.Y_0 - y) / r) / self.wcsobj.C;
+						theta = self.wcsobj.theta_a + WCS.Math.atand(1 / WCS.Math.tand(self.wcsobj.theta_a) - (Math.PI * r) / (180 * WCS.Math.cosd(self.wcsobj.eta)));
+
 						return [phi, theta];
 					}
 	
@@ -596,15 +595,15 @@
 					
 				} else if (projection === 'COD') {
 	
-					self.C = (180 / Math.PI) * WCS.Math.sind(self.theta_0) * WCS.Math.sind(self.eta) / self.eta;
-					self.Y_0 = self.eta * (1 / WCS.Math.tand(self.eta)) * (1 / WCS.Math.tand(self.theta_0));
-	
+					self.wcsobj.C = (180 / Math.PI) * WCS.Math.sind(self.theta_0) * WCS.Math.sind(self.eta) / self.eta;
+					self.wcsobj.Y_0 = self.eta * (1 / WCS.Math.tand(self.eta)) * (1 / WCS.Math.tand(self.theta_0));
+
 					self.to_spherical = function (x, y) {
 						var r, theta_a_sign;
 	
 						theta_a_sign = self.theta_0 < 0 ? -1 : 1; 
 						r = theta_a_sign * Math.sqrt(x*x + Math.pow(self.Y_0 - y, 2));
-	
+						console.log(self.wcsobj.Y_0);
 						phi = WCS.Math.atan2d(x / r , (self.Y_0 - y) / r) / self.C;
 						theta = self.theta_0 + self.eta * (1 / WCS.Math.tand(self.eta)) * (1 / WCS.Math.tand(self.theta_0));
 	
