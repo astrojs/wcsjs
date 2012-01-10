@@ -1,124 +1,23 @@
-var air, arc, azp, ncp, sin, stg, szp, tan, tan_sip, zea, zpn;
-var ait, car, cea, cyp, mer, mol, par, sfl;
-var cop;
-
-//
-//	Zenithal Projections
-//
-
-// Airy
-air = {"crpix": [-234.754501084, 8.33933082442], "equinox": 2000, "pv": [45], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AIR", "DEC--AIR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Zenithal Equidistant
-arc = {"crpix": [-246.941901905, 5.08227445044], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ARC", "DEC--ARC"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Zenithal perspective
-azp = {"crpix": [-254.110084878, -11.3494854253], "equinox": 2000, "pv": [2, 30], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AZP", "DEC--AZP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// North Celestial Pole (SIN special case)
-ncp = {"crpix": [-237.189543154, 7.68857200935], "equinox": 2000, "pv": [0, -1.21679644751e-08], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SIN", "DEC--SIN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Generalized orthographic
-sin = {"crpix": [-237.189543154, 7.68857112488], "equinox": 2000, "pv": [0, 0], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SIN", "DEC--SIN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Stereographic
-stg = {"crpix": [-251.945990929, 3.74494253774], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---STG", "DEC--STG"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Slant zenithal perspective
-szp = {"crpix": [-247.865697278, -22.6205195637], "equinox": 2000, "pv": [2, 180, 60], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SZP", "DEC--SZP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Gnomonic
-tan = {"crpix": [-268.065808712, -0.563043720109], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---TAN", "DEC--TAN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-tan_flat = {"CRPIX1": -268.065808712, "CRPIX2": -0.563043720109, "EQUINOX": 2000, "WCSAXES": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS": 2, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---TAN", "CTYPE2": "DEC--TAN", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0};
-
-tan_sip = {"CDELT1": 5.555555555555556e-05, "CDELT2": 5.555555555555556e-05, "NAXIS": 2, "CD1_2": 1.119595821259043e-08, "CD1_1": -5.557083308307701e-05, "EQUINOX": 2000.0, "B_1_1": 1.654076157788624e-09, "B_2_0": -2.358464967766551e-09, "B_ORDER": 2, "A_ORDER": 2, "B_0_2": 2.419127563916605e-09, "NAXIS1": 4096, "NAXIS2": 4096, "CD2_1": 9.183699386059067e-09, "CD2_2": 5.557204016463274e-05, "CRVAL2": -0.1132432699671816, "A_1_1": 1.889718326840132e-09, "CRPIX1": 0.0, "CRPIX2": 0.0, "CRVAL1": 22.11388326212198, "A_0_2": 6.68821909513515e-09, "A_2_0": 2.326398584898877e-09, "CTYPE2": "DEC--TAN-SIP", "CTYPE1": "RA---TAN-SIP", "RADESYS": "FK5"};
-
-// Zenithal equal area
-zea = {"crpix": [-244.488069036, 5.73805594999], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ZEA", "DEC--ZEA"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-// Zenithal polynomial
-zpn = {"crpix": [-183.293725563, 22.0921112058], "equinox": 2000, "pv": [0.05, 0.975, -0.807, 0.337, -0.065, 0.01, 0.003, -0.001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---ZPN", "DEC--ZPN"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -90, "restwav": 0};
-
-//
-// FLAT HEADERS
-//
-// Generalized orthographic
-sin_flat = {"CRPIX1": -237.189543154, "CRPIX2": 7.68857112488, "EQUINOX": 2000, "pv": [0, 0], "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---SIN", "CTYPE2": "DEC--SIN", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0};
-
-// Stereographic
-stg_flat = {"CRPIX1": -251.945990929, "CRPIX2":3.74494253774, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---STG", "CTYPE2": "DEC--STG", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0};
-
-
-// Zenithal Equidistant
-arc_flat = {"CRPIX1": -246.941901905, "CRPIX2": 5.08227445044, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---ARC", "CTYPE2": "DEC--ARC", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0};
-
-
-tan_flat = {"CRPIX1": -268.065808712, "CRPIX2": -0.563043720109, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS": 2, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---TAN", "CTYPE2": "DEC--TAN", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0}
-
-// Cylindrical Perspective
-cyp_flat = {"CRPIX1": -147.105551401, "CRPIX2": 20.5609993928, "EQUINOX": 2000, "pv": [1, 0.707106781187], "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---CYP", "CTYPE2": "DEC--CYP", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Zenithal equal area
-zea_flat = {"CRPIX1": -244.488069036, "CRPIX2": 5.73805594999, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---ZEA", "CTYPE2": "DEC--ZEA", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": -90, "RESTWAV": 0};
-
-// Cylindrical Perspective
-cyp_flat = {"CRPIX1": -147.105551401, "CRPIX2": 20.5609993928, "EQUINOX": 2000, "pv": [1, 0.707106781187], "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---CYP", "CTYPE2": "DEC--CYP", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Cylindrical Equal Area
-cea_flat = {"CRPIX1": -248.217381441, "CRPIX2": 7.68857112488, "EQUINOX": 2000, "pv": [1], "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---CEA", "CTYPE2": "DEC--CEA", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Plate Carrée
-car_flat = {"CRPIX1": -248.217381441, "CRPIX2": 7.52703819975, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---CAR", "CTYPE2": "DEC--CAR", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Mercator
-mer_flat = {"CRPIX1": -248.217381441, "CRPIX2": 7.36497841286, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---MER", "CTYPE2": "DEC--MER", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Sanson-Flamsteed
-sfl_flat = {"CRPIX1": -246.348308624, "CRPIX2": 7.52703819975, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---SFL", "CTYPE2": "DEC--SFL", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Parabolic
-par_flat = {"CRPIX1": -246.555149428, "CRPIX2": 3.32293776965, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---PAR", "CTYPE2": "DEC--PAR", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Mollweide
-mol_flat = {"CRPIX1": -212.76559475, "CRPIX2": -2.31067099452, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---MOL", "CTYPE2": "DEC--MOL", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-// Hammer-Aitoff
-ait_flat = {"CRPIX1": -246.231711628, "CRPIX2": 7.11585002705, "EQUINOX": 2000, "NAXIS": 2, "LONPOLE": 180, "CDELT1": -0.0666666666667, "CDELT2": 0.0666666666667, "NAXIS1": 192, "NAXIS2": 192, "CTYPE1": "RA---AIT", "CTYPE2": "DEC--AIT", "CRVAL1": 0, "CRVAL2": -90, "RESTFRQ": 1420405750, "CUNIT1": "deg", "CUNIT2": "deg", "LATPOLE": 0, "RESTWAV": 0};
-
-
-
-//
-//	Cylindrical Projections
-//
-
-// Hammer-Aitoff
-ait = {"crpix": [-246.231711628, 7.11585002705], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---AIT", "DEC--AIT"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Plate Carrée
-car = {"crpix": [-248.217381441, 7.52703819975], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---CAR", "DEC--CAR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Cylindrical Equal Area
-cea = {"crpix": [-248.217381441, 7.68857112488], "equinox": 2000, "pv": [1], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---CEA", "DEC--CEA"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Cylindrical Perspective
-cyp = {"crpix": [-147.105551401, 20.5609993928], "equinox": 2000, "pv": [1, 0.707106781187], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---CYP", "DEC--CYP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Mercator
-mer = {"crpix": [-248.217381441, 7.36497841286], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---MER", "DEC--MER"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Mollweide
-mol = {"crpix": [-212.76559475, -2.31067099452], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---MOL", "DEC--MOL"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Parabolic
-par = {"crpix": [-246.555149428, 3.32293776965], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---PAR", "DEC--PAR"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-// Sanson-Flamsteed
-sfl = {"crpix": [-246.348308624, 7.52703819975], "equinox": 2000, "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---SFL", "DEC--SFL"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": 0, "restwav": 0};
-
-//
-//	Conic Projections
-//
-cop = {"crpix": [-215.192313909, 15.0576827274], "equinox": 2000, "pv": [45, 25], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---COP", "DEC--COP"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -45, "restwav": 0};
-
-cod = {"crpix": [-215.343171469, 15.6130268271], "equinox": 2000, "pv": [45, 25], "wcsaxes": 2, "lonpole": 180, "cdelt": [-0.0666666666667, 0.0666666666667], "naxis": [192, 192], "ctype": ["RA---COD", "DEC--COD"], "crval": [0, -90], "restfrq": 1420405750, "cunit": ["deg", "deg"], "latpole": -45, "restwav": 0};
+var cod = {"EQUINOX": 2000.0, "CRPIX1": -215.3431714695, "CRPIX2": 15.61302682707, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--COD", "CTYPE1": "RA---COD", "CRVAL2": -90.0, "LATPOLE": -45.0};
+var coe = {"EQUINOX": 2000.0, "CRPIX1": -223.0375366798, "CRPIX2": -14.35249668783, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--COE", "CTYPE1": "RA---COE", "CRVAL2": -90.0, "LATPOLE": 45.0};
+var coo = {"EQUINOX": 2000.0, "CRPIX1": -213.6486051767, "CRPIX2": 12.92640949564, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--COO", "CTYPE1": "RA---COO", "CRVAL2": -90.0, "LATPOLE": -45.0};
+var cop = {"EQUINOX": 2000.0, "CRPIX1": -215.1923139086, "CRPIX2": 15.05768272737, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--COP", "CTYPE1": "RA---COP", "CRVAL2": -90.0, "LATPOLE": -45.0};
+var ait = {"EQUINOX": 2000.0, "CRPIX1": -246.2317116277, "CRPIX2": 7.115850027049, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--AIT", "CTYPE1": "RA---AIT", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var car = {"EQUINOX": 2000.0, "CRPIX1": -248.2173814412, "CRPIX2": 7.527038199745, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--CAR", "CTYPE1": "RA---CAR", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var cea = {"EQUINOX": 2000.0, "CRPIX1": -248.2173814412, "CRPIX2": 7.688571124876, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--CEA", "CTYPE1": "RA---CEA", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var cyp = {"EQUINOX": 2000.0, "CRPIX1": -147.1055514007, "CRPIX2": 20.56099939277, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--CYP", "CTYPE1": "RA---CYP", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var mer = {"EQUINOX": 2000.0, "CRPIX1": -248.2173814412, "CRPIX2": 7.364978412864, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--MER", "CTYPE1": "RA---MER", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var mol = {"EQUINOX": 2000.0, "CRPIX1": -212.7655947497, "CRPIX2": -2.310670994515, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--MOL", "CTYPE1": "RA---MOL", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var par = {"EQUINOX": 2000.0, "CRPIX1": -246.5551494284, "CRPIX2": 3.322937769653, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--PAR", "CTYPE1": "RA---PAR", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var sfl = {"EQUINOX": 2000.0, "CRPIX1": -246.3483086237, "CRPIX2": 7.527038199745, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--SFL", "CTYPE1": "RA---SFL", "CRVAL2": -90.0, "LATPOLE": 0.0};
+var air = {"EQUINOX": 2000.0, "CRPIX1": -234.7545010835, "CRPIX2": 8.339330824422, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--AIR", "CTYPE1": "RA---AIR", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var arc = {"EQUINOX": 2000.0, "CRPIX1": -246.941901905, "CRPIX2": 5.082274450444, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--ARC", "CTYPE1": "RA---ARC", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var azp = {"EQUINOX": 2000.0, "CRPIX1": -254.1100848779, "CRPIX2": -11.34948542534, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--AZP", "CTYPE1": "RA---AZP", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var ncp = {"EQUINOX": 2000.0, "CRPIX1": -237.1895431541, "CRPIX2": 7.688572009351, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--SIN", "CTYPE1": "RA---SIN", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var sin = {"EQUINOX": 2000.0, "CRPIX1": -237.1895431541, "CRPIX2": 7.688571124876, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--SIN", "CTYPE1": "RA---SIN", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var stg = {"EQUINOX": 2000.0, "CRPIX1": -251.945990929, "CRPIX2": 3.744942537739, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--STG", "CTYPE1": "RA---STG", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var szp = {"EQUINOX": 2000.0, "CRPIX1": -247.8656972779, "CRPIX2": -22.62051956373, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--SZP", "CTYPE1": "RA---SZP", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var tan = {"EQUINOX": 2000.0, "CRPIX1": -268.0658087122, "CRPIX2": -0.5630437201085, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--TAN", "CTYPE1": "RA---TAN", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var zea = {"EQUINOX": 2000.0, "CRPIX1": -244.4880690361, "CRPIX2": 5.738055949994, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--ZEA", "CTYPE1": "RA---ZEA", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var zpn = {"EQUINOX": 2000.0, "CRPIX1": -183.2937255632, "CRPIX2": 22.09211120575, "CRVAL1": 0.0, "NAXIS1": 192, "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "NAXIS": 2, "CTYPE2": "DEC--ZPN", "CTYPE1": "RA---ZPN", "CRVAL2": -90.0, "LATPOLE": -90.0};
+var tan_sip = {"CDELT1": 5.555555555555556e-05, "CDELT2": 5.555555555555556e-05, "NAXIS": 2, "CD1_2": 1.119595821259043e-08, "CD1_1": -5.557083308307701e-05, "EQUINOX": 2000.0, "B_1_1": 1.654076157788624e-09, "B_2_0": -2.358464967766551e-09, "B_ORDER": 2, "A_ORDER": 2, "B_0_2": 2.419127563916605e-09, "NAXIS1": 4096, "NAXIS2": 4096, "CD2_1": 9.183699386059067e-09, "CD2_2": 5.557204016463274e-05, "CRVAL2": -0.1132432699671816, "A_1_1": 1.889718326840132e-09, "CRPIX1": 0.0, "CRPIX2": 0.0, "CRVAL1": 22.11388326212198, "A_0_2": 6.68821909513515e-09, "A_2_0": 2.326398584898877e-09, "CTYPE2": "DEC--TAN-SIP", "CTYPE1": "RA---TAN-SIP", "RADESYS": "FK5"};
