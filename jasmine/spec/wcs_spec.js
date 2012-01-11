@@ -151,7 +151,8 @@ describe ("pixels to projection plane coordinates and back", function () {
 
 
 describe ("sky to pixel transformations", function () {
-	var wcs, pixels, sky, i, coords;
+	var wcs, pixels, sky, i, coords, precision;
+	precision = 4;
 	
 	beforeEach(function () {
 		pixels = [];
@@ -177,6 +178,38 @@ describe ("sky to pixel transformations", function () {
 		sky.push([284.90543739577, -66.30663097651]);
 	
 		wcs = new WCS.Mapper(arc);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+	
+	it ("SIN Projection", function () {
+
+		sky.push([268.39150699215, -73.90353552624]);
+		sky.push([269.10716399624, -60.03668870909]);
+		sky.push([307.73275850866, -69.48636458818]);
+		sky.push([293.24065113325, -57.07877059966]);
+		sky.push([284.90376923726, -66.31039234200]);
+
+		wcs = new WCS.Mapper(sin);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+	
+	it ("STG Projection", function () {
+		
+		sky.push([269.37825680266, -73.25613046025]);
+		sky.push([269.64574155082, -61.03602098451]);
+		sky.push([306.65846712587, -69.21034027654]);
+		sky.push([292.97934645515, -58.65820590407]);
+		sky.push([284.90625709548, -66.30490865995]);
+
+		wcs = new WCS.Mapper(stg);
 		for (i = 0; i < pixels.length; i += 1) {
 			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
 			expect(coords.x).toBeCloseTo(pixels[i][0], precision);

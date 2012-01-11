@@ -116,12 +116,13 @@
 			
 			// Attempt to derive the PC matrix when not given, otherwise default to identity
 			self.wcsobj.pc = check_card(json, 'PC', naxis) || derive_pc(json);
+			self.wcsobj.pc_inv = WCS.Math.matrixInverse(self.wcsobj.pc);
 			
 			// Store the CD matrix if given
 			self.wcsobj.cd = check_card(json, 'CD', naxis);
-
-			// Inverse PC Matrix
-			self.wcsobj.pc_inv = WCS.Math.matrixInverse(self.wcsobj.pc);
+			if (self.wcsobj.cd) {
+				self.wcsobj.cd_inv = WCS.Math.matrixInverse(self.wcsobj.cd);
+			}			
 		}
 		
 		
@@ -279,6 +280,17 @@
 	
 				        return [phi, theta]
 					};
+					
+					self.from_spherical = function (phi, theta) {
+						
+						var r, x, y;
+						
+						r = 180 / Math.PI * WCS.Math.cosd(theta);
+						x = r * WCS.Math.sind(phi);
+						y = -r * WCS.Math.cosd(phi);
+						
+						return [x, y];
+					};
 	
 				} else if (projection === 'STG') {
 	
@@ -290,8 +302,17 @@
 						phi = WCS.Math.atan2d(x, -y);
 	
 				        return [phi, theta];
-	
 					};
+					
+					self.from_spherical = function (phi, theta) {
+						
+						var r, x, y;
+						r = 360 / Math.PI * WCS.Math.tand((90 - theta) / 2);
+						x = r * WCS.Math.sind(phi);
+						y = -r * WCS.Math.cosd(phi);
+						
+						return [x, y];
+					}
 	
 				} else if (projection === 'SZP') {
 	
@@ -334,12 +355,16 @@
 						}
 						sip.a_order = header.A_ORDER;
 						sip.b_order = header.B_ORDER;
-						
+						sip.ap_order = header.AP_ORDER || 0;
+						sip.bp_order = header.BP_ORDER || 0;
+
 						// Get the coefficients from the header
 						// Coefficients are stored in a 2D array with indexing
 						// A_i_j => a_coeffs[i][j]
 						sip.a_coeffs = [];
 						sip.b_coeffs = [];
+						sip.ap_coeffs = [];
+						sip.bp_coeffs = [];
 						for (i = 0; i <= sip.a_order; i += 1) {
 							sip.a_coeffs[i] = [];
 							for (j = 0; j <= sip.a_order; j += 1) {
@@ -354,11 +379,24 @@
 								sip.b_coeffs[i][j] = header[key] || 0;
 							}
 						}
-						
+						for (i = 0; i <= sip.ap_order; i += 1) {
+							sip.ap_coeffs[i] = [];
+							for (j = 0; j <= sip.ap_order; j += 1) {
+								key = 'AP_' + i + '_' + j;
+								sip.ap_coeffs[i][j] = header[key] || 0;
+							}
+						}
+						for (i = 0; i <= sip.bp_order; i += 1) {
+							sip.bp_coeffs[i] = [];
+							for (j = 0; j <= sip.bp_order; j += 1) {
+								key = 'BP_' + i + '_' + j;
+								sip.bp_coeffs[i][j] = header[key] || 0;
+							}
+						}
 						if (!sip.a_coeffs || !sip.b_coeffs) {
 							throw new Error("Where are the coeffs, dude!");
 						}
-						
+
 						return sip;
 					};					
 					
@@ -384,13 +422,13 @@
 						wcsobj = this.wcsobj;
 						proj = [];
 						
-						u = points[0] - self.wcsobj.crpix[0];
-						v = points[1] - self.wcsobj.crpix[1];
+						u = points[0] - wcsobj.crpix[0];
+						v = points[1] - wcsobj.crpix[1];
 						
 						dx = dy = 0;
-						dx = self.f(u, v, self.wcsobj.sip.a_coeffs);
-						dy = self.f(u, v, self.wcsobj.sip.b_coeffs);
-						
+						dx = self.f(u, v, wcsobj.sip.a_coeffs);
+						dy = self.f(u, v, wcsobj.sip.b_coeffs);
+
 						points[0] = points[0] + dx;
 						points[1] = points[1] + dy;
 
@@ -401,24 +439,35 @@
 								proj[i] += wcsobj.cd[i][j] * points[j];
 							}
 						}
-
+						
 						return proj;
 					};
 						
-					// self.from_intermediate = function (proj) {
-					// 	console.log('in SIP');
-					// 	var i, j, points;
-					// 	points = [];
-					// 	
-					// 	for (i = 0; i < self.wcsobj.naxis; i += 1) {
-					// 		points[i] = 0;
-					// 		for (j = 0; j < self.wcsobj.naxis; j += 1) {
-					// 			points[i] += self.wcsobj.pc_inv[i][j] * proj[j] / self.wcsobj.cdelt[i];
-					// 		}
-					// 		points[i] += self.wcsobj.crpix[i];
-					// 	}
-					// 	return points
-					// };
+					self.from_intermediate = function (proj) {
+						var wcsobj, i, j, tmp, points, dx, dy;
+						wcsobj = this.wcsobj;
+						
+						tmp = [];
+						for (i = 0; i < wcsobj.naxis; i += 1) {
+							tmp[i] = 0;
+							for (j = 0; j < wcsobj.naxis; j += 1) {
+								tmp[i] += wcsobj.cd_inv[i][j] * proj[j];
+							}
+							tmp[i] += wcsobj.crpix[i];
+						}
+						dx = dy = 0;
+						dx = self.f(tmp[0], tmp[1], wcsobj.sip.ap_coeffs);
+						dy = self.f(tmp[0], tmp[1], wcsobj.sip.bp_coeffs);
+
+						points = [];
+						points[0] = tmp[0] + dx;
+						points[1] = tmp[1] + dy;
+
+						points[0] += wcsobj.crpix[0];
+						points[1] += wcsobj.crpix[1];
+
+						return points;
+					};
 					
 					self.to_spherical = function (x, y) {
 						var r, theta, phi;
