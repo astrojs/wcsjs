@@ -227,14 +227,23 @@ WCS.Math.determinant = function (mat) {
 };
 
 
-WCS.Math.matrixInverse = function (mat) {
-	var w, h, I, inv, temp, i, j;
-	w = mat[0].length;
-	h = mat.length;
+WCS.Math.matrixInverse = function (m) {
+	var w, h, I, inv, temp, mat, i, j;
+	w = m[0].length;
+	h = m.length;
 	I = new Array(h);
 	inv = new Array(h);
 	temp = [];
 	
+	// Clone the array
+	mat = [];
+	for (j = 0; j < h; j += 1) {
+		mat[j] = [];
+		for (i = 0; i < w; i += 1) {
+			mat[j][i] = m[j][i];
+		}
+	}
+
 	// Initialize an identity matrix of the correct dimensions
 	for (j = 0; j < h; j +=1 ) {
 		I[j] = new Array(w);
@@ -248,11 +257,12 @@ WCS.Math.matrixInverse = function (mat) {
 	}
 	
 	// Gauss-Jordan
-	WCS.Math.gaussJordan(mat);
+	WCS.Math.gaussJordan(temp);
 	
 	for (j = 0; j < h; j += 1) {
 		inv[j] = temp[j].slice(w, 2*w);
 	}
+
 	return inv;
 };
 
