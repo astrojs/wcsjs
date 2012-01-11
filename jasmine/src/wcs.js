@@ -66,6 +66,7 @@
 		 * appropriate keywords to compute celestial coordinates.
 		 * 
 		 * TODO: Handle CROTA and CD keywords, derive PC matrix from these
+		 * TODO: Handle different axis configuration
 		 */
 		function verify_header (json) {
 			var naxis, axiskw_req, key, axis, j, arrayname, date, pc;
@@ -137,7 +138,6 @@
 		function check_card(header, key, dimensions) {
 			var i, j, full_key, obj;
 
-			// console.log(header, key, dimensions, offset);
 			obj = [];
 			for (i = 1; i <= dimensions; i += 1) {
 				obj[i-1] = [];
@@ -500,6 +500,16 @@
 	
 						return [phi, theta];
 					};
+					
+					self.from_spherical = function (phi, theta) {
+						var r, x, y;
+						
+						r = 360 / Math.PI * WCS.Math.sind((90 - theta) / 2);
+						x = r * WCS.Math.sind(phi);
+						y = -r * WCS.Math.cosd(phi);
+						
+						return [x, y];
+					};
 	
 				} else if (projection === 'ZPN') {
 	
@@ -527,7 +537,17 @@
 						phi = x / self.wcsobj.lambda;
 
 						return [phi, theta];
-					}
+					};
+					
+					// FIXME: This test is failing
+					self.from_spherical = function (phi, theta) {
+						var x, y;
+						
+						x = self.wcsobj.lambda * phi;
+						y = (180 / Math.PI) * ((self.wcsobj.mu + self.wcsobj.lambda) / (self.wcsobj.mu + WCS.Math.cosd(theta))) * WCS.Math.sind(theta);
+						
+						return [x, y];
+					};
 	
 				} else if (projection === 'CEA') {
 	
@@ -541,13 +561,26 @@
 						phi = x;
 	
 						return [phi, theta];
-					}
+					};
+					
+					self.from_spherical = function (phi, theta) {
+						var x, y;
+						
+						x = phi;
+						y = 180 / Math.PI * WCS.Math.sind(theta) / self.wcsobj.lambda;
+						
+						return [x, y];
+					};
 	
 				} else if (projection === 'CAR') {
 	
 					self.to_spherical = function (x, y) {
 						return [x, y];
-					}
+					};
+					
+					self.from_spherical = function (phi, theta) {
+						return [phi, theta];
+					};
 	
 				} else if (projection === 'MER') {
 	
@@ -556,7 +589,13 @@
 	
 						theta = 2 * WCS.Math.atand(Math.exp(y * Math.PI / 180)) - 90;
 						return [x, theta];
-					}
+					};
+					
+					self.from_spherical = function (phi, theta) {
+						var y;
+						y = (180 / Math.PI) * Math.log(WCS.Math.tand((90 + theta) / 2));
+						return [phi, y];
+					};
 	
 				} else if (projection === 'SFL') {
 	
@@ -565,7 +604,13 @@
 	
 						phi = x / WCS.Math.cosd(y);
 						return [phi, y];
-					}
+					};
+					
+					self.from_spherical = function (phi, theta) {
+						var x;
+						x = phi * WCS.Math.cosd(theta);
+						return [x, theta];
+					};
 	
 				} else if (projection === 'PAR') {
 	
@@ -576,7 +621,16 @@
 						phi = x / (1 - 4 * Math.pow(y / 180, 2));
 	
 						return [phi, theta];
-					}
+					};
+					
+					self.from_spherical = function (phi, theta) {
+						var x, y;
+						
+						x = phi * (2 * WCS.Math.cosd(2 * theta / 3) - 1);
+						y = 180 * WCS.Math.sind(theta / 3);
+						
+						return [x, y];
+					};
 	
 				} else if (projection === 'MOL') {
 	
@@ -587,7 +641,19 @@
 						phi = (Math.PI * x) / (2 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)));
 	
 						return [phi, theta];
-					}
+					};
+					
+					// TODO: Variable gamma needs to be solved iteratively.
+					self.from_spherical = function (phi, theta) {
+						var x, y, gamma;
+						
+						throw new Error('Sorry, projection is not yet implemented.');
+						
+						x = 2 * Math.sqrt(2) / Math.PI * phi * WCS.Math.cosd(gamma);
+						y = Math.sqrt(2) * 180 / Math.PI * WCS.Math.sind(gamma);
+						
+						return [x, y];
+					};
 	
 				} else if (projection === 'AIT') {
 	
@@ -601,6 +667,17 @@
 						phi = 2 * WCS.Math.atan2d(Math.PI * z * x / (2 * 180), 2 * z * z - 1);
 	
 						return [phi, theta];
+					};
+					
+					self.from_spherical = function (phi, theta) {
+						var x, y, gamma;
+						
+						gamma = 180 / Math.PI * Math.sqrt(2 / (1 + WCS.Math.cosd(theta) * WCS.Math.cosd(phi / 2)));
+						
+						x = 2 * gamma * WCS.Math.cosd(theta) * WCS.Math.sind(phi / 2);
+						y = gamma * WCS.Math.sind(theta);
+						
+						return [x, y];
 					};
 				}
 			} else if (conic.indexOf(projection) > -1) {
@@ -787,11 +864,10 @@
 			
 			x_temp = sin_theta * cos_dec_p - cos_theta * sin_dec_p * cos_dphi;
 			y_temp = -cos_theta * sin_dphi;
+			z_temp = sin_theta * sin_dec_p + cos_theta * cos_dec_p * cos_dphi;
 			
 			ra = WCS.Math.atan2d(y_temp, x_temp) + wcsobj.alpha_p;
 			ra = (ra + 360) % 360;
-			
-			z_temp = sin_theta * sin_dec_p + cos_theta * cos_dec_p * cos_dphi;
 			dec = WCS.Math.asind(z_temp);
 			
 			return [ra, dec];

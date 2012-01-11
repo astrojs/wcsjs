@@ -249,6 +249,154 @@ describe ("sky to pixel transformations", function () {
 		}
 	});
 	
+	it ("ZEA Projection", function () {
+
+		sky.push([268.89429694488, -73.57489559933]);
+		sky.push([269.37808163249, -60.57684091173]);
+		sky.push([307.18909348552, -69.34483973313]);
+		sky.push([293.10932896827, -57.94570137254]);
+		sky.push([284.90502664962, -66.30752029696]);
+
+		wcs = new WCS.Mapper(zea);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+	
+	//
+	//	Cylindrical Projections
+	//
+	
+	it ("CYP Projection", function () {
+		
+		sky.push([263.69300640788, -75.95480262512]);
+		sky.push([267.11650280878, -57.99620775699]);
+		sky.push([314.47700550214, -70.78754655132]);
+		sky.push([294.10767800687, -55.63518650347]);
+		sky.push([284.89605048654, -66.32061940296]);
+		
+		wcs = new WCS.Mapper(cyp);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+	
+	it ("CEA Projection", function () {
+		
+		sky.push([268.44085265462, -73.37969380549]);
+		sky.push([269.09024385942, -60.64908874812]);
+		sky.push([307.52044819239, -69.38302901111]);
+		sky.push([294.13191054912, -58.36209566279]);
+		sky.push([284.90109941802, -66.30599022330]);
+		
+		wcs = new WCS.Mapper(cea);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+
+	it ("CAR Projection", function () {
+		
+		sky.push([268.47850587888, -73.37997130772]);
+		sky.push([269.11222126114, -60.64923604906]);
+		sky.push([307.32299968118, -69.43277061051]);
+		sky.push([293.97962362308, -58.39244690857]);
+		sky.push([284.90153565747, -66.30594750654]);
+		
+		wcs = new WCS.Mapper(car);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+
+	it ("MER Projection", function () {
+
+		sky.push([268.51628090050, -73.38024288395]);
+		sky.push([269.13426924501, -60.64938020277]);
+		sky.push([307.13073648219, -69.48077163725]);
+		sky.push([293.83175889043, -58.42169429877]);
+		sky.push([284.90196957302, -66.30590501598]);
+		
+		wcs = new WCS.Mapper(mer);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+
+	it ("SFL Projection", function () {
+		
+		sky.push([268.46737987111, -73.50405652146]);
+		sky.push([269.10879603428, -60.77298321216]);
+		sky.push([306.90291088836, -69.22328916258]);
+		sky.push([293.61495994868, -57.87845261548]);
+		sky.push([284.90245830848, -66.30746896901]);
+		
+		wcs = new WCS.Mapper(sfl);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+
+	it ("PAR Projection", function () {
+		
+		sky.push([269.47944138196, -73.49563038873]);
+		sky.push([269.69722708408, -60.76256251520]);
+		sky.push([306.32989302475, -69.41721246570]);
+		sky.push([293.18212343779, -58.05648713597]);
+		sky.push([284.90591012398, -66.30689603965]);
+		
+		wcs = new WCS.Mapper(par);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+
+	it ("MOL Projection", function () {
+		
+		sky.push([270.72846180802, -74.16980073050]);
+		sky.push([270.39774981058, -60.02718873940]);
+		sky.push([306.84442527764, -70.24462868694]);
+		sky.push([292.26796386222, -57.66494958439]);
+		sky.push([284.91211049555, -66.30961122414]);
+		
+		wcs = new WCS.Mapper(mol);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+
+	it ("AIT Projection", function () {
+		
+		sky.push([268.56813922636, -73.49845984257]);
+		sky.push([269.17359044102, -60.70174516331]);
+		sky.push([307.08620023155, -69.28342195718]);
+		sky.push([293.58502491896, -57.98593060648]);
+		sky.push([284.90284110443, -66.30720454723]);
+
+		wcs = new WCS.Mapper(ait);
+		for (i = 0; i < pixels.length; i += 1) {
+			coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+			expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+			expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+		}
+	});
+	
 });
 
 describe ("pixel to sky transformations", function () {
