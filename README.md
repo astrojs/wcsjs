@@ -1,8 +1,32 @@
-Quick and dirty README.
+wcsjs
+=====
 
-Sift out the files wcs.js and math.js in the jasmine directory.  Drop them into your JS project.
+wcsjs is a JavaScript library for transforming astronomical coordinates.  The following projections are currently supported
 
-Create a JSON with relevant WCS keywords and values, e.g.
+* ARC
+* SIN
+* STG
+* TAN
+* TAN-SIP
+* ZEA
+* CYP\*
+* CEA\*
+* CAR\*
+* MER\*
+* SFL\*
+* PAR\*
+* MOL\*
+* AIT\*
+* COP\*
+* COD\*
+
+\* Sky to pixel transformation not yet implemented
+
+Instructions
+------------
+Sift out the files wcs.js and math.js in the jasmine directory.  Drop them into your JS project. 
+
+Create a JavaScript object with relevant WCS keywords and values, e.g.
 
 
     var tan = {
@@ -22,7 +46,7 @@ Create a JSON with relevant WCS keywords and values, e.g.
         "LATPOLE": -90.0
     };
 
-Initialize a WCS Mapper object with the JSON.
+Initialize a WCS Mapper object with the JavaScript object.
 
 
     var wcs;
@@ -49,4 +73,4 @@ Transform coordinates from pixel to sky and back:
     alert(pix.x);
     alert(pix.y);
 
-
+BAM!
