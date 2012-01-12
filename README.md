@@ -22,6 +22,8 @@ wcsjs is a JavaScript library for transforming astronomical coordinates.  The fo
 
 \* Sky to pixel transformation not yet implemented
 
+Here is a [working example](http://kapadia.github.com/wcsjs/).
+
 Instructions
 ------------
 Sift out the files wcs.js and math.js in the jasmine directory.  Drop them into your JS project. 
