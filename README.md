@@ -52,7 +52,7 @@ Initialize a WCS Mapper object with the JavaScript object.
 
 
     var wcs;
-    wcs = WCS.Mapper(tan);
+    wcs = new WCS.Mapper(tan);
 
 
 Transform coordinates from pixel to sky and back:
