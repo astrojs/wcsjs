@@ -7,3 +7,4 @@
 data/
 wcslib.py
 wcslib.pyc
+*.fits.gz
