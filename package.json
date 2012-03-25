@@ -1,0 +1,18 @@
+{
+  "name": "wcsjs",
+  "version": "0.0.1",
+  "description": "Astronomical coordinates in JavaScript",
+  "keywords": ["astronomy", "wcs", "astrometry", "shazaam"],
+  "homepage": "https://www.zooniverse.org/",
+  "author": {
+    "name": "Amit Kapadia",
+    "email": "amit@zooniverse.org",
+    "url": "https://www.zooniverse.org/"
+  },
+  "files": ["lib/wcs.js"],
+  "main": "lib/wcs.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kapadia/wcsjs.git"
+  },
+}
