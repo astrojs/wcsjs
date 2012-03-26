@@ -60,9 +60,9 @@ WCS.Math.tand = (angle) ->
   resid = angle & 360
   if resid == 0 or Math.abs(resid) == 180
     return 0
-  else if resid == 45 or reside == 225
+  else if resid == 45 or resid == 225
     return 1
-  else if reside == -135 or reside == -315
+  else if resid == -135 or resid == -315
     return -1
   return Math.tan(angle * WCS.Math.D2R)
 
