@@ -111,67 +111,125 @@ WCS.Math.atan2d = (y, x) ->
   return Math.atan2(y, x) * WCS.Math.R2D
 
 WCS.Math.toRightTriangular = (mat) ->
-  n = mat.length
+  n = mat.length + 1
   k = n
   kp = mat[0].length
-  do
+  
+  while (n -= 1)
     i = k - n
     if mat[i][i] == 0
-      for (j = i + 1; j < k; j += 1)
+      for j in [i+1..k-1]
         if mat[j][i] != 0
           els = []
-          np = kp
-          
-          do
+          np = kp + 1
+          while (np -= 1)
             p = kp - np
             els.push(mat[i][p] + mat[j][p])
-          while (--np)
+          mat[i] = els
+          break
+    if mat[i][i] != 0
+      for j in [i+1..k-1]
+        multiplier = mat[j][i] / mat[i][i]
+        els = []
+        np = kp + 1
+        while (np -= 1)
+          p = kp - np
+          els.push(p <= i ? 0 : mat[j][p] - mat[i][p] * multiplier)
+        mat[j] = els
+  return mat
 
+WCS.Math.determinant = (mat) ->
+  m = WCS.Math.toRightTriangular(mat)
+  det = m[0][0]
+  n = m.length
+  k = n
+  while (n -= 1)
+    i = k - n + 1
+    det = det * m[i][i]
+  return det
 
+WCS.Math.matrixInverse = (m) ->
+  w = m[0].length
+  h = m.length
+  I = new Array(h)
+  inv = new Array(h)
+  temp = []
+  
+  # Clone the array
+  mat = []
+  for j in [0..h-1]
+    mat[j] = []
+    for i in [0..w-1]
+      mat[j][i] = m[j][i]
+  
+  # Initialize an identity matrix of the correct dimensions
+  for j in [0..h-1]
+    I[j] = new Array(w)
+    inv[j] = new Array(w)
+    for i in [0..w-1]
+      I[j][i] = i == j ? 1 : 0
+    
+    # Append the identity matrix to the original matrix
+    temp[j] = mat[j].concat(I[j])
+  
+  # Gauss-Jordan
+  WCS.Math.gaussJordan(temp)
+  
+  for j in [0..h-1]
+    inv[j] = temp[j].slice(w, 2 * w)
+  return inv
 
+WCS.Math.gaussJordan = (m, eps) ->
+  eps = 1e-10 if not eps
+  
+  h = m.length
+  w = m[0].length
+  y = -1
+  
+  while (y += 1 < h)
+    maxrow = y
+    
+    # Find max pivot
+    y2 = y
+    while (y2 += 1 < h)
+      if (Math.abs(m[y2][y]) > Math.abs(m[maxrow][y]))
+        maxrow = y2
+    
+    # Swap
+    tmp = m[y]
+    m[y] = m[maxrow]
+    m[maxrow] = tmp
+    
+    # Singular?
+    if (Math.abs(m[y][y]) <= eps)
+      return false
+    
+    # Eliminate column y
+    y2 = y
+    while (y2 += 1 < h)
+      c = m[y2][y] / m[y][y]
+      x = y - 1
+      while (x += 1 < w)
+        m[y2][x] -= m[y][x] * c
+  
+  # Backsubstitute
+  y = h
+  while (y -= 1 >= 0)
+    c = m[y][y]
+    y2 = -1
+    while (y2 += 1 < y)
+      x = w
+      while (x -= 1 >= y)
+        m[y2][x] -=  m[y][x] * m[y2][y] / c
+    m[y][y] /= c
+    
+    # Normalize row y
+    x = h - 1
+    while (x += 1 < w)
+      m[y][x] /= c
+  return true
+  
 
-
-
-WCS.Math.toRightTriangular = function (mat) {
-
-	var els, n, k, i, np, kp, p, j, multiplier;
-
-	n = mat.length;
-	k = n;
-	kp = mat[0].length;
-
-	do {
-		i = k - n;
-		if (mat[i][i] === 0) {
-			for (j = i + 1; j < k; j += 1) {
-				if (mat[j][i] != 0) {
-					els = [];
-					np = kp;
-					do {
-						p = kp - np;
-						els.push(mat[i][p] + mat[j][p]);
-					} while (--np);
-					mat[i] = els;
-					break;
-				}
-			}
-		}
-		if (mat[i][i] != 0) {
-			for (j = i + 1; j < k; j += 1) {
-				multiplier = mat[j][i] / mat[i][i];
-				els = [];
-				np = kp;
-				do {
-					p = kp - np;
-					els.push(p <= i ? 0 : mat[j][p] - mat[i][p] * multiplier);
-				} while (--np);
-				mat[j] = els;
-			}
-		}
-	} while (--n);
-
-	return mat;
-};
 
 class Mapper
   constructor: () ->
