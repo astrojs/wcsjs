@@ -232,11 +232,101 @@ WCS.Math.gaussJordan = (m, eps) ->
 
 
 class Mapper
-  constructor: () ->
-    console.log 'Initializing WCS.Mapper object'
+  constructor: (header) ->
+    @wcsobj = {}
+    @verifyHeader(header)
+    @setProjection(header)
+
+  verifyHeader: (json) ->
+    @wcsobj.naxis = naxis = json.NAXIS || json.WCSAXES || 2;
+    @wcsobj.radesys = json.RADESYS || 'ICRS';
     
+    requiredCards = ['CRPIX', 'CRVAL', 'CTYPE']
+    @wcsobj.crpix = []
+    @wcsobj.crval = []
+    @wcsobj.ctype = []
     
+    # Check that required values exist in JSON object
+    for axis in [1..naxis]
+      for j in [0..requiredCards.length-1]
+        key = requiredCards[j] + axis
+        if not json.hasOwnProperty(key)
+          throw new Error("Not enough information to compute WCS, missing required keyword " + key)
+        else
+          arrayName = requiredCards[j].toLowerCase()
+          @wcsobj[arrayName].push(json[key])
     
+    # Check for CUNIT and CDELT, defaulting to degrees and unity, respectively
+    # TODO: When CUNIT is not degrees, relevant values need to be converted
+    @wcsobj.cunit = []
+    @wcsobj.cdelt = []
+    for axis in [1..naxis]
+      key = 'CUNIT' + axis
+      @wcsobj.cunit.push(json[key] || 'deg')
+      key = 'CDELT' + axis
+      @wcsobj.cdelt.push(json[key] || 1)
+    
+  	# LONPOLE and LATPOLE default to values appropriate for a zenithal projection
+		@wcsobj.lonpole = json.LONPOLE || 0
+		@wcsobj.latpole = json.LATPOLE || 0
+		
+		# EQUINOX defaults to 2000 if not given
+		@wcsobj.equinox = json.EQUINOX || 2000
+		
+    # DATE_OBS defaults to today
+		date = new Date()
+		@wcsobj.date_obs = json.DATE_OBS || (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+		
+    # Attempt to derive the PC matrix when not given, otherwise default to identity
+		@wcsobj.pc = @checkCard(json, 'PC', naxis) || @derive_pc(json)
+		@wcsobj.pc_inv = WCS.Math.matrixInverse(@wcsobj.pc)
+		
+		# Store the CD matrix if given
+		@wcsobj.cd = @check_card(json, 'CD', naxis)
+		if @wcsobj.cd
+			@wcsobj.cd_inv = WCS.Math.matrixInverse(@wcsobj.cd)
+
+  ###
+  Check that a given array-valued key is contained in the header.
+  e.g. For NAXIS = 2 and the PC matrix, the header should contain:
+  PC1_1, PC1_2, PC2_1, PC2_2
+  ###
+	checkCard: (header, key, dimensions) ->
+	  obj = []
+	  for i in [1..dimensions]
+	    obj[i-1] = []
+	    for j in [1..dimensions]
+	      fullKey = key + i + '_' + j
+	      if not header.hasOwnProperty(fullKey)
+	        return
+	      else
+	        obj[i-1].push(header[fullKey])
+	  return obj
+  
+  ###
+  Derive the PC matrix using CROTAi or using the CD matrix
+  
+  TODO: Test this function!
+  ###
+  derivePC: (header) ->
+    if header.hasOwnProperty('CROTA2')
+      crota = header['CROTA2']
+      lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
+    else
+      cd = @checkCard(header, 'CD', @wcsobj.naxis)
+      if cd?
+        crota = 0
+        lambda = 1
+      else
+        # TODO: Generalize for larger matrices
+        cdDet = WCS.Math.determinant(cd)
+        cdSign = cdDet < 0 ? -1 : 1
+        @wcsobj.cdelt[0] = Math.sqrt(Math.abs(cdDet)) * cdSign
+        @wcsobj.cdelt[1] = Math.sqrt(Math.abs(cdDet))
+        crota = WCS.Math.atan2d(-1 * cd[0][1], cd[1][1])
+        lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
+    pc = [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
+    return pc
 
 # module = (name) ->
 #   global[name] = global[name] or {}

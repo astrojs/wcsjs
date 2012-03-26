@@ -1,6 +1,6 @@
 {
   "name": "wcsjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Astronomical coordinates in JavaScript",
   "keywords": ["astronomy", "wcs", "astrometry", "shazaam"],
   "homepage": "https://www.zooniverse.org/",

@@ -123,7 +123,7 @@
 			self.wcsobj.cd = check_card(json, 'CD', naxis);
 			if (self.wcsobj.cd) {
 				self.wcsobj.cd_inv = WCS.Math.matrixInverse(self.wcsobj.cd);
-			}			
+			}
 		}
 		
 		
