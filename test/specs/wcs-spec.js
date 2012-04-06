@@ -1,152 +1,145 @@
 var precision = 8;
 
 describe ("unit conversion", function () {
+  var value_deg = 180;
+  var value_rad = Math.PI;
 
-	var value_deg = 180;
-	var value_rad = Math.PI;
-	
-	it ("converts degrees to radians", function () {
-		expect(value_deg * WCS.Math.D2R).toEqual(value_rad);
-	});
-	
-	it ("converts radians to degrees", function () {
-		expect(value_rad * WCS.Math.R2D).toEqual(value_deg);
-	});
+  it ("converts degrees to radians", function () {
+    expect(value_deg * WCS.Math.D2R).toEqual(value_rad);
+  });
+
+  it ("converts radians to degrees", function () {
+    expect(value_rad * WCS.Math.R2D).toEqual(value_deg);
+  });
 });
-
 
 describe ("compute the determinant", function () {
-	var mat2d, mat3d, mat4d;
-	mat2d = [[1, 2], [3, 4]];
-	mat3d = [[1, 2, 3], [4, 5, 60], [7, 8, 9]];
-	mat4d = [[1, 2, 3, 4], [5, 60, 7, 8], [9, 10, 11, 120], [13, 14, 15, 16]];
-	
-	it ("should compute the determinant of a 2 by 2 matrix", function () {
-		expect(WCS.Math.determinant(mat2d)).toEqual(-2);
-	});
-	
-	it ("should compute the determinant of a 3 by 3 matrix", function () {
-		expect(WCS.Math.determinant(mat3d)).toEqual(324);
-	});
-	
-	it ("should compute the determinant of a 4 by 4 matrix", function () {
-		expect(WCS.Math.determinant(mat4d)).toEqual(139968);
-	});
-});
+  var mat2d, mat3d, mat4d;
+  mat2d = [[1, 2], [3, 4]];
+  mat3d = [[1, 2, 3], [4, 5, 60], [7, 8, 9]];
+  mat4d = [[1, 2, 3, 4], [5, 60, 7, 8], [9, 10, 11, 120], [13, 14, 15, 16]];
 
+  it ("should compute the determinant of a 2 by 2 matrix", function () {
+    expect(WCS.Math.determinant(mat2d)).toEqual(-2);
+  });
+
+  it ("should compute the determinant of a 3 by 3 matrix", function () {
+    expect(WCS.Math.determinant(mat3d)).toEqual(324);
+  });
+
+  it ("should compute the determinant of a 4 by 4 matrix", function () {
+    expect(WCS.Math.determinant(mat4d)).toEqual(139968);
+  });
+});
 
 describe ("Compute the cosine in units of degrees", function () {
-	var angle;
-	
-	it ("cosine of 0 degrees", function () {
-		angle = 0;
-		expect(WCS.Math.cosd(angle)).toEqual(1);
-	});
-	
-	it ("cosine of 90 degrees", function () {
-		angle = 90;
-		expect(WCS.Math.cosd(angle)).toEqual(0);
-	});
-	
-	it ("cosine of 180 degrees", function () {
-		angle = 180;
-		expect(WCS.Math.cosd(angle)).toEqual(-1);
-	});
-	
-	it ("cosine of 270 degrees", function () {
-		angle = 270;
-		expect(WCS.Math.cosd(angle)).toEqual(0);
-	});
-	
-	it ("cosine of angle in the first quadrant", function () {
-		angle = 45;
-		expect(WCS.Math.cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
-	});
-	
-	it ("cosine of angle in the second quadrant", function () {
-		angle = 135;
-		expect(WCS.Math.cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
-	});
-	
-	it ("cosine of angle in the third quadrant", function () {
-		angle = 225;
-		expect(WCS.Math.cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
-	});
-	
-	it ("cosine of angle in the fourth quadrant", function () {
-		angle = 315;
-		expect(WCS.Math.cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
-	});
-});
+  var angle;
 
+  it ("cosine of 0 degrees", function () {
+    angle = 0;
+    expect(WCS.Math.cosd(angle)).toEqual(1);
+  });
+
+  it ("cosine of 90 degrees", function () {
+    angle = 90;
+    expect(WCS.Math.cosd(angle)).toEqual(0);
+  });
+
+  it ("cosine of 180 degrees", function () {
+    angle = 180;
+    expect(WCS.Math.cosd(angle)).toEqual(-1);
+  });
+
+  it ("cosine of 270 degrees", function () {
+    angle = 270;
+    expect(WCS.Math.cosd(angle)).toEqual(0);
+  });
+
+  it ("cosine of angle in the first quadrant", function () {
+    angle = 45;
+    expect(WCS.Math.cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+  });
+
+  it ("cosine of angle in the second quadrant", function () {
+    angle = 135;
+    expect(WCS.Math.cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+  });
+
+  it ("cosine of angle in the third quadrant", function () {
+    angle = 225;
+    expect(WCS.Math.cosd(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+  });
+
+  it ("cosine of angle in the fourth quadrant", function () {
+    angle = 315;
+    expect(WCS.Math.cosd(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+  });
+});
 
 describe ("Compute the sine in units of degrees", function () {
-	var angle;
-	
-	it ("sine of 0 degrees", function () {
-		angle = 0;
-		expect(WCS.Math.sind(angle)).toEqual(0);
-	});
-	
-	it ("sine of 90 degrees", function () {
-		angle = 90;
-		expect(WCS.Math.sind(angle)).toEqual(1);
-	});
-	
-	it ("sine of 180 degrees", function () {
-		angle = 180;
-		expect(WCS.Math.sind(angle)).toEqual(0);
-	});
-	
-	it ("sine of 270 degrees", function () {
-		angle = 270;
-		expect(WCS.Math.sind(angle)).toEqual(-1);
-	});
-	
-	it ("sine of angle in the first quadrant", function () {
-		angle = 45;
-		expect(WCS.Math.sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
-	});
-	
-	it ("sine of angle in the second quadrant", function () {
-		angle = 135;
-		expect(WCS.Math.sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
-	});
-	
-	it ("sine of angle in the third quadrant", function () {
-		angle = 225;
-		expect(WCS.Math.sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
-	});
-	
-	it ("sine of angle in the fourth quadrant", function () {
-		angle = 315;
-		expect(WCS.Math.sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
-	});
+  var angle;
+
+  it ("sine of 0 degrees", function () {
+    angle = 0;
+    expect(WCS.Math.sind(angle)).toEqual(0);
+  });
+
+  it ("sine of 90 degrees", function () {
+    angle = 90;
+    expect(WCS.Math.sind(angle)).toEqual(1);
+  });
+
+  it ("sine of 180 degrees", function () {
+    angle = 180;
+    expect(WCS.Math.sind(angle)).toEqual(0);
+  });
+
+  it ("sine of 270 degrees", function () {
+    angle = 270;
+    expect(WCS.Math.sind(angle)).toEqual(-1);
+  });
+
+  it ("sine of angle in the first quadrant", function () {
+    angle = 45;
+    expect(WCS.Math.sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+  });
+
+  it ("sine of angle in the second quadrant", function () {
+    angle = 135;
+    expect(WCS.Math.sind(angle)).toBeCloseTo(1 / Math.sqrt(2), 14);
+  });
+
+  it ("sine of angle in the third quadrant", function () {
+    angle = 225;
+    expect(WCS.Math.sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+  });
+
+  it ("sine of angle in the fourth quadrant", function () {
+    angle = 315;
+    expect(WCS.Math.sind(angle)).toBeCloseTo(-1 / Math.sqrt(2), 14);
+  });
 });
 
+describe ("pixels to projection plane coordinates and back", function () {	
+  it ("pixels to projection plane", function () {
+    var wcs, pixels, proj;
+    pixels = [51, 41];
 
-describe ("pixels to projection plane coordinates and back", function () {
-	
-	it ("pixels to projection plane", function () {
-		var wcs, pixels, proj;
-		pixels = [51, 41];
-		
-		wcs = new WCS.Mapper(tan);
-		proj = wcs.to_intermediate(pixels);
-		expect(proj[0]).toBeCloseTo(-21.271053914143966, precision);
-		expect(proj[1]).toBeCloseTo(2.7708695813419855, precision);
-	});
-	
-	it ("projection plane to pixels", function () {
-		var wcs, pixels, proj;
-		proj = [-21.271053914143966, 2.7708695813419855];
-		
-		wcs = new WCS.Mapper(tan);
-		pixels = wcs.from_intermediate(proj);
-		expect(pixels[0]).toBeCloseTo(51, precision);
-		expect(pixels[1]).toBeCloseTo(41, precision);
-	});
-	
+    wcs = new WCS.Mapper(tan);
+    proj = wcs.to_intermediate(pixels);
+    expect(proj[0]).toBeCloseTo(-21.271053914143966, precision);
+    expect(proj[1]).toBeCloseTo(2.7708695813419855, precision);
+  });
+
+  it ("projection plane to pixels", function () {
+    var wcs, pixels, proj;
+    proj = [-21.271053914143966, 2.7708695813419855];
+
+    wcs = new WCS.Mapper(tan);
+    pixels = wcs.from_intermediate(proj);
+    expect(pixels[0]).toBeCloseTo(51, precision);
+    expect(pixels[1]).toBeCloseTo(41, precision);
+  });
 });
 
 

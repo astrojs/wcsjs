@@ -230,16 +230,22 @@ WCS.Math.gaussJordan = (m, eps) ->
   
 
 
-class Mapper
+class WCS.Mapper
   constructor: (header) ->
+
+    # Instance attributes
     @wcsobj = {}
+    @projection = null
+    @longitudeAxis = null
+    @latitudeAxis = null
+
     @verifyHeader(header)
     @setProjection(header)
 
-  verifyHeader: (json) =>
-    @wcsobj.naxis = naxis = json.NAXIS || json.WCSAXES || 2;
-    @wcsobj.radesys = json.RADESYS || 'ICRS';
-    
+  verifyHeader: (header) =>
+    @wcsobj.naxis = naxis = header['NAXIS'] || header['WCSAXES'] || 2
+    @wcsobj.radesys = header['RADESYS'] || 'ICRS'
+
     requiredCards = ['CRPIX', 'CRVAL', 'CTYPE']
     @wcsobj.crpix = []
     @wcsobj.crval = []
@@ -249,11 +255,11 @@ class Mapper
     for axis in [1..naxis]
       for j in [0..requiredCards.length-1]
         key = requiredCards[j] + axis
-        if not json.hasOwnProperty(key)
+        if not header.hasOwnProperty(key)
           throw new Error("Not enough information to compute WCS, missing required keyword " + key)
         else
           arrayName = requiredCards[j].toLowerCase()
-          @wcsobj[arrayName].push(json[key])
+          @wcsobj[arrayName].push(header[key])
     
     # Check for CUNIT and CDELT, defaulting to degrees and unity, respectively
     # TODO: When CUNIT is not degrees, relevant values need to be converted
@@ -261,27 +267,27 @@ class Mapper
     @wcsobj.cdelt = []
     for axis in [1..naxis]
       key = 'CUNIT' + axis
-      @wcsobj.cunit.push(json[key] || 'deg')
+      @wcsobj.cunit.push(header[key] || 'deg')
       key = 'CDELT' + axis
-      @wcsobj.cdelt.push(json[key] || 1)
+      @wcsobj.cdelt.push(header[key] || 1)
     
     # LONPOLE and LATPOLE default to values appropriate for a zenithal projection
-    @wcsobj.lonpole = json.LONPOLE || 0
-    @wcsobj.latpole = json.LATPOLE || 0
+    @wcsobj.lonpole = header['LONPOLE'] || 0
+    @wcsobj.latpole = header['LATPOLE'] || 0
 
     # EQUINOX defaults to 2000 if not given
-    @wcsobj.equinox = json.EQUINOX || 2000
+    @wcsobj.equinox = header['EQUINOX'] || 2000
 
     # DATE_OBS defaults to today
     date = new Date()
-    @wcsobj.date_obs = json.DATE_OBS || (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+    @wcsobj.date_obs = header['DATE_OBS'] || (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
 
     # Attempt to derive the PC matrix when not given, otherwise default to identity
-    @wcsobj.pc = @checkCard(json, 'PC', naxis) || @derive_pc(json)
+    @wcsobj.pc = @checkCard(header, 'PC', naxis) || @derivePC(header)
     @wcsobj.pc_inv = WCS.Math.matrixInverse(@wcsobj.pc)
 
     # Store the CD matrix if given
-    @wcsobj.cd = @check_card(json, 'CD', naxis)
+    @wcsobj.cd = @check_card(header, 'CD', naxis)
     if @wcsobj.cd
       @wcsobj.cd_inv = WCS.Math.matrixInverse(@wcsobj.cd)
 
@@ -327,58 +333,170 @@ class Mapper
     pc = [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
     return pc
     
-  setProjection: (json) =>
+  setProjection: (header) =>
     zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN']
     cylindrical = ['CYP', 'CEA', 'CAR', 'MER', 'SFL', 'PAR', 'MOL', 'AIT']
     conic = ['COP', 'COE', 'COD', 'COO']
     polyConic = ['BON', 'PCO']
     quadCube = ['TSC', 'CSC', 'QSC']
-    
-    projection = @wcsobj.ctype[0].slice(5)
-    
-    if projection in zenithal
+
+    # Determine the longitude and latitude axis
+    @projection = @wcsobj.ctype[0][5..]
+    @longitudeAxis  = if @wcsobj.ctype[0].match("RA|GLON|ELON|HLON|SLON") then 0 else 1
+    @latitudeAxis   = if @wcsobj.ctype[1].match("DEC|GLAT|ELAT|HLAT|SLAT") then 1 else 0
+
+    # TODO: Incorporate @longitudeAxis and @latitudeAxis into this code
+    if @projection in zenithal
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = 90
       @wcsobj.alphaP  = @wcsobj.crval[0]
       @wcsobj.deltaP  = @wcsobj.crval[1]
       @wcsobj.lonpole = if @wcsobj.crval[1] >= @wcsobj.theta0 then 0 else 180
-      
+
       if projection is 'AIR'
-        console.log 'AIR'
-        # Airy projection requires an additional parameter from the FITS header
-        @wcsobj.thetaB = parseFloat(json.pv[3]);
-        
+        @wcsobj.thetaB = if header.hasOwnProperty('PV2_1') then parseFloat(header['PV2_1']) else 90
+        @wcsobj.etaB = (90 - @wcsobj.thetaB) / 2
+
+        toSpherical: (x, y) =>
+          throw 'Sorry, not yet implemented!'
+        fromSpherical: (phi, theta) =>
+          throw 'Sorry, not yet implemented!'
+
       else if projection is 'ARC'
-        console.log 'ARC'
+
+        toSpherical: (x, y) =>
+          r     = Math.sqrt(x * x + y * y)
+          theta = @wcsobj.theta0 - r
+          phi   = WCS.Math.atan2d(x, -y)
+          
+          return [phi, theta]
+          
+        fromSpherical: (phi, theta) =>
+          r = 90 - theta
+          x = r * WCS.Math.sind(phi)
+          y = -r * WCS.Math.cosd(phi)
+
+          return [x, y]
+
       else if projection is 'AZP'
-        console.log 'AZP'
-      else if projection is 'ARC'
-        console.log 'AIR'
+
+        toSpherical: (x, y) =>
+          throw 'Sorry, not yet implemented!'
+        fromSpherical: (phi, theta) =>
+          throw 'Sorry, not yet implemented!'
+
       else if projection is 'NCP'
-        console.log 'NCP'
+
+        toSpherical: (x, y) =>
+          throw 'Sorry, not yet implemented!'
+        fromSpherical: (phi, theta) =>
+          throw 'Sorry, not yet implemented!'
+
       else if projection is 'SIN'
-        console.log 'SIN'
+
+        toSpherical: (x, y) =>
+          r     = Math.sqrt(x * x + y * y)
+          theta = WCS.Math.acosd(Math.PI * r / 180)
+          phi   = WCS.Math.atan2d(x, -y)
+
+          return [phi, theta]
+
+        fromSpherical: (phi, theta) =>
+          r = 180 / Math.PI * WCS.Math.cosd(theta)
+          x = r * WCS.Math.sind(phi)
+          y = -r * WCS.Math.cosd(phi)
+
+          return [x, y]
+
       else if projection is 'STG'
-        console.log 'STG'
+
+        toSpherical: (x, y) =>
+          r     = Math.sqrt(x * x + y * y)
+          theta = @wcsobj.theta0 - 2 * WCS.Math.atand(Math.PI * r / 360)
+          phi   = WCS.Math.atan2d(x, -y)
+
+          return [phi, theta]
+
+        fromSpherical: (phi, theta) =>
+          r = 360 / Math.PI * WCS.Math.tand((90 - theta) / 2)
+          x = r * WCS.Math.sind(phi)
+          y = -r * WCS.Math.cosd(phi)
+
+          return [x, y]
+
       else if projection is 'SZP'
-        console.log 'SZP'
+
+        toSpherical: (x, y) =>
+          throw 'Sorry, not yet implemented!'
+        fromSpherical: (phi, theta) =>
+          throw 'Sorry, not yet implemented!'
+
       else if projection is 'TAN'
-        console.log 'TAN'
+
+        toSpherical: (x, y) =>
+          r     = Math.sqrt(x * x + y * y)
+          theta = WCS.Math.atand(180 / (Math.PI * r))
+          phi   = WCS.Math.atan2d(x, -y)
+
+          return [phi, theta]
+
+        fromSpherical: (phi, theta) =>
+          r = 180 / (Math.PI * WCS.Math.tand(theta))
+          x = r * WCS.Math.sind(phi)
+          y = -r * WCS.Math.cosd(phi)
+
+          return [x, y]
+
       else if projection is 'TAN-SIP'
-        console.log 'TAN-SIP'
+
+        toSpherical: (x, y) =>
+          throw 'Sorry, not yet implemented!'
+        fromSpherical: (phi, theta) =>
+          throw 'Sorry, not yet implemented!'
+
       else if projection is 'ZEA'
-        console.log 'ZEA'
+        toSpherical: (x, y) =>
+          r     = Math.sqrt(x * x + y * y)
+          theta = @wcsobj.theta0 - 2 * WCS.Math.asind(Math.PI * r / 360)
+          phi   = WCS.Math.atan2d(x, -y)
+
+          return [phi, theta]
+
+        fromSpherical: (phi, theta) =>
+          r = 360 / Math.PI * WCS.Math.sind((90 - theta) / 2)
+          x = r * WCS.Math.sind(phi)
+          y = -r * WCS.Math.cosd(phi)
+
+          return [x, y]
+
       else if projection is 'ZPN'
-        console.log 'ZPN'
+
+        toSpherical: (x, y) =>
+          throw 'Sorry, not yet implemented!'
+        fromSpherical: (phi, theta) =>
+          throw 'Sorry, not yet implemented!'
 
     if projection in cylindrical
-      console.log 'cylindrical'
+      @wcsobj.phi0    = 0
+      @wcsobj.theta0  = 90
+      throw 'Sorry, not yet implemented!'
+
     if projection in conic
-      console.log 'conic'
+      @wcsobj.phi0    = 0
+      @wcsobj.theta0  = if header.hasOwnProperty('PV2_1') then header['PV2_1'] else 0
+
+      throw 'Sorry, not yet implemented!'
+
     if projection in polyConic
-      console.log 'polyConic'
+      @wcsobj.phi0    = 0
+      @wcsobj.theta0  = 0
+      throw 'Sorry, not yet implemented!'
+
     if projection in quadCube
-      console.log 'quadCube'
+      @wcsobj.phi0    = 0
+      @wcsobj.theta0  = 0
+      throw 'Sorry, not yet implemented!'
+
     
     
     

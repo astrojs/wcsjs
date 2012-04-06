@@ -301,7 +301,7 @@
 						theta = self.wcsobj.theta_0 - 2 * WCS.Math.atand(Math.PI * r / 360);
 						phi = WCS.Math.atan2d(x, -y);
 	
-				        return [phi, theta];
+				    return [phi, theta];
 					};
 					
 					self.from_spherical = function (phi, theta) {
