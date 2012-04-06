@@ -111,39 +111,38 @@ WCS.Math.atan2d = (y, x) ->
   return Math.atan2(y, x) * WCS.Math.R2D
 
 WCS.Math.toRightTriangular = (mat) ->
-  n = mat.length + 1
+  n = mat.length
   k = n
   kp = mat[0].length
-  
-  while (n -= 1)
+  for x in [n..1]
     i = k - n
-    if mat[i][i] == 0
+    if (mat[i][i] is 0)
       for j in [i+1..k-1]
-        if mat[j][i] != 0
+        if (mat[j][i] isnt 0)
           els = []
-          np = kp + 1
-          while (np -= 1)
+          np = kp
+          for y in [np..1]
             p = kp - np
             els.push(mat[i][p] + mat[j][p])
           mat[i] = els
           break
-    if mat[i][i] != 0
+    if (mat[i][i] isnt 0)
       for j in [i+1..k-1]
         multiplier = mat[j][i] / mat[i][i]
         els = []
-        np = kp + 1
-        while (np -= 1)
+        np = kp
+        for y in [np..1]
           p = kp - np
-          els.push(p <= i ? 0 : mat[j][p] - mat[i][p] * multiplier)
+          els.push(if p <= i then 0 else mat[j][p] - mat[i][p] * multiplier)
         mat[j] = els
   return mat
 
 WCS.Math.determinant = (mat) ->
   m = WCS.Math.toRightTriangular(mat)
   det = m[0][0]
-  n = m.length
+  n = m.length - 1
   k = n
-  while (n -= 1)
+  for x in [n..1]
     i = k - n + 1
     det = det * m[i][i]
   return det
@@ -237,7 +236,7 @@ class Mapper
     @verifyHeader(header)
     @setProjection(header)
 
-  verifyHeader: (json) ->
+  verifyHeader: (json) =>
     @wcsobj.naxis = naxis = json.NAXIS || json.WCSAXES || 2;
     @wcsobj.radesys = json.RADESYS || 'ICRS';
     
@@ -266,49 +265,49 @@ class Mapper
       key = 'CDELT' + axis
       @wcsobj.cdelt.push(json[key] || 1)
     
-  	# LONPOLE and LATPOLE default to values appropriate for a zenithal projection
-		@wcsobj.lonpole = json.LONPOLE || 0
-		@wcsobj.latpole = json.LATPOLE || 0
-		
-		# EQUINOX defaults to 2000 if not given
-		@wcsobj.equinox = json.EQUINOX || 2000
-		
+    # LONPOLE and LATPOLE default to values appropriate for a zenithal projection
+    @wcsobj.lonpole = json.LONPOLE || 0
+    @wcsobj.latpole = json.LATPOLE || 0
+
+    # EQUINOX defaults to 2000 if not given
+    @wcsobj.equinox = json.EQUINOX || 2000
+
     # DATE_OBS defaults to today
-		date = new Date()
-		@wcsobj.date_obs = json.DATE_OBS || (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
-		
+    date = new Date()
+    @wcsobj.date_obs = json.DATE_OBS || (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+
     # Attempt to derive the PC matrix when not given, otherwise default to identity
-		@wcsobj.pc = @checkCard(json, 'PC', naxis) || @derive_pc(json)
-		@wcsobj.pc_inv = WCS.Math.matrixInverse(@wcsobj.pc)
-		
-		# Store the CD matrix if given
-		@wcsobj.cd = @check_card(json, 'CD', naxis)
-		if @wcsobj.cd
-			@wcsobj.cd_inv = WCS.Math.matrixInverse(@wcsobj.cd)
+    @wcsobj.pc = @checkCard(json, 'PC', naxis) || @derive_pc(json)
+    @wcsobj.pc_inv = WCS.Math.matrixInverse(@wcsobj.pc)
+
+    # Store the CD matrix if given
+    @wcsobj.cd = @check_card(json, 'CD', naxis)
+    if @wcsobj.cd
+      @wcsobj.cd_inv = WCS.Math.matrixInverse(@wcsobj.cd)
 
   ###
   Check that a given array-valued key is contained in the header.
   e.g. For NAXIS = 2 and the PC matrix, the header should contain:
   PC1_1, PC1_2, PC2_1, PC2_2
   ###
-	checkCard: (header, key, dimensions) ->
-	  obj = []
-	  for i in [1..dimensions]
-	    obj[i-1] = []
-	    for j in [1..dimensions]
-	      fullKey = key + i + '_' + j
-	      if not header.hasOwnProperty(fullKey)
-	        return
-	      else
-	        obj[i-1].push(header[fullKey])
-	  return obj
-  
+  checkCard: (header, key, dimensions) =>
+    obj = []
+    for i in [1..dimensions]
+      obj[i-1] = []
+      for j in [1..dimensions]
+        fullKey = key + i + '_' + j
+        if not header.hasOwnProperty(fullKey)
+          return
+        else
+        obj[i-1].push(header[fullKey])
+    return obj
+
   ###
   Derive the PC matrix using CROTAi or using the CD matrix
-  
+
   TODO: Test this function!
   ###
-  derivePC: (header) ->
+  derivePC: (header) =>
     if header.hasOwnProperty('CROTA2')
       crota = header['CROTA2']
       lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
@@ -327,6 +326,71 @@ class Mapper
         lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
     pc = [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
     return pc
+    
+  setProjection: (json) =>
+    zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN']
+    cylindrical = ['CYP', 'CEA', 'CAR', 'MER', 'SFL', 'PAR', 'MOL', 'AIT']
+    conic = ['COP', 'COE', 'COD', 'COO']
+    polyConic = ['BON', 'PCO']
+    quadCube = ['TSC', 'CSC', 'QSC']
+    
+    projection = @wcsobj.ctype[0].slice(5)
+    
+    if projection in zenithal
+      @wcsobj.phi0    = 0
+      @wcsobj.theta0  = 90
+      @wcsobj.alphaP  = @wcsobj.crval[0]
+      @wcsobj.deltaP  = @wcsobj.crval[1]
+      @wcsobj.lonpole = if @wcsobj.crval[1] >= @wcsobj.theta0 then 0 else 180
+      
+      if projection is 'AIR'
+        console.log 'AIR'
+        # Airy projection requires an additional parameter from the FITS header
+        @wcsobj.thetaB = parseFloat(json.pv[3]);
+        
+      else if projection is 'ARC'
+        console.log 'ARC'
+      else if projection is 'AZP'
+        console.log 'AZP'
+      else if projection is 'ARC'
+        console.log 'AIR'
+      else if projection is 'NCP'
+        console.log 'NCP'
+      else if projection is 'SIN'
+        console.log 'SIN'
+      else if projection is 'STG'
+        console.log 'STG'
+      else if projection is 'SZP'
+        console.log 'SZP'
+      else if projection is 'TAN'
+        console.log 'TAN'
+      else if projection is 'TAN-SIP'
+        console.log 'TAN-SIP'
+      else if projection is 'ZEA'
+        console.log 'ZEA'
+      else if projection is 'ZPN'
+        console.log 'ZPN'
 
+    if projection in cylindrical
+      console.log 'cylindrical'
+    if projection in conic
+      console.log 'conic'
+    if projection in polyConic
+      console.log 'polyConic'
+    if projection in quadCube
+      console.log 'quadCube'
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 # module = (name) ->
 #   global[name] = global[name] or {}
