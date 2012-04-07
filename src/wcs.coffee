@@ -110,41 +110,86 @@ WCS.Math.atan2d = (y, x) ->
       return -90
   return Math.atan2(y, x) * WCS.Math.R2D
 
+# WCS.Math.toRightTriangular = (mat) ->
+#   n = mat.length
+#   k = n
+#   kp = mat[0].length
+#   for x in [n..1]
+#     i = k - n
+#     if (mat[i][i] is 0)
+#       for j in [i+1..k-1]
+#         if (mat[j][i] isnt 0)
+#           els = []
+#           np = kp
+#           for y in [np..1]
+#             p = kp - np
+#             els.push(mat[i][p] + mat[j][p])
+#           mat[i] = els
+#           break
+#     if (mat[i][i] isnt 0)
+#       for j in [i+1..k-1]
+#         multiplier = mat[j][i] / mat[i][i]
+#         els = []
+#         np = kp
+#         for y in [np..1]
+#           p = kp - np
+#           els.push(if p <= i then 0 else mat[j][p] - mat[i][p] * multiplier)
+#         mat[j] = els
+#   return mat
+
 WCS.Math.toRightTriangular = (mat) ->
   n = mat.length
   k = n
   kp = mat[0].length
-  for x in [n..1]
+  loop
     i = k - n
-    if (mat[i][i] is 0)
-      for j in [i+1..k-1]
-        if (mat[j][i] isnt 0)
+    if mat[i][i] is 0
+      j = i + 1
+      while j < k
+        unless mat[j][i] is 0
           els = []
           np = kp
-          for y in [np..1]
+          loop
             p = kp - np
-            els.push(mat[i][p] + mat[j][p])
+            els.push mat[i][p] + mat[j][p]
+            break unless --np
           mat[i] = els
           break
-    if (mat[i][i] isnt 0)
-      for j in [i+1..k-1]
+        j += 1
+    unless mat[i][i] is 0
+      j = i + 1
+      while j < k
         multiplier = mat[j][i] / mat[i][i]
         els = []
         np = kp
-        for y in [np..1]
+        loop
           p = kp - np
-          els.push(if p <= i then 0 else mat[j][p] - mat[i][p] * multiplier)
+          els.push (if p <= i then 0 else mat[j][p] - mat[i][p] * multiplier)
+          break unless --np
         mat[j] = els
+        j += 1
+    break unless --n
   return mat
+
+# WCS.Math.determinant = (mat) ->
+#   m = WCS.Math.toRightTriangular(mat)
+#   det = m[0][0]
+#   n = m.length - 1
+#   k = n
+#   for x in [n..1]
+#     i = k - n + 1
+#     det = det * m[i][i]
+#   return det
 
 WCS.Math.determinant = (mat) ->
   m = WCS.Math.toRightTriangular(mat)
   det = m[0][0]
   n = m.length - 1
   k = n
-  for x in [n..1]
+  loop
     i = k - n + 1
     det = det * m[i][i]
+    break unless --n
   return det
 
 WCS.Math.matrixInverse = (m) ->
