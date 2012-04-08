@@ -3,9 +3,9 @@ WCS = exports? and @ or @WCS = {}
 
 WCS.Math = {}
 
-WCS.Math.R2D = 180 / Math.PI;
-WCS.Math.D2R = Math.PI / 180;
-WCS.Math.WCSTRIG_TOL = 1e-10;
+WCS.Math.R2D = 180 / Math.PI
+WCS.Math.D2R = Math.PI / 180
+WCS.Math.WCSTRIG_TOL = 1e-10
 
 WCS.Math.cosd = (angle) ->
   if angle % 90 == 0
@@ -110,33 +110,6 @@ WCS.Math.atan2d = (y, x) ->
       return -90
   return Math.atan2(y, x) * WCS.Math.R2D
 
-# WCS.Math.toRightTriangular = (mat) ->
-#   n = mat.length
-#   k = n
-#   kp = mat[0].length
-#   for x in [n..1]
-#     i = k - n
-#     if (mat[i][i] is 0)
-#       for j in [i+1..k-1]
-#         if (mat[j][i] isnt 0)
-#           els = []
-#           np = kp
-#           for y in [np..1]
-#             p = kp - np
-#             els.push(mat[i][p] + mat[j][p])
-#           mat[i] = els
-#           break
-#     if (mat[i][i] isnt 0)
-#       for j in [i+1..k-1]
-#         multiplier = mat[j][i] / mat[i][i]
-#         els = []
-#         np = kp
-#         for y in [np..1]
-#           p = kp - np
-#           els.push(if p <= i then 0 else mat[j][p] - mat[i][p] * multiplier)
-#         mat[j] = els
-#   return mat
-
 WCS.Math.toRightTriangular = (mat) ->
   n = mat.length
   k = n
@@ -171,16 +144,6 @@ WCS.Math.toRightTriangular = (mat) ->
     break unless --n
   return mat
 
-# WCS.Math.determinant = (mat) ->
-#   m = WCS.Math.toRightTriangular(mat)
-#   det = m[0][0]
-#   n = m.length - 1
-#   k = n
-#   for x in [n..1]
-#     i = k - n + 1
-#     det = det * m[i][i]
-#   return det
-
 WCS.Math.determinant = (mat) ->
   m = WCS.Math.toRightTriangular(mat)
   det = m[0][0]
@@ -198,82 +161,124 @@ WCS.Math.matrixInverse = (m) ->
   I = new Array(h)
   inv = new Array(h)
   temp = []
-  
-  # Clone the array
   mat = []
-  for j in [0..h-1]
+  j = 0
+  while j < h
     mat[j] = []
-    for i in [0..w-1]
+    i = 0
+    while i < w
       mat[j][i] = m[j][i]
-  
-  # Initialize an identity matrix of the correct dimensions
-  for j in [0..h-1]
+      i += 1
+    j += 1
+  j = 0
+  while j < h
     I[j] = new Array(w)
     inv[j] = new Array(w)
-    for i in [0..w-1]
-      I[j][i] = i == j ? 1 : 0
-    
-    # Append the identity matrix to the original matrix
+    i = 0
+    while i < w
+      I[j][i] = (if i is j then 1 else 0)
+      i += 1
     temp[j] = mat[j].concat(I[j])
-  
-  # Gauss-Jordan
-  WCS.Math.gaussJordan(temp)
-  
-  for j in [0..h-1]
+    j += 1
+  WCS.Math.gaussJordan temp
+  j = 0
+  while j < h
     inv[j] = temp[j].slice(w, 2 * w)
+    j += 1
   return inv
 
-WCS.Math.gaussJordan = (m, eps) ->
-  eps = 1e-10 if not eps
-  
-  h = m.length
-  w = m[0].length
-  y = -1
-  
-  while (y += 1 < h)
-    maxrow = y
-    
-    # Find max pivot
-    y2 = y
-    while (y2 += 1 < h)
-      if (Math.abs(m[y2][y]) > Math.abs(m[maxrow][y]))
-        maxrow = y2
-    
-    # Swap
-    tmp = m[y]
-    m[y] = m[maxrow]
-    m[maxrow] = tmp
-    
-    # Singular?
-    if (Math.abs(m[y][y]) <= eps)
-      return false
-    
-    # Eliminate column y
-    y2 = y
-    while (y2 += 1 < h)
-      c = m[y2][y] / m[y][y]
-      x = y - 1
-      while (x += 1 < w)
-        m[y2][x] -= m[y][x] * c
-  
-  # Backsubstitute
-  y = h
-  while (y -= 1 >= 0)
-    c = m[y][y]
-    y2 = -1
-    while (y2 += 1 < y)
-      x = w
-      while (x -= 1 >= y)
-        m[y2][x] -=  m[y][x] * m[y2][y] / c
-    m[y][y] /= c
-    
-    # Normalize row y
-    x = h - 1
-    while (x += 1 < w)
-      m[y][x] /= c
-  return true
-  
+WCS.Math.gaussJordan = `function (m, eps) {
+  console.log(m);
+  if (!eps) eps = 1e-10;
+  var h, w, y, y2, x, maxrow, tmp, c;
+  h = m.length;
+  w = m[0].length;
+  y = -1;
 
+  while (++y < h) {
+    maxrow = y;
+
+    // Find max pivot.
+    y2 = y;
+    while (++y2 < h) {
+      if (Math.abs(m[y2][y]) > Math.abs(m[maxrow][y]))
+        maxrow = y2;
+    }
+
+    // Swap.
+    tmp = m[y];
+    m[y] = m[maxrow];
+    m[maxrow] = tmp;
+
+    // Singular?
+    if (Math.abs(m[y][y]) <= eps)
+      return false;
+
+    // Eliminate column y.
+    y2 = y;
+    while (++y2 < h) {
+      c = m[y2][y] / m[y][y];
+      x = y - 1;
+      while (++x < w) {
+        m[y2][x] -= m[y][x] * c;
+      }
+    }
+  }
+
+  // Backsubstitute.
+  y = h;
+  while (--y >= 0) {
+    c = m[y][y];
+    y2 = -1;
+    while (++y2 < y) {
+      x = w;
+      while (--x >= y) {
+        m[y2][x] -=  m[y][x] * m[y2][y] / c;
+      }
+    }
+    m[y][y] /= c;
+    // Normalize row y.
+    x = h - 1;
+    while (++x < w) {
+      m[y][x] /= c;
+    }
+  }
+  return true;
+};`
+
+
+# WCS.Math.gaussJordan = (mat) ->
+#   eps = 1e-10
+#   # h = mat.length
+#   # w = mat[0].length
+#   h = 2
+#   w = 3
+#   y = -1
+#   while ++y < h
+#     console.log 'this is y', y
+#     maxrow = y
+#     y2 = y
+#     maxrow = y2 if Math.abs(mat[y2][y]) > Math.abs(mat[maxrow][y]) while ++y2 < h
+#     tmp = mat[y]
+#     mat[y] = mat[maxrow]
+#     mat[maxrow] = tmp
+#     return false if Math.abs(mat[y][y]) <= eps
+#     y2 = y
+#     while ++y2 < h
+#       c = mat[y2][y] / mat[y][y]
+#       x = y - 1
+#       mat[y2][x] -= mat[y][x] * c  while ++x < w
+#   y = h
+#   while --y >= 0
+#     c = mat[y][y]
+#     y2 = -1
+#     while ++y2 < y
+#       x = w
+#       mat[y2][x] -= mat[y][x] * mat[y2][y] / c  while --x >= y
+#     mat[y][y] /= c
+#     x = h - 1
+#     mat[y][x] /= c  while ++x < w
+#   return true
 
 class WCS.Mapper
   constructor: (header) ->
@@ -288,9 +293,9 @@ class WCS.Mapper
     @setProjection(header)
 
   verifyHeader: (header) =>
-    @wcsobj.naxis = naxis = header['NAXIS'] || header['WCSAXES'] || 2
-    @wcsobj.radesys = header['RADESYS'] || 'ICRS'
-
+    @wcsobj.naxis = naxis = header['NAXIS'] or header['WCSAXES'] or 2
+    @wcsobj.radesys = header['RADESYS'] or 'ICRS'
+  
     requiredCards = ['CRPIX', 'CRVAL', 'CTYPE']
     @wcsobj.crpix = []
     @wcsobj.crval = []
@@ -312,28 +317,28 @@ class WCS.Mapper
     @wcsobj.cdelt = []
     for axis in [1..naxis]
       key = 'CUNIT' + axis
-      @wcsobj.cunit.push(header[key] || 'deg')
+      @wcsobj.cunit.push(header[key] or 'deg')
       key = 'CDELT' + axis
-      @wcsobj.cdelt.push(header[key] || 1)
+      @wcsobj.cdelt.push(header[key] or 1)
     
     # LONPOLE and LATPOLE default to values appropriate for a zenithal projection
-    @wcsobj.lonpole = header['LONPOLE'] || 0
-    @wcsobj.latpole = header['LATPOLE'] || 0
-
+    @wcsobj.lonpole = header['LONPOLE'] or 0
+    @wcsobj.latpole = header['LATPOLE'] or 0
+  
     # EQUINOX defaults to 2000 if not given
-    @wcsobj.equinox = header['EQUINOX'] || 2000
-
+    @wcsobj.equinox = header['EQUINOX'] or 2000
+  
     # DATE_OBS defaults to today
     date = new Date()
-    @wcsobj.date_obs = header['DATE_OBS'] || (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
-
+    @wcsobj.date_obs = header['DATE_OBS'] or (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+  
     # Attempt to derive the PC matrix when not given, otherwise default to identity
-    @wcsobj.pc = @checkCard(header, 'PC', naxis) || @derivePC(header)
+    @wcsobj.pc = @checkCard(header, 'PC', naxis) or @derivePC(header)
     @wcsobj.pc_inv = WCS.Math.matrixInverse(@wcsobj.pc)
-
+  
     # Store the CD matrix if given
-    @wcsobj.cd = @check_card(header, 'CD', naxis)
-    if @wcsobj.cd
+    @wcsobj.cd = @checkCard(header, 'CD', naxis)
+    if @wcsobj.cd?
       @wcsobj.cd_inv = WCS.Math.matrixInverse(@wcsobj.cd)
 
   ###
@@ -364,7 +369,7 @@ class WCS.Mapper
       lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
     else
       cd = @checkCard(header, 'CD', @wcsobj.naxis)
-      if cd?
+      if !cd?
         crota = 0
         lambda = 1
       else
