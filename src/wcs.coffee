@@ -188,7 +188,6 @@ WCS.Math.matrixInverse = (m) ->
   return inv
 
 WCS.Math.gaussJordan = `function (m, eps) {
-  console.log(m);
   if (!eps) eps = 1e-10;
   var h, w, y, y2, x, maxrow, tmp, c;
   h = m.length;
@@ -246,40 +245,6 @@ WCS.Math.gaussJordan = `function (m, eps) {
   return true;
 };`
 
-
-# WCS.Math.gaussJordan = (mat) ->
-#   eps = 1e-10
-#   # h = mat.length
-#   # w = mat[0].length
-#   h = 2
-#   w = 3
-#   y = -1
-#   while ++y < h
-#     console.log 'this is y', y
-#     maxrow = y
-#     y2 = y
-#     maxrow = y2 if Math.abs(mat[y2][y]) > Math.abs(mat[maxrow][y]) while ++y2 < h
-#     tmp = mat[y]
-#     mat[y] = mat[maxrow]
-#     mat[maxrow] = tmp
-#     return false if Math.abs(mat[y][y]) <= eps
-#     y2 = y
-#     while ++y2 < h
-#       c = mat[y2][y] / mat[y][y]
-#       x = y - 1
-#       mat[y2][x] -= mat[y][x] * c  while ++x < w
-#   y = h
-#   while --y >= 0
-#     c = mat[y][y]
-#     y2 = -1
-#     while ++y2 < y
-#       x = w
-#       mat[y2][x] -= mat[y][x] * mat[y2][y] / c  while --x >= y
-#     mat[y][y] /= c
-#     x = h - 1
-#     mat[y][x] /= c  while ++x < w
-#   return true
-
 class WCS.Mapper
   constructor: (header) ->
 
@@ -334,7 +299,7 @@ class WCS.Mapper
   
     # Attempt to derive the PC matrix when not given, otherwise default to identity
     @wcsobj.pc = @checkCard(header, 'PC', naxis) or @derivePC(header)
-    @wcsobj.pc_inv = WCS.Math.matrixInverse(@wcsobj.pc)
+    @wcsobj.pcInv = WCS.Math.matrixInverse(@wcsobj.pc)
   
     # Store the CD matrix if given
     @wcsobj.cd = @checkCard(header, 'CD', naxis)
@@ -403,7 +368,7 @@ class WCS.Mapper
       @wcsobj.deltaP  = @wcsobj.crval[1]
       @wcsobj.lonpole = if @wcsobj.crval[1] >= @wcsobj.theta0 then 0 else 180
 
-      if projection is 'AIR'
+      if @projection is 'AIR'
         @wcsobj.thetaB = if header.hasOwnProperty('PV2_1') then parseFloat(header['PV2_1']) else 90
         @wcsobj.etaB = (90 - @wcsobj.thetaB) / 2
 
@@ -412,7 +377,7 @@ class WCS.Mapper
         fromSpherical: (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
-      else if projection is 'ARC'
+      else if @projection is 'ARC'
 
         toSpherical: (x, y) =>
           r     = Math.sqrt(x * x + y * y)
@@ -428,21 +393,21 @@ class WCS.Mapper
 
           return [x, y]
 
-      else if projection is 'AZP'
+      else if @projection is 'AZP'
 
         toSpherical: (x, y) =>
           throw 'Sorry, not yet implemented!'
         fromSpherical: (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
-      else if projection is 'NCP'
+      else if @projection is 'NCP'
 
         toSpherical: (x, y) =>
           throw 'Sorry, not yet implemented!'
         fromSpherical: (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
-      else if projection is 'SIN'
+      else if @projection is 'SIN'
 
         toSpherical: (x, y) =>
           r     = Math.sqrt(x * x + y * y)
@@ -458,7 +423,7 @@ class WCS.Mapper
 
           return [x, y]
 
-      else if projection is 'STG'
+      else if @projection is 'STG'
 
         toSpherical: (x, y) =>
           r     = Math.sqrt(x * x + y * y)
@@ -474,14 +439,14 @@ class WCS.Mapper
 
           return [x, y]
 
-      else if projection is 'SZP'
+      else if @projection is 'SZP'
 
         toSpherical: (x, y) =>
           throw 'Sorry, not yet implemented!'
         fromSpherical: (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
-      else if projection is 'TAN'
+      else if @projection is 'TAN'
 
         toSpherical: (x, y) =>
           r     = Math.sqrt(x * x + y * y)
@@ -497,14 +462,14 @@ class WCS.Mapper
 
           return [x, y]
 
-      else if projection is 'TAN-SIP'
+      else if @projection is 'TAN-SIP'
 
         toSpherical: (x, y) =>
           throw 'Sorry, not yet implemented!'
         fromSpherical: (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
-      else if projection is 'ZEA'
+      else if @projection is 'ZEA'
         toSpherical: (x, y) =>
           r     = Math.sqrt(x * x + y * y)
           theta = @wcsobj.theta0 - 2 * WCS.Math.asind(Math.PI * r / 360)
@@ -519,39 +484,52 @@ class WCS.Mapper
 
           return [x, y]
 
-      else if projection is 'ZPN'
+      else if @projection is 'ZPN'
 
         toSpherical: (x, y) =>
           throw 'Sorry, not yet implemented!'
         fromSpherical: (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
-    if projection in cylindrical
+    if @projection in cylindrical
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = 90
       throw 'Sorry, not yet implemented!'
 
-    if projection in conic
+    if @projection in conic
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = if header.hasOwnProperty('PV2_1') then header['PV2_1'] else 0
 
       throw 'Sorry, not yet implemented!'
 
-    if projection in polyConic
+    if @projection in polyConic
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = 0
       throw 'Sorry, not yet implemented!'
 
-    if projection in quadCube
+    if @projection in quadCube
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = 0
       throw 'Sorry, not yet implemented!'
 
+  toIntermediate: (points) =>
+    proj = [];
+    for i in [0..@wcsobj.naxis-1]
+      proj[i] = 0
+      points[i] -= @wcsobj.crpix[i]
+      for j in [0..@wcsobj.naxis-1]
+        proj[i] += @wcsobj.cdelt[i] * @wcsobj.pc[i][j] * points[j]
+    return proj
     
-    
-    
-    
-    
+  fromIntermediate: (proj) =>
+    points = []
+    for i in [0..@wcsobj.naxis-1]
+      points[i] = 0
+      for j in [0..@wcsobj.naxis-1]
+        points[i] += @wcsobj.pcInv[i][j] * proj[j] / @wcsobj.cdelt[i]
+      points[i] += @wcsobj.crpix[i]
+    return points
+
     
     
     
