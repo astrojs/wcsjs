@@ -838,12 +838,12 @@
 			wcsobj = this.wcsobj;
 			points = [];
 			
-            for (i = 0; i < wcsobj.naxis; i += 1) {
+      for (i = 0; i < wcsobj.naxis; i += 1) {
 				points[i] = 0;
 				for (j = 0; j < wcsobj.naxis; j += 1) {
 					points[i] += wcsobj.pc_inv[i][j] * proj[j] / wcsobj.cdelt[i];
 				}
-                // -1 to make 0-based index
+        // -1 to make 0-based index
 				points[i] += wcsobj.crpix[i];
 			}
 			return points

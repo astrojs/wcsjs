@@ -511,6 +511,46 @@ class WCS.Mapper
       @wcsobj.theta0  = 0
       throw 'Sorry, not yet implemented!'
 
+  computeCelestialParameters: (phi0, theta0) =>
+    [alpha0, delta0] = @wcsobj.crval
+    phiP = @wcsobj.lonpole
+    thetaP = @wcsobj.latpole
+    
+    # Compute deltaP
+    deltaP1 = WCS.Math.atan2d(WCS.Math.sind(@wcsobj.theta0), WCS.Math.cosd(@wcsobj.theta0 * WCS.Math.cosd(phiP - @wcsobj.phi0)))
+    deltaP2 = WCS.Math.acosd(WCS.Math.sind(delta0) / Math.sqrt(1 - Math.pow(WCS.Math.cosd(@wcsobj.theta0), 2) * Math.pow(WCS.Math.sind(phiP - @wcsobj.phi0), 2)))
+    
+    # Choose the appropriate solution for deltaP.  Either
+    #   1. Two solutions in range [-90, 90]
+    #   2. One solution in range [-90, 90]
+    #   3. No solutions in range [-90, 90]
+    
+    sol1 = sol2 = false
+    if deltaP1 + deltaP2 >= -90 and deltaP1 + deltaP2 <= 90
+      sol1 = true
+    if deltaP1 - deltaP2 >= -90 and deltaP1 - deltaP2 <= 90
+      sol2 = true
+    if sol1 and sol2
+      dist1 = Math.abs(deltaP1 + deltaP2 - thetaP)
+      dist2 = Math.abs(deltaP1 - deltaP2 - thetaP)
+      
+      if dist1 < dist2
+        @wcsobj.deltaP = deltaP1 + deltaP2
+      else
+        @wcsobj.deltaP = deltaP1 - deltaP2
+    else if sol1
+      @wcsobj.deltaP = deltaP1 + deltaP2
+    else if sol2
+      @wcsobj.deltaP = deltaP1 - deltaP2
+    else
+      @wcsobj.deltaP = thetaP
+
+    # Compute alphaP
+    if Math.abs(delta0 is 90)
+      @wcsobj.alphaP = alpha0
+    else
+      @wcsobj.alphaP = alpha0 - WCS.Math.asind(WCS.Math.sind(phiP - @wcsobj.phi0) * WCS.Math.cosd(@wcsobj.theta0) / WCS.Math.cosd(delta0))
+
   toIntermediate: (points) =>
     proj = [];
     for i in [0..@wcsobj.naxis-1]
