@@ -2,7 +2,6 @@
 WCS = exports? and @ or @WCS = {}
 
 WCS.Math = {}
-
 WCS.Math.R2D = 180 / Math.PI
 WCS.Math.D2R = Math.PI / 180
 WCS.Math.WCSTRIG_TOL = 1e-10
@@ -20,7 +19,7 @@ WCS.Math.cosd = (angle) ->
       when 3
         return 0
   return Math.cos(angle * WCS.Math.D2R)
-  
+
 WCS.Math.sind = (angle) ->
   if angle % 90 == 0
     i = Math.abs(Math.floor(angle / 90 - 0.5)) % 4
@@ -260,7 +259,7 @@ class WCS.Mapper
   verifyHeader: (header) =>
     @wcsobj.naxis = naxis = header['NAXIS'] or header['WCSAXES'] or 2
     @wcsobj.radesys = header['RADESYS'] or 'ICRS'
-  
+
     requiredCards = ['CRPIX', 'CRVAL', 'CTYPE']
     @wcsobj.crpix = []
     @wcsobj.crval = []
@@ -275,7 +274,7 @@ class WCS.Mapper
         else
           arrayName = requiredCards[j].toLowerCase()
           @wcsobj[arrayName].push(header[key])
-    
+
     # Check for CUNIT and CDELT, defaulting to degrees and unity, respectively
     # TODO: When CUNIT is not degrees, relevant values need to be converted
     @wcsobj.cunit = []
@@ -285,22 +284,22 @@ class WCS.Mapper
       @wcsobj.cunit.push(header[key] or 'deg')
       key = 'CDELT' + axis
       @wcsobj.cdelt.push(header[key] or 1)
-    
+
     # LONPOLE and LATPOLE default to values appropriate for a zenithal projection
     @wcsobj.lonpole = header['LONPOLE'] or 0
     @wcsobj.latpole = header['LATPOLE'] or 0
-  
+
     # EQUINOX defaults to 2000 if not given
     @wcsobj.equinox = header['EQUINOX'] or 2000
-  
+
     # DATE_OBS defaults to today
     date = new Date()
     @wcsobj.date_obs = header['DATE_OBS'] or (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
-  
+
     # Attempt to derive the PC matrix when not given, otherwise default to identity
     @wcsobj.pc = @checkCard(header, 'PC', naxis) or @derivePC(header)
     @wcsobj.pcInv = WCS.Math.matrixInverse(@wcsobj.pc)
-  
+
     # Store the CD matrix if given
     @wcsobj.cd = @checkCard(header, 'CD', naxis)
     if @wcsobj.cd?
@@ -347,7 +346,7 @@ class WCS.Mapper
         lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
     pc = [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
     return pc
-    
+
   setProjection: (header) =>
     zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN']
     cylindrical = ['CYP', 'CEA', 'CAR', 'MER', 'SFL', 'PAR', 'MOL', 'AIT']
@@ -520,7 +519,7 @@ class WCS.Mapper
       for j in [0..@wcsobj.naxis-1]
         proj[i] += @wcsobj.cdelt[i] * @wcsobj.pc[i][j] * points[j]
     return proj
-    
+
   fromIntermediate: (proj) =>
     points = []
     for i in [0..@wcsobj.naxis-1]
@@ -530,13 +529,48 @@ class WCS.Mapper
       points[i] += @wcsobj.crpix[i]
     return points
 
-    
-    
-    
-    
-    
-    
-    
-    
-# module = (name) ->
-#   global[name] = global[name] or {}
+  toCelestial: (phi, theta) =>
+    sinTheta = WCS.Math.sind(theta)
+    cosTheta = WCS.Math.cosd(theta)
+    sinDphi = WCS.Math.sind(phi - @wcsobj.lonpole)
+    cosDphi = WCS.Math.cosd(phi - @wcsobj.lonpole)
+    sinDecP = WCS.Math.sind(@wcsobj.delta_p)
+    cosDecP = WCS.Math.cosd(@wcsobj.delta_p)
+
+    xTemp = sinTheta * cosDecP - cosTheta * sinDecP * cosDphi
+    yTemp = -cos_theta * sin_dphi
+    zTemp = sinTheta * sinDecP + cosTheta * cosDecP * cosDphi
+
+    ra = WCS.Math.atan2d(yTemp, xTemp) + @wcsobj.alphaP
+    ra = (ra + 360) % 360
+    dec = WCS.Math.asind(zTemp)
+
+    return [ra, dec]
+
+  fromCelestial: (ra, dec) =>
+    sinDelta = WCS.Math.sind(dec)
+    cosDelta = WCS.Math.cosd(dec)
+    sinDp = WCS.Math.sind(@wcsobj.deltaP)
+    cosDp = WCS.Math.cosd(@wcsobj.deltaP)
+    sinDalpha = WCS.Math.sind(ra - @wcsobj.alphaP)
+    cosDalpha = WCS.Math.cosd(ra - @wcsobj.alphaP)
+
+    xTemp = sinDelta * cosDp - cosDelta * sinDp * cosDalpha
+    yTemp = -cosDelta * sinDalpha
+
+    phi = @wcsobj.lonpole + WCS.Math.atan2d(yTemp, xTemp)
+    theta = WCS.Math.asind(sinDelta * sinDp + cosDelta * cosDp * cosDalpha)
+
+    return [phi, theta];
+
+  pixelToCoordinate: () =>
+    coords = @toIntermediate(arguments[0], arguments[1])
+    coords = @toSpherical(coords[0], coords[1])
+    coords = @toCelestial(coords[0], coords[1])
+    return {ra: coords[0], dec: coords[1]}
+
+  coordinateToPixel: () =>
+    coords = @fromCelestial(arguments[0], arguments[1])
+    coords = @fromSpherical(coords[0], coords[1])
+    coords = @fromIntermediate(coords)
+    return {x: coords[0], y: coords[1]}
