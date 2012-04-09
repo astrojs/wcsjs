@@ -11,65 +11,64 @@ def wcs2json(in_file, out_file, string = False):
     """
     
     # Keywords relavant to WCS
-    wcs_single_keywords = ['NAXIS', 'WCSAXES', 'LONPOLE', 'LATPOLE', 'EQUINOX', 'RADESYS']
-    wcs_axis_keywords = ['NAXIS', 'CRVAL', 'CRPIX', 'CDELT', 'CTYPE']
-    wcs_matrix_keywords = ['PC', 'CD', 'PV']
-    sip_single_keywords = ['A_ORDER', 'B_ORDER', 'AP_ORDER', 'BP_ORDER']
-    sip_multivalued_keywords = ['A', 'B', 'AP', 'BP']
+    # wcs_single_keywords = ['NAXIS', 'WCSAXES', 'LONPOLE', 'LATPOLE', 'EQUINOX', 'RADESYS']
+    # wcs_axis_keywords = ['NAXIS', 'CRVAL', 'CRPIX', 'CDELT', 'CTYPE']
+    # wcs_matrix_keywords = ['PC', 'CD', 'PV']
+    # sip_single_keywords = ['A_ORDER', 'B_ORDER', 'AP_ORDER', 'BP_ORDER']
+    # sip_multivalued_keywords = ['A', 'B', 'AP', 'BP']
 
     # Initialize a dictionary for the WCS properties
-    wcs = {}
+    # wcs = {}
     
     # Get the FITS header
     header = pyfits.getheader(in_file)
     
-    # Loop through the single keywords, adding them to dictionary
-    for key in wcs_single_keywords:
-        if (header.has_key(key)):
-            wcs[key] = header[key]
-    
-    # Get the number of axes
-    if wcs.has_key('NAXIS'):
-        naxes = wcs['NAXIS']
-    elif wcs.has_key('WCSAXES'):
-        naxes = wcs['WCSAXES']
-    else:
-        naxes = 2
-    
-    # Cool, now that we know the dimensions, loop through the axis keywords
-    for key in wcs_axis_keywords:
-        for axis in xrange(1, naxes + 1):
-            full_key = "%s%d" % (key, axis)
-            if (header.has_key(full_key)):
-                wcs[full_key] = header[full_key]
-                
-    # Now, for the matrix keywords
-    for key in wcs_matrix_keywords:
-        for i in xrange(1, naxes + 1):
-            for j in xrange(1, naxes + 1):
-                full_key = "%s%d_%d" % (key, i, j)
-                if (header.has_key(full_key)):
-                    wcs[full_key] = header[full_key]
-    
-    # And on to the SIP keywords
-    for key in sip_single_keywords:
-        if (header.has_key(key)):
-            wcs[key] = header[key]
-    if (wcs.has_key('A_ORDER') and wcs.has_key('B_ORDER')):
-        for key in sip_multivalued_keywords:
-            for i in xrange(0, wcs['A_ORDER'] + 1):
-                for j in xrange(0, wcs['B_ORDER'] + 1):
-                    full_key = "%s_%d_%d" % (key, i, j)
-                    if (header.has_key(full_key)):
-                        wcs[full_key] = header[full_key]
+    # # Loop through the single keywords, adding them to dictionary
+    # for key in wcs_single_keywords:
+    #     if (header.has_key(key)):
+    #         wcs[key] = header[key]
+    # 
+    # # Get the number of axes
+    # if wcs.has_key('NAXIS'):
+    #     naxes = wcs['NAXIS']
+    # elif wcs.has_key('WCSAXES'):
+    #     naxes = wcs['WCSAXES']
+    # else:
+    #     naxes = 2
+    # 
+    # # Cool, now that we know the dimensions, loop through the axis keywords
+    # for key in wcs_axis_keywords:
+    #     for axis in xrange(1, naxes + 1):
+    #         full_key = "%s%d" % (key, axis)
+    #         if (header.has_key(full_key)):
+    #             wcs[full_key] = header[full_key]
+    #             
+    # # Now, for the matrix keywords
+    # for key in wcs_matrix_keywords:
+    #     for i in xrange(1, naxes + 1):
+    #         for j in xrange(1, naxes + 1):
+    #             full_key = "%s%d_%d" % (key, i, j)
+    #             if (header.has_key(full_key)):
+    #                 wcs[full_key] = header[full_key]
+    # 
+    # # And on to the SIP keywords
+    # for key in sip_single_keywords:
+    #     if (header.has_key(key)):
+    #         wcs[key] = header[key]
+    # if (wcs.has_key('A_ORDER') and wcs.has_key('B_ORDER')):
+    #     for key in sip_multivalued_keywords:
+    #         for i in xrange(0, wcs['A_ORDER'] + 1):
+    #             for j in xrange(0, wcs['B_ORDER'] + 1):
+    #                 full_key = "%s_%d_%d" % (key, i, j)
+    #                 if (header.has_key(full_key)):
+    #                     wcs[full_key] = header[full_key]
 
-
-    json = JSONEncoder().encode(wcs)    
+    json = JSONEncoder().encode(dict(header))
     if string:
-        return "var %s = %s;" % (wcs['CTYPE1'].lower()[5:].replace('-', '_'), json)
+        return "var %s = %s;" % (header['CTYPE1'].lower()[5:].replace('-', '_'), json)
     else :
         f = open(out_file, 'w')    
-        f.write( "var %s = %s;" % (wcs['CTYPE1'].lower()[5:], json) )
+        f.write( "var %s = %s;" % (header['CTYPE1'].lower()[5:], json) )
         f.close()
 
 

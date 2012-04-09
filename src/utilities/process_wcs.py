@@ -25,7 +25,7 @@ def process_wcs(directory):
                 fits_files.append(f)
                 data.append( wcs2json( f, os.path.join(root, filename), string = True) )
     
-    f = open('jasmine/spec/data.js', 'w')
+    f = open('test/data/data.js', 'w')
     for item in data:
         f.write(item)
         f.write("\n");

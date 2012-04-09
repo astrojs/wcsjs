@@ -346,7 +346,7 @@ class WCS.Mapper
     quadCube = ['TSC', 'CSC', 'QSC']
 
     # Determine the longitude and latitude axis
-    @projection = @wcsobj.ctype[0][5..]
+    @projection     = @wcsobj.ctype[0][5..]
     @longitudeAxis  = if @wcsobj.ctype[0].match("RA|GLON|ELON|HLON|SLON") then 1 else 2
     @latitudeAxis   = if @wcsobj.ctype[1].match("DEC|GLAT|ELAT|HLAT|SLAT") then 2 else 1
 
@@ -419,9 +419,20 @@ class WCS.Mapper
             return [x, y]
 
         when 'SZP'
+          [key1, key2, key3] = ["PV#{@latitudeAxis}_1,", "PV#{@latitudeAxis}_2", "PV#{@latitudeAxis}_3"]
+          @wcsobj.mu      = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 0
+          @wcsobj.phiC    = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 0
+          @wcsobj.thetaC  = if header.hasOwnProperty(key3) then parseFloat(header[key3]) else 90
+          @wcsobj.xp      = -@wcsobj.mu * WCS.Math.cosd(@wcsobj.thetaC) * WCS.Math.sind(@wcsobj.phiC)
+          @wcsobj.yp      = @wcsobj.mu * WCS.Math.cosd(@wcsobj.thetaC) * WCS.Math.cosd(@wcsobj.phiC)
+          @wcsobj.zp      = @wcsobj.mu * WCS.Math.sind(@wcsobj.thetaC) + 1
 
-          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
-          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented'
+          @fromSpherical = (phi, theta) =>
+            divisor = @wcsobj.zp - (1 - WCS.Math.sind(theta))
+            x = 180 / Math.PI * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.sind(phi) - @wcsobj.xp * (1 - WCS.Math.sind(theta))) / divisor
+            y = -180 / Math.PI * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.cosd(phi) + @wcsobj.yp * (1 - WCS.Math.sind(theta))) / divisor
+            return [x, y]
 
         when 'TAN'
 
@@ -528,7 +539,7 @@ class WCS.Mapper
         when 'CYP'
 
           # FITS convention is to default to 1 unless parameters are defined
-          [key1, key2] = ["PV#{@latitudeAxis}_1,", "PV#{@latitudeAxis}_1"]
+          [key1, key2] = ["PV#{@latitudeAxis}_1,", "PV#{@latitudeAxis}_2"]
           @wcsobj.mu      = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 1
           @wcsobj.lambda  = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 1
           raise "Divide by zero error" if @wcsobj.mu + @wcsobj.lambda is 0
