@@ -151,34 +151,32 @@ describe ("pixels to projection plane coordinates and back", function () {
   });
 });
 
-
 describe ("sky to pixel transformations", function () {
  var wcs, pixels, sky, i, coords, precision;
  precision = 4;
- 
+
  beforeEach(function () {
    pixels = [];
    sky = [];
-   
+
    pixels.push([1.0, 1.0]);
    pixels.push([192.0, 1.0]);
    pixels.push([1.0, 192.0]);
    pixels.push([192.0, 192.0]);
    pixels.push([96.5, 96.5]);
  });
- 
- 
+
  //
  // Zenithal Projections
  //
  it ("ARC Projection", function() {
- 
+
    sky.push([269.05673077774, -73.46829958535]);
    sky.push([269.46714963295, -60.73594102637]);
    sky.push([307.01180433182, -69.29965938607]);
    sky.push([293.06610193764, -58.19446383811]);
    sky.push([284.90543739577, -66.30663097651]);
- 
+
    wcs = new WCS.Mapper(arc);
    for (i = 0; i < pixels.length; i += 1) {
      coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
@@ -186,7 +184,7 @@ describe ("sky to pixel transformations", function () {
      expect(coords.y).toBeCloseTo(pixels[i][1], precision);
    }
  });
- 
+
  it ("SIN Projection", function () {
 
    sky.push([268.39150699215, -73.90353552624]);
@@ -202,9 +200,9 @@ describe ("sky to pixel transformations", function () {
      expect(coords.y).toBeCloseTo(pixels[i][1], precision);
    }
  });
- 
+
  it ("STG Projection", function () {
-   
+
    sky.push([269.37825680266, -73.25613046025]);
    sky.push([269.64574155082, -61.03602098451]);
    sky.push([306.65846712587, -69.21034027654]);
@@ -218,9 +216,25 @@ describe ("sky to pixel transformations", function () {
      expect(coords.y).toBeCloseTo(pixels[i][1], precision);
    }
  });
- 
+
+ it ("SZP Projection", function () {
+
+   sky.push([272.37781512101, -73.41689969644]);
+   sky.push([267.60403992873, -60.76623615082]);
+   sky.push([307.83488111027, -69.03723146289]);
+   sky.push([290.73621202629, -58.78452312823]);
+   sky.push([284.91980906467, -66.30475721459]);
+
+   wcs = new WCS.Mapper(stg);
+   for (i = 0; i < pixels.length; i += 1) {
+     coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
+     expect(coords.x).toBeCloseTo(pixels[i][0], precision);
+     expect(coords.y).toBeCloseTo(pixels[i][1], precision);
+   }
+ });
+
  it ("TAN Projection", function () {
-   
+
    sky.push([270.33283605009, -72.61583231845]);
    sky.push([270.19465794261, -61.83923481247]);
    sky.push([305.59026284675, -68.94388297928]);
