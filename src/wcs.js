@@ -525,7 +525,7 @@
 	
 				if (projection === 'CYP') {
 	
-					// Set projection parameters assuming Gall's stereographic projection if parameters are undefined
+					// Set projection parameters assuming Gall's stereographic projection if parameters are not defined
 					self.wcsobj.mu = typeof(json.pv) != 'undefined' ? json.pv.length == 2 ? parseFloat(json.pv[0]) : 1 : 1;
 					self.wcsobj.lambda = typeof(json.pv) != 'undefined' ? json.pv.length == 2 ? parseFloat(json.pv[1]) : 1 / Math.sqrt(2) : 1 / Math.sqrt(2);
 

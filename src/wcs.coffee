@@ -249,9 +249,10 @@ class WCS.Mapper
 
     # Instance attributes
     @wcsobj = {}
-    @projection = null
-    @longitudeAxis = null
-    @latitudeAxis = null
+    @projection = undefined
+    @longitudeAxis = undefined
+    @latitudeAxis = undefined
+    @sip = undefined
 
     @verifyHeader(header)
     @setProjection(header)
@@ -269,11 +270,9 @@ class WCS.Mapper
     for axis in [1..naxis]
       for j in [0..requiredCards.length-1]
         key = requiredCards[j] + axis
-        if not header.hasOwnProperty(key)
-          throw new Error("Not enough information to compute WCS, missing required keyword " + key)
-        else
-          arrayName = requiredCards[j].toLowerCase()
-          @wcsobj[arrayName].push(header[key])
+        throw "Not enough information to compute WCS, missing required keyword #{key}" if not header.hasOwnProperty(key)
+        arrayName = requiredCards[j].toLowerCase()
+        @wcsobj[arrayName].push(header[key])
 
     # Check for CUNIT and CDELT, defaulting to degrees and unity, respectively
     # TODO: When CUNIT is not degrees, relevant values need to be converted
@@ -294,7 +293,8 @@ class WCS.Mapper
 
     # DATE_OBS defaults to today
     date = new Date()
-    @wcsobj.date_obs = header['DATE_OBS'] or (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+    @wcsobj.dateObs = header['DATE_OBS'] or (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+    @wcsobj.dateObs = header['DATE_OBS'] or "#{date.getFullYear()}-#{date.getMonth() + 1}-#{date.getDate()}"
 
     # Attempt to derive the PC matrix when not given, otherwise default to identity
     @wcsobj.pc = @checkCard(header, 'PC', naxis) or @derivePC(header)
@@ -303,49 +303,40 @@ class WCS.Mapper
     # Store the CD matrix if given
     @wcsobj.cd = @checkCard(header, 'CD', naxis)
     if @wcsobj.cd?
-      @wcsobj.cd_inv = WCS.Math.matrixInverse(@wcsobj.cd)
+      @wcsobj.cdInv = WCS.Math.matrixInverse(@wcsobj.cd)
 
-  ###
-  Check that a given array-valued key is contained in the header.
-  e.g. For NAXIS = 2 and the PC matrix, the header should contain:
-  PC1_1, PC1_2, PC2_1, PC2_2
-  ###
+  # Check that a given array-valued key is contained in the header.
+  # e.g. For NAXIS = 2 and the PC matrix, the header should contain:
+  # PC1_1, PC1_2, PC2_1, PC2_2
   checkCard: (header, key, dimensions) =>
     obj = []
     for i in [1..dimensions]
       obj[i-1] = []
       for j in [1..dimensions]
-        fullKey = key + i + '_' + j
-        if not header.hasOwnProperty(fullKey)
-          return
-        else
+        fullKey = "#{key}#{i}_#{j}"
+        return if not header.hasOwnProperty(fullKey)
         obj[i-1].push(header[fullKey])
     return obj
 
-  ###
-  Derive the PC matrix using CROTAi or using the CD matrix
-
-  TODO: Test this function!
-  ###
+  # Derive the PC matrix using CROTAi or using the CD matrix
+  # TODO: Test this function!
   derivePC: (header) =>
     if header.hasOwnProperty('CROTA2')
       crota = header['CROTA2']
       lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
     else
       cd = @checkCard(header, 'CD', @wcsobj.naxis)
-      if !cd?
-        crota = 0
-        lambda = 1
+      unless cd?
+        [crota, lambda] = [0, 1]
       else
         # TODO: Generalize for larger matrices
         cdDet = WCS.Math.determinant(cd)
-        cdSign = cdDet < 0 ? -1 : 1
+        cdSign = if cdDet < 0 then -1 else 1
         @wcsobj.cdelt[0] = Math.sqrt(Math.abs(cdDet)) * cdSign
         @wcsobj.cdelt[1] = Math.sqrt(Math.abs(cdDet))
         crota = WCS.Math.atan2d(-1 * cd[0][1], cd[1][1])
         lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
-    pc = [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
-    return pc
+    return [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
 
   setProjection: (header) =>
     zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN']
@@ -356,8 +347,8 @@ class WCS.Mapper
 
     # Determine the longitude and latitude axis
     @projection = @wcsobj.ctype[0][5..]
-    @longitudeAxis  = if @wcsobj.ctype[0].match("RA|GLON|ELON|HLON|SLON") then 0 else 1
-    @latitudeAxis   = if @wcsobj.ctype[1].match("DEC|GLAT|ELAT|HLAT|SLAT") then 1 else 0
+    @longitudeAxis  = if @wcsobj.ctype[0].match("RA|GLON|ELON|HLON|SLON") then 1 else 2
+    @latitudeAxis   = if @wcsobj.ctype[1].match("DEC|GLAT|ELAT|HLAT|SLAT") then 2 else 1
 
     # TODO: Incorporate @longitudeAxis and @latitudeAxis into this code
     if @projection in zenithal
@@ -367,138 +358,230 @@ class WCS.Mapper
       @wcsobj.deltaP  = @wcsobj.crval[1]
       @wcsobj.lonpole = if @wcsobj.crval[1] >= @wcsobj.theta0 then 0 else 180
 
-      if @projection is 'AIR'
-        @wcsobj.thetaB = if header.hasOwnProperty('PV2_1') then parseFloat(header['PV2_1']) else 90
-        @wcsobj.etaB = (90 - @wcsobj.thetaB) / 2
+      switch @projection
+        when 'AIR'
+          @wcsobj.thetaB = if header.hasOwnProperty('PV2_1') then parseFloat(header['PV2_1']) else 90
+          @wcsobj.etaB = (90 - @wcsobj.thetaB) / 2
 
-        toSpherical: (x, y) =>
-          throw 'Sorry, not yet implemented!'
-        fromSpherical: (phi, theta) =>
-          throw 'Sorry, not yet implemented!'
+          toSpherical: (x, y) => throw 'Sorry, not yet implemented!'
+          fromSpherical: (phi, theta) => throw 'Sorry, not yet implemented!'
 
-      else if @projection is 'ARC'
+        when 'ARC'
 
-        @toSpherical = (x, y) =>
-          r     = Math.sqrt(x * x + y * y)
-          theta = @wcsobj.theta0 - r
-          phi   = WCS.Math.atan2d(x, -y)
+          @toSpherical = (x, y) =>
+            r     = Math.sqrt(x * x + y * y)
+            theta = @wcsobj.theta0 - r
+            phi   = WCS.Math.atan2d(x, -y)
+            return [phi, theta]
           
-          return [phi, theta]
-          
-        @fromSpherical = (phi, theta) =>
-          r = 90 - theta
-          x = r * WCS.Math.sind(phi)
-          y = -r * WCS.Math.cosd(phi)
+          @fromSpherical = (phi, theta) =>
+            r = 90 - theta
+            x = r * WCS.Math.sind(phi)
+            y = -r * WCS.Math.cosd(phi)
+            return [x, y]
 
-          return [x, y]
+        when 'AZP'
 
-      else if @projection is 'AZP'
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
 
-        @toSpherical = (x, y) =>
-          throw 'Sorry, not yet implemented!'
-        @fromSpherical = (phi, theta) =>
-          throw 'Sorry, not yet implemented!'
+        when 'NCP'
 
-      else if @projection is 'NCP'
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
 
-        @toSpherical = (x, y) =>
-          throw 'Sorry, not yet implemented!'
-        @fromSpherical = (phi, theta) =>
-          throw 'Sorry, not yet implemented!'
+        when 'SIN'
 
-      else if @projection is 'SIN'
+          @toSpherical = (x, y) =>
+            r     = Math.sqrt(x * x + y * y)
+            theta = WCS.Math.acosd(Math.PI * r / 180)
+            phi   = WCS.Math.atan2d(x, -y)
+            return [phi, theta]
 
-        @toSpherical = (x, y) =>
-          r     = Math.sqrt(x * x + y * y)
-          theta = WCS.Math.acosd(Math.PI * r / 180)
-          phi   = WCS.Math.atan2d(x, -y)
+          @fromSpherical = (phi, theta) =>
+            r = 180 / Math.PI * WCS.Math.cosd(theta)
+            x = r * WCS.Math.sind(phi)
+            y = -r * WCS.Math.cosd(phi)
+            return [x, y]
 
-          return [phi, theta]
+        when 'STG'
 
-        @fromSpherical = (phi, theta) =>
-          r = 180 / Math.PI * WCS.Math.cosd(theta)
-          x = r * WCS.Math.sind(phi)
-          y = -r * WCS.Math.cosd(phi)
+          @toSpherical = (x, y) =>
+            r     = Math.sqrt(x * x + y * y)
+            theta = @wcsobj.theta0 - 2 * WCS.Math.atand(Math.PI * r / 360)
+            phi   = WCS.Math.atan2d(x, -y)
+            return [phi, theta]
 
-          return [x, y]
+          @fromSpherical = (phi, theta) =>
+            r = 360 / Math.PI * WCS.Math.tand((90 - theta) / 2)
+            x = r * WCS.Math.sind(phi)
+            y = -r * WCS.Math.cosd(phi)
+            return [x, y]
 
-      else if @projection is 'STG'
+        when 'SZP'
 
-        @toSpherical = (x, y) =>
-          r     = Math.sqrt(x * x + y * y)
-          theta = @wcsobj.theta0 - 2 * WCS.Math.atand(Math.PI * r / 360)
-          phi   = WCS.Math.atan2d(x, -y)
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
 
-          return [phi, theta]
+        when 'TAN'
 
-        @fromSpherical = (phi, theta) =>
-          r = 360 / Math.PI * WCS.Math.tand((90 - theta) / 2)
-          x = r * WCS.Math.sind(phi)
-          y = -r * WCS.Math.cosd(phi)
+          @toSpherical = (x, y) =>
+            r     = Math.sqrt(x * x + y * y)
+            theta = WCS.Math.atand(180 / (Math.PI * r))
+            phi   = WCS.Math.atan2d(x, -y)
+            return [phi, theta]
 
-          return [x, y]
+          @fromSpherical = (phi, theta) =>
+            r = 180 / (Math.PI * WCS.Math.tand(theta))
+            x = r * WCS.Math.sind(phi)
+            y = -r * WCS.Math.cosd(phi)
+            return [x, y]
 
-      else if @projection is 'SZP'
+        when 'TAN-SIP'
+          @getSipCoefficients(header)
 
-        @toSpherical = (x, y) =>
-          throw 'Sorry, not yet implemented!'
-        @fromSpherical = (phi, theta) =>
-          throw 'Sorry, not yet implemented!'
+          @f = (u, v, coeffs) =>
+            value = 0
+            order = coeffs[0].length - 1
+            
+            # Compute the sum
+            for p in [0..order]
+              for q in [0..order]
+                value += coeffs[p][q] * Math.pow(u, p) * Math.pow(v, q)
+            return value
 
-      else if @projection is 'TAN'
+          @toIntermediate = (points) =>
+            proj = []
+            u = points[0] - @wcsobj.crpix[0]
+            v = points[1] - @wcsobj.crpix[1]
 
-        @toSpherical = (x, y) =>
-          r     = Math.sqrt(x * x + y * y)
-          theta = WCS.Math.atand(180 / (Math.PI * r))
-          phi   = WCS.Math.atan2d(x, -y)
+            dx = dy = 0
+            dx = @f(u, v, @sip.aCoeffs)
+            dy = @f(u, v, @sip.bCoeffs)
 
-          return [phi, theta]
+            points[0] = points[0] + dx
+            points[1] = points[1] + dy
 
-        @fromSpherical = (phi, theta) =>
-          r = 180 / (Math.PI * WCS.Math.tand(theta))
-          x = r * WCS.Math.sind(phi)
-          y = -r * WCS.Math.cosd(phi)
+            for i in [0..@wcsobj.naxis - 1]
+              proj[i] = 0
+              points[i] -= @wcsobj.crpix[i]
+              for j in [0..@wcsobj - 1]
+                proj[i] += @wcsobj.cd[i][j] * points[j]
+            return proj
 
-          return [x, y]
+          @fromIntermediate = (proj) =>
+            tmp = []
+            for i in [0..@wcsobj.naxis - 1]
+              tmp[i] = 0
+              for j in [0..@wcsobj.naxis - 1]
+                tmp[i] += @wcsobj.cdInv[i][j] * proj[j]
+              tmp[i] += @wcsobj.crpix[i]
 
-      else if @projection is 'TAN-SIP'
+            dx = dy = 0
+            dx = @f(tmp[0], tmp[1], @sip.apCoeffs)
+            dy = @f(tmp[0], tmp[1], @sip.bpCoeffs)
 
-        @toSpherical = (x, y) =>
-          throw 'Sorry, not yet implemented!'
-        @fromSpherical = (phi, theta) =>
-          throw 'Sorry, not yet implemented!'
+            points = []
+            points[0] = tmp[0] + dx
+            points[1] = tmp[1] + dy
 
-      else if @projection is 'ZEA'
-        @toSpherical = (x, y) =>
-          r     = Math.sqrt(x * x + y * y)
-          theta = @wcsobj.theta0 - 2 * WCS.Math.asind(Math.PI * r / 360)
-          phi   = WCS.Math.atan2d(x, -y)
+            points[0] += @wcsobj.crpix[0]
+            points[1] += @wcsobj.crpix[1]
+            return points
 
-          return [phi, theta]
+          @toSpherical = (x, y) =>
+            r     = Math.sqrt(x * x + y * y)
+            theta = WCS.Math.atand(180 / (Math.PI * r))
+            phi   = WCS.Math.atan2d(x, -y)
+            return [phi, theta]
 
-        @fromSpherical = (phi, theta) =>
-          r = 360 / Math.PI * WCS.Math.sind((90 - theta) / 2)
-          x = r * WCS.Math.sind(phi)
-          y = -r * WCS.Math.cosd(phi)
+          @fromSpherical = (phi, theta) =>
+            r = 180 / (Math.PI * WCS.Math.tand(theta))
+            x = r * WCS.Math.sind(phi)
+            y = -r * WCS.Math.cosd(phi)
+            return [x, y]
 
-          return [x, y]
+        when 'ZEA'
+          @toSpherical = (x, y) =>
+            r     = Math.sqrt(x * x + y * y)
+            theta = @wcsobj.theta0 - 2 * WCS.Math.asind(Math.PI * r / 360)
+            phi   = WCS.Math.atan2d(x, -y)
+            return [phi, theta]
 
-      else if @projection is 'ZPN'
+          @fromSpherical = (phi, theta) =>
+            r = 360 / Math.PI * WCS.Math.sind((90 - theta) / 2)
+            x = r * WCS.Math.sind(phi)
+            y = -r * WCS.Math.cosd(phi)
+            return [x, y]
 
-        @toSpherical = (x, y) =>
-          throw 'Sorry, not yet implemented!'
-        @fromSpherical = (phi, theta) =>
-          throw 'Sorry, not yet implemented!'
+        when 'ZPN'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
 
     if @projection in cylindrical
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = 90
-      throw 'Sorry, not yet implemented!'
+      @computeCelestialParameters(@wcsobj.phi0, @wcsobj.theta0)
+
+      switch @projection
+        when 'CYP'
+
+          # FITS convention is to default to 1 unless parameters are defined
+          [key1, key2] = ["PV#{@latitudeAxis}_1,", "PV#{@latitudeAxis}_1"]
+          @wcsobj.mu      = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 1
+          @wcsobj.lambda  = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 1
+          raise "Divide by zero error" if @wcsobj.mu + @wcsobj.lambda is 0
+
+          @toSpherical = (x, y) => 
+            nu = (Math.PI * y) / (180 * (@wcsobj.mu + @wcsobj.lambda))
+            theta = WCS.Math.atan2d(nu, 1) + WCS.Math.asind(nu * @wcsobj.mu / Math.sqrt(nu * nu + 1))
+            phi = x / @wcsobj.lambda
+            return [phi, theta]
+
+          @fromSpherical = (phi, theta) =>
+            x = @wcsobj.lambda * phi
+            y = (180 / Math.PI) * ((@wcsobj.mu + @wcsobj.lambda) / (@wcsobj.mu + WCS.Math.cosd(theta))) * WCS.Math.sind(theta)
+            return [x, y]
+
+        when 'CEA'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+
+        when 'CAR'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+
+        when 'MER'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+
+        when 'SFL'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+
+        when 'PAR'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+
+        when 'MOL'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
+
+        when 'AIT'
+
+          @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
+          @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
 
     if @projection in conic
       @wcsobj.phi0    = 0
       @wcsobj.theta0  = if header.hasOwnProperty('PV2_1') then header['PV2_1'] else 0
-
       throw 'Sorry, not yet implemented!'
 
     if @projection in polyConic
@@ -511,48 +594,80 @@ class WCS.Mapper
       @wcsobj.theta0  = 0
       throw 'Sorry, not yet implemented!'
 
+  getSipCoefficients: (header) =>
+    throw "What's the polynomial order, man!" unless header.hasOwnProperty('A_ORDER') or header.hasOwnProperty('B_ORDER')
+    @sip = {}
+    @sip.aOrder = header.A_ORDER
+    @sip.bOrder = header.B_ORDER
+    @sip.apOrder = header.AP_ORDER or 0
+    @sip.bpOrder = header.BP_ORDER or 0
+
+    # Get the coefficients from the header
+    # Coefficients are stored in a 2D array with indexing
+    # A_i_j => aCoeffs[i][j]
+    @sip.aCoeffs = []
+    @sip.bCoeffs = []
+    @sip.apCoeffs = []
+    @sip.bpCoeffs = []
+
+    for i in [0..@sip.aOrder]
+      @sip.aCoeffs[i] = []
+      for j in [0..@sip.aOrder]
+        key = "A_#{i}_#{j}"
+        @sip.aCoeffs[i][j] = header[key] or 0
+
+    for i in [0..@sip.bOrder]
+      @sip.bCoeffs[i] = []
+      for j in [0..@sip.bOrder]
+        key = "B_#{i}_#{j}"
+        @sip.bCoeffs[i][j] = header[key] or 0
+
+    for i in [0..@sip.apOrder]
+      @sip.apCoeffs[i] = []
+      for j in [0..@sip.apOrder]
+        key = "AP_#{i}_#{j}"
+        @sip.apCoeffs[i][j] = header[key] or 0
+
+    for i in [0..@sip.bpOrder]
+      @sip.bpCoeffs[i] = []
+      for j in [0..@sip.bpOrder]
+        key = "BP_#{i}_#{j}"
+        @sip.bpCoeffs[i][j] = header[key] or 0
+    throw "Where are the coefficients dude!" unless @sip.aCoeffs or @sip.bCoeffs
+
   computeCelestialParameters: (phi0, theta0) =>
     [alpha0, delta0] = @wcsobj.crval
-    phiP = @wcsobj.lonpole
-    thetaP = @wcsobj.latpole
-    
+    [phiP, thetaP] = [@wcsobj.lonpole, @wcsobj.latpole]
+
     # Compute deltaP
     deltaP1 = WCS.Math.atan2d(WCS.Math.sind(@wcsobj.theta0), WCS.Math.cosd(@wcsobj.theta0 * WCS.Math.cosd(phiP - @wcsobj.phi0)))
     deltaP2 = WCS.Math.acosd(WCS.Math.sind(delta0) / Math.sqrt(1 - Math.pow(WCS.Math.cosd(@wcsobj.theta0), 2) * Math.pow(WCS.Math.sind(phiP - @wcsobj.phi0), 2)))
-    
+
     # Choose the appropriate solution for deltaP.  Either
     #   1. Two solutions in range [-90, 90]
     #   2. One solution in range [-90, 90]
     #   3. No solutions in range [-90, 90]
-    
+
     sol1 = sol2 = false
     if deltaP1 + deltaP2 >= -90 and deltaP1 + deltaP2 <= 90
       sol1 = true
     if deltaP1 - deltaP2 >= -90 and deltaP1 - deltaP2 <= 90
       sol2 = true
+
     if sol1 and sol2
       dist1 = Math.abs(deltaP1 + deltaP2 - thetaP)
       dist2 = Math.abs(deltaP1 - deltaP2 - thetaP)
-      
-      if dist1 < dist2
-        @wcsobj.deltaP = deltaP1 + deltaP2
-      else
-        @wcsobj.deltaP = deltaP1 - deltaP2
+      @wcsobj.deltaP = if dist1 < dist2 then deltaP1 + deltaP2 else deltaP1 - deltaP2
     else if sol1
       @wcsobj.deltaP = deltaP1 + deltaP2
     else if sol2
       @wcsobj.deltaP = deltaP1 - deltaP2
     else
       @wcsobj.deltaP = thetaP
-
-    # Compute alphaP
-    if Math.abs(delta0 is 90)
-      @wcsobj.alphaP = alpha0
-    else
-      @wcsobj.alphaP = alpha0 - WCS.Math.asind(WCS.Math.sind(phiP - @wcsobj.phi0) * WCS.Math.cosd(@wcsobj.theta0) / WCS.Math.cosd(delta0))
+    @wcsobj.alphaP = if delta0 is 90 then alpha0 else alpha0 - WCS.Math.asind(WCS.Math.sind(phiP - @wcsobj.phi0) * WCS.Math.cosd(@wcsobj.theta0) / WCS.Math.cosd(delta0))
 
   toIntermediate: (points) =>
-    proj = [];
+    proj = []
     for i in [0..@wcsobj.naxis-1]
       proj[i] = 0
       points[i] -= @wcsobj.crpix[i]
@@ -584,7 +699,6 @@ class WCS.Mapper
     ra = WCS.Math.atan2d(yTemp, xTemp) + @wcsobj.alphaP
     ra = (ra + 360) % 360
     dec = WCS.Math.asind(zTemp)
-
     return [ra, dec]
 
   fromCelestial: (ra, dec) =>
@@ -600,14 +714,13 @@ class WCS.Mapper
 
     phi = @wcsobj.lonpole + WCS.Math.atan2d(yTemp, xTemp)
     theta = WCS.Math.asind(sinDelta * sinDp + cosDelta * cosDp * cosDalpha)
-
-    return [phi, theta];
+    return [phi, theta]
 
   pixelToCoordinate: () =>
     coords = @toIntermediate(arguments[0], arguments[1])
     coords = @toSpherical(coords[0], coords[1])
     coords = @toCelestial(coords[0], coords[1])
-    return {ra: coords[0], dec: coords[1]}
+    return {ra: coords[@longitudeAxis-1], dec: coords[@latitudeAxis-1]}
 
   coordinateToPixel: () =>
     coords = @fromCelestial(arguments[0], arguments[1])
