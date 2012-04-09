@@ -378,14 +378,14 @@ class WCS.Mapper
 
       else if @projection is 'ARC'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           r     = Math.sqrt(x * x + y * y)
           theta = @wcsobj.theta0 - r
           phi   = WCS.Math.atan2d(x, -y)
           
           return [phi, theta]
           
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           r = 90 - theta
           x = r * WCS.Math.sind(phi)
           y = -r * WCS.Math.cosd(phi)
@@ -394,28 +394,28 @@ class WCS.Mapper
 
       else if @projection is 'AZP'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           throw 'Sorry, not yet implemented!'
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
       else if @projection is 'NCP'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           throw 'Sorry, not yet implemented!'
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
       else if @projection is 'SIN'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           r     = Math.sqrt(x * x + y * y)
           theta = WCS.Math.acosd(Math.PI * r / 180)
           phi   = WCS.Math.atan2d(x, -y)
 
           return [phi, theta]
 
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           r = 180 / Math.PI * WCS.Math.cosd(theta)
           x = r * WCS.Math.sind(phi)
           y = -r * WCS.Math.cosd(phi)
@@ -424,14 +424,14 @@ class WCS.Mapper
 
       else if @projection is 'STG'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           r     = Math.sqrt(x * x + y * y)
           theta = @wcsobj.theta0 - 2 * WCS.Math.atand(Math.PI * r / 360)
           phi   = WCS.Math.atan2d(x, -y)
 
           return [phi, theta]
 
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           r = 360 / Math.PI * WCS.Math.tand((90 - theta) / 2)
           x = r * WCS.Math.sind(phi)
           y = -r * WCS.Math.cosd(phi)
@@ -440,21 +440,21 @@ class WCS.Mapper
 
       else if @projection is 'SZP'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           throw 'Sorry, not yet implemented!'
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
       else if @projection is 'TAN'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           r     = Math.sqrt(x * x + y * y)
           theta = WCS.Math.atand(180 / (Math.PI * r))
           phi   = WCS.Math.atan2d(x, -y)
 
           return [phi, theta]
 
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           r = 180 / (Math.PI * WCS.Math.tand(theta))
           x = r * WCS.Math.sind(phi)
           y = -r * WCS.Math.cosd(phi)
@@ -463,20 +463,20 @@ class WCS.Mapper
 
       else if @projection is 'TAN-SIP'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           throw 'Sorry, not yet implemented!'
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
       else if @projection is 'ZEA'
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           r     = Math.sqrt(x * x + y * y)
           theta = @wcsobj.theta0 - 2 * WCS.Math.asind(Math.PI * r / 360)
           phi   = WCS.Math.atan2d(x, -y)
 
           return [phi, theta]
 
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           r = 360 / Math.PI * WCS.Math.sind((90 - theta) / 2)
           x = r * WCS.Math.sind(phi)
           y = -r * WCS.Math.cosd(phi)
@@ -485,9 +485,9 @@ class WCS.Mapper
 
       else if @projection is 'ZPN'
 
-        toSpherical: (x, y) =>
+        @toSpherical = (x, y) =>
           throw 'Sorry, not yet implemented!'
-        fromSpherical: (phi, theta) =>
+        @fromSpherical = (phi, theta) =>
           throw 'Sorry, not yet implemented!'
 
     if @projection in cylindrical
@@ -574,11 +574,11 @@ class WCS.Mapper
     cosTheta = WCS.Math.cosd(theta)
     sinDphi = WCS.Math.sind(phi - @wcsobj.lonpole)
     cosDphi = WCS.Math.cosd(phi - @wcsobj.lonpole)
-    sinDecP = WCS.Math.sind(@wcsobj.delta_p)
-    cosDecP = WCS.Math.cosd(@wcsobj.delta_p)
+    sinDecP = WCS.Math.sind(@wcsobj.deltaP)
+    cosDecP = WCS.Math.cosd(@wcsobj.deltaP)
 
     xTemp = sinTheta * cosDecP - cosTheta * sinDecP * cosDphi
-    yTemp = -cos_theta * sin_dphi
+    yTemp = -cosTheta * sinDphi
     zTemp = sinTheta * sinDecP + cosTheta * cosDecP * cosDphi
 
     ra = WCS.Math.atan2d(yTemp, xTemp) + @wcsobj.alphaP
