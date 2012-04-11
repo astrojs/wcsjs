@@ -1,7 +1,23 @@
 import os
 import sys
 import inspect
-from wcs_utils import wcs2json
+from json import JSONEncoder
+
+import pyfits
+import pywcs
+
+def wcs2json(in_file, out_file, string = False):
+    """
+    Constructs a JSON file containing FITS keywords relevant to world coordinate system.
+    """
+    header = pyfits.getheader(in_file)
+    json = JSONEncoder().encode(dict(header))
+    if string:
+        return "var %s = %s;" % (header['CTYPE1'].lower()[5:].replace('-', '_'), json)
+    else :
+        f = open(out_file, 'w')    
+        f.write( "var %s = %s;" % (header['CTYPE1'].lower()[5:], json) )
+        f.close()
 
 def process_wcs(directory):
     """
