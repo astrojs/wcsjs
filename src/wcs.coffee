@@ -534,7 +534,7 @@ class WCS.Mapper
 
     if @projection in cylindrical
       @wcsobj.phi0    = 0
-      @wcsobj.theta0  = 90
+      @wcsobj.theta0  = 0
       @computeCelestialParameters(@wcsobj.phi0, @wcsobj.theta0)
 
       switch @projection
@@ -694,6 +694,57 @@ class WCS.Mapper
         @sip.bpCoeffs[i][j] = header[key] or 0
     throw "Where are the coefficients dude!" unless @sip.aCoeffs or @sip.bCoeffs
 
+#   function compute_celestial_parameters(phi_0, theta_0) {
+#     var alpha_0, delta_0, phi_p, theta_p, delta_p1, delta_p2, sol1, sol2, dist1, dist2, alpha_p, delta_p;
+# 
+#     alpha_0 = self.wcsobj.crval[0];
+#     delta_0 = self.wcsobj.crval[1];
+#     phi_p = self.wcsobj.lonpole;
+#     theta_p = self.wcsobj.latpole;
+# 
+#     self.phi_0 = phi_0;
+#     self.theta_0 = theta_0;
+# 
+#     // Compute delta_p
+#     delta_p1 = WCS.Math.atan2d(WCS.Math.sind(self.wcsobj.theta_0), WCS.Math.cosd(self.wcsobj.theta_0 * WCS.Math.cosd(phi_p - self.wcsobj.phi_0)));
+#     delta_p2 = WCS.Math.acosd(WCS.Math.sind(delta_0) / Math.sqrt(1 - Math.pow(WCS.Math.cosd(self.wcsobj.theta_0), 2) * Math.pow(WCS.Math.sind(phi_p - self.wcsobj.phi_0), 2)));
+# 
+#     // Choose the appropriate solution for delta_p.  Either,
+#     //  1.  Two solutions in range [-90, 90]
+#     //  2.  One solution in range [-90, 90]
+#     //  3.  No solutions in range [-90, 90]
+#     sol1 = sol2 = false;
+#     if (delta_p1 + delta_p2 >= -90 && delta_p1 + delta_p2 <= 90 ) {
+#       sol1 = true;
+#     }
+#     if (delta_p1 - delta_p2 >= -90 && delta_p1 - delta_p2 <= 90 ) {
+#       sol2 = true;
+#     }
+#     if (sol1 && sol2) {
+#       dist1 = Math.abs(delta_p1 + delta_p2 - theta_p);
+#       dist2 = Math.abs(delta_p1 - delta_p2 - theta_p);
+#       if (dist1 < dist2) {
+#         self.wcsobj.delta_p = delta_p1 + delta_p2;
+#       } else {
+#         self.wcsobj.delta_p = delta_p1 - delta_p2;
+#       }
+#     } else if (sol1) {
+#       self.wcsobj.delta_p = delta_p1 + delta_p2;
+#     } else if (sol2) {
+#       self.wcsobj.delta_p = delta_p1 - delta_p2;
+#     } else {
+#       self.wcsobj.delta_p = theta_p;
+#     }
+# 
+#     // Compute alpha_p
+#     if (Math.abs(delta_0) === 90) {
+#       self.wcsobj.alpha_p = alpha_0;
+#     } else {
+#       self.wcsobj.alpha_p = alpha_0 - WCS.Math.asind(WCS.Math.sind(phi_p - self.wcsobj.phi_0) * WCS.Math.cosd(self.wcsobj.theta_0) / WCS.Math.cosd(delta_0));
+#     }
+#   }
+# };
+
   computeCelestialParameters: (phi0, theta0) =>
     [alpha0, delta0] = @wcsobj.crval
     [phiP, thetaP] = [@wcsobj.lonpole, @wcsobj.latpole]
@@ -723,7 +774,7 @@ class WCS.Mapper
       @wcsobj.deltaP = deltaP1 - deltaP2
     else
       @wcsobj.deltaP = thetaP
-    @wcsobj.alphaP = if delta0 is 90 then alpha0 else alpha0 - WCS.Math.asind(WCS.Math.sind(phiP - @wcsobj.phi0) * WCS.Math.cosd(@wcsobj.theta0) / WCS.Math.cosd(delta0))
+    @wcsobj.alphaP = if Math.abs(delta0) is 90 then alpha0 else alpha0 - WCS.Math.asind(WCS.Math.sind(phiP - @wcsobj.phi0) * WCS.Math.cosd(@wcsobj.theta0) / WCS.Math.cosd(delta0))
 
   toIntermediate: (points) =>
     proj = []
