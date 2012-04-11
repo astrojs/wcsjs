@@ -7,18 +7,20 @@ wcsjs is a JavaScript library for transforming astronomical coordinates.  The fo
 * SIN
 * STG
 * TAN
-* TAN-SIP
+* TAN-SIP\*
 * ZEA
-* CYP\*
-* CEA\*
-* CAR\*
-* MER\*
-* SFL\*
-* PAR\*
-* MOL\*
-* AIT\*
-* COP\*
-* COD\*
+
+The following are a work in progress:
+* CYP
+* CEA
+* CAR
+* MER
+* SFL
+* PAR
+* MOL
+* AIT
+* COP
+* COD
 
 \* Sky to pixel transformation not yet implemented
 
@@ -26,10 +28,11 @@ Here is a [working example](http://kapadia.github.com/wcsjs/).
 
 Instructions
 ------------
-Sift out the files wcs.js and math.js in the jasmine directory.  Drop them into your JS project. 
+Add lib/wcs.js to your JavaScript project, e.g.
+
+    <script type="text/javascript" src="wcs.js"></script>
 
 Create a JavaScript object with relevant WCS keywords and values, e.g.
-
 
     var tan = {
         "EQUINOX": 2000.0,
@@ -50,13 +53,9 @@ Create a JavaScript object with relevant WCS keywords and values, e.g.
 
 Initialize a WCS Mapper object with the JavaScript object.
 
-
-    var wcs;
-    wcs = new WCS.Mapper(tan);
-
+    var wcs = new WCS.Mapper(tan);
 
 Transform coordinates from pixel to sky and back:
-
 
     // Pixel to sky transformation
     var pixel = [x, y];
@@ -65,7 +64,6 @@ Transform coordinates from pixel to sky and back:
     // Access the sky coordinates
     alert(sky.ra);
     alert(sky.dec);
-
 
     // Sky to pixel transformation
     var sky = [ra, dec];
