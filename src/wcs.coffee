@@ -419,20 +419,21 @@ class WCS.Mapper
             return [x, y]
 
         when 'SZP'
+          throw 'Not yet implemented'
+
           [key1, key2, key3] = ["PV#{@latitudeAxis}_1,", "PV#{@latitudeAxis}_2", "PV#{@latitudeAxis}_3"]
           @wcsobj.mu      = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 0
           @wcsobj.phiC    = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 0
           @wcsobj.thetaC  = if header.hasOwnProperty(key3) then parseFloat(header[key3]) else 90
-          console.log @wcsobj.mu, @wcsobj.phiC, @wcsobj.thetaC
           @wcsobj.xp      = -@wcsobj.mu * WCS.Math.cosd(@wcsobj.thetaC) * WCS.Math.sind(@wcsobj.phiC)
           @wcsobj.yp      = @wcsobj.mu * WCS.Math.cosd(@wcsobj.thetaC) * WCS.Math.cosd(@wcsobj.phiC)
           @wcsobj.zp      = @wcsobj.mu * WCS.Math.sind(@wcsobj.thetaC) + 1
 
           @toSpherical = (x, y) => throw 'Sorry, not yet implemented'
           @fromSpherical = (phi, theta) =>
-            divisor = @wcsobj.zp - (1 - WCS.Math.sind(theta))
-            x = 180 / Math.PI * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.sind(phi) - @wcsobj.xp * (1 - WCS.Math.sind(theta))) / divisor
-            y = -180 / Math.PI * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.cosd(phi) + @wcsobj.yp * (1 - WCS.Math.sind(theta))) / divisor
+            divisor = @wcsobj.zp - 1 + WCS.Math.sind(theta)
+            x = (180 / Math.PI) * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.sind(phi) - @wcsobj.xp * (1 - WCS.Math.sind(theta))) / divisor
+            y = (-180 / Math.PI) * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.cosd(phi) + @wcsobj.yp * (1 - WCS.Math.sind(theta))) / divisor
             return [x, y]
 
         when 'TAN'
@@ -595,25 +596,25 @@ class WCS.Mapper
             x = phi * WCS.Math.cosd(theta)
             return [x, theta]
 
-        # when 'PAR'
-        # 
-        #   @toSpherical = (x, y) =>
-        #     theta = 3 * WCS.Math.asind(y / 180)
-        #     phi   = x / (1 - 4 * Math.pow(y / 180, 2))
-        #     return [phi, theta]
-        # 
-        #   @fromSpherical = (phi, theta)
-        #     x = phi * (2 * WCS.Math.cosd(2 * theta / 3) - 1)
-        #     y = 180 * WCS.Math.sind(theta / 3)
-        #     return [x, y]
+        when 'PAR'
+
+          @toSpherical = (x, y) =>
+            theta = 3 * WCS.Math.asind(y / 180)
+            phi   = x / (1 - 4 * Math.pow(y / 180, 2))
+            return [phi, theta]
+
+          @fromSpherical = (phi, theta) =>
+            x = phi * (2 * WCS.Math.cosd(2 * theta / 3) - 1)
+            y = 180 * WCS.Math.sind(theta / 3)
+            return [x, y]
 
         when 'MOL'
-        
+
           @toSpherical = (x, y) =>
             theta = WCS.Math.asind(WCS.Math.asind((Math.PI * y) / (180 * Math.sqrt(2))) / 90 + (y / 180) * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)))
             phi   = (Math.PI * x) / (2 * Math.sqrt(2 - Math.pow(Math.PI * y / 180, 2)))
             return [phi, theta]
-        
+
           # TODO: Parameter gamma needs to be solved iteratively
           @fromSpherical = (phi, theta) =>
             throw 'Sorry, not yet implemented!'
@@ -622,7 +623,7 @@ class WCS.Mapper
             return [x, y]
 
         when 'AIT'
-        
+
           @toSpherical = (x, y) =>
             x_z   = Math.pow((Math.PI * x) / (4 * 180), 2)
             y_z   = Math.pow((Math.PI * y) / (2 * 180), 2)
@@ -630,7 +631,7 @@ class WCS.Mapper
             theta = WCS.Math.asind(Math.PI * y * z / 180)
             phi   = 2 * WCS.Math.atan2d(Math.PI * z * x / (2 * 180), 2 * z * z - 1)
             return [phi, theta]
-        
+
           @fromSpherical = (phi, theta) =>
             gamma = 180 / Math.PI * Math.sqrt(2 / (1 + WCS.Math.cosd(theta) * WCS.Math.cosd(phi / 2)))
             x     = 2 * gamma * WCS.Math.cosd(theta) * WCS.Math.sind(phi / 2)

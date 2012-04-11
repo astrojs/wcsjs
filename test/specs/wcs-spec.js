@@ -225,7 +225,7 @@ describe ("sky to pixel transformations", function () {
    sky.push([290.73621202629, -58.78452312823]);
    sky.push([284.91980906467, -66.30475721459]);
 
-   wcs = new WCS.Mapper(stg);
+   wcs = new WCS.Mapper(szp);
    for (i = 0; i < pixels.length; i += 1) {
      coords = wcs.coordinateToPixel(sky[i][0], sky[i][1]);
      expect(coords.x).toBeCloseTo(pixels[i][0], precision);

@@ -32,5 +32,3 @@ curl -# -C - -o "1904-66_COD.fits.gz" "http://www.atnf.csiro.au/people/mcalabre/
 curl -# -C - -o "1904-66_COE.fits.gz" "http://www.atnf.csiro.au/people/mcalabre/data/WCS/1904-66_COE.fits.gz"
 curl -# -C - -o "1904-66_COO.fits.gz" "http://www.atnf.csiro.au/people/mcalabre/data/WCS/1904-66_COO.fits.gz"
 curl -# -C - -o "1904-66_COP.fits.gz" "http://www.atnf.csiro.au/people/mcalabre/data/WCS/1904-66_COP.fits.gz"
-
-
