@@ -360,7 +360,8 @@ class WCS.Mapper
 
       switch @projection
         when 'AIR'
-          @wcsobj.thetaB = if header.hasOwnProperty('PV2_1') then parseFloat(header['PV2_1']) else 90
+          key = "PV#{@latitudeAxis}_1"
+          @wcsobj.thetaB = if header.hasOwnProperty(key) then parseFloat(header[key]) else 90
           @wcsobj.etaB = (90 - @wcsobj.thetaB) / 2
 
           toSpherical: (x, y) => throw 'Sorry, not yet implemented!'
@@ -381,6 +382,9 @@ class WCS.Mapper
             return [x, y]
 
         when 'AZP'
+          [key1, key2] = ["PV#{@latitudeAxis}_1", "PV#{@latitudeAxis}_2"]
+          @wcsobj.mu    = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 0
+          @wcsobj.gamma = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 0
 
           @toSpherical = (x, y) => throw 'Sorry, not yet implemented!'
           @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
@@ -391,6 +395,9 @@ class WCS.Mapper
           @fromSpherical = (phi, theta) => throw 'Sorry, not yet implemented!'
 
         when 'SIN'
+          [key1, key2] = ["PV#{@latitudeAxis}_1", "PV#{@latitudeAxis}_2"]
+          @wcsobj.eta = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 0
+          @wcsobj.nu  = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 0
 
           @toSpherical = (x, y) =>
             r     = Math.sqrt(x * x + y * y)
@@ -419,9 +426,7 @@ class WCS.Mapper
             return [x, y]
 
         when 'SZP'
-          throw 'Not yet implemented'
-
-          [key1, key2, key3] = ["PV#{@latitudeAxis}_1,", "PV#{@latitudeAxis}_2", "PV#{@latitudeAxis}_3"]
+          [key1, key2, key3] = ["PV#{@latitudeAxis}_1", "PV#{@latitudeAxis}_2", "PV#{@latitudeAxis}_3"]
           @wcsobj.mu      = if header.hasOwnProperty(key1) then parseFloat(header[key1]) else 0
           @wcsobj.phiC    = if header.hasOwnProperty(key2) then parseFloat(header[key2]) else 0
           @wcsobj.thetaC  = if header.hasOwnProperty(key3) then parseFloat(header[key3]) else 90
@@ -431,6 +436,7 @@ class WCS.Mapper
 
           @toSpherical = (x, y) => throw 'Sorry, not yet implemented'
           @fromSpherical = (phi, theta) =>
+            throw 'Sorry, not yet implemented'
             divisor = @wcsobj.zp - 1 + WCS.Math.sind(theta)
             x = (180 / Math.PI) * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.sind(phi) - @wcsobj.xp * (1 - WCS.Math.sind(theta))) / divisor
             y = (-180 / Math.PI) * (@wcsobj.zp * WCS.Math.cosd(theta) * WCS.Math.cosd(phi) + @wcsobj.yp * (1 - WCS.Math.sind(theta))) / divisor
@@ -639,8 +645,9 @@ class WCS.Mapper
             return [x, y]
 
     if @projection in conic
+      key = "PV#{@latitudeAxis}_1"
       @wcsobj.phi0    = 0
-      @wcsobj.theta0  = if header.hasOwnProperty('PV2_1') then header['PV2_1'] else 0
+      @wcsobj.theta0  = if header.hasOwnProperty(key) then header[key] else 0
       throw 'Sorry, not yet implemented!'
 
     if @projection in polyConic
