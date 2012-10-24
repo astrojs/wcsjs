@@ -329,15 +329,34 @@ class WCS.Mapper
       unless cd?
         [crota, lambda] = [0, 1]
       else
-        # TODO: Generalize for larger matrices
-        cdcpy = [cd[0], cd[1]]
-        cdDet = WCS.Math.determinant(cdcpy)
-        cdSign = if cdDet < 0 then -1 else 1
-        @wcsobj.cdelt[0] = Math.sqrt(Math.abs(cdDet)) * cdSign
-        @wcsobj.cdelt[1] = Math.sqrt(Math.abs(cdDet))
-        crota = WCS.Math.atan2d(-1 * cd[0][1], cd[1][1])
-        lambda = @wcsobj.cdelt[1] / @wcsobj.cdelt[0]
-    return [[WCS.Math.cosd(crota), -lambda * WCS.Math.sind(crota)], [WCS.Math.sind(crota) / lambda, WCS.Math.cosd(crota)]]
+        cd11 = cd[0][0]
+        cd12 = cd[0][1]
+        cd21 = cd[1][0]
+        cd22 = cd[1][1]
+        
+        # Compute rho_a
+        if cd21 > 0
+          rho_a = Math.atan2(cd21, cd11)
+        else if cd21 is 0
+          rho_a = 0
+        else
+          rho_a = Math.atan2(-cd21, -cd11)
+        
+        # Compute rho_b
+        if cd12 > 0
+          rho_b = Math.atan2(cd12, -cd22)
+        else if cd12 is 0
+          rho_b = 0
+        else
+          rho_b = Math.atan2(-cd21, cd22)
+        
+        crota = 0.5 * (rho_a + rho_b)
+        cos_rho = Math.cos(crota)
+        @wcsobj.cdelt1 = cd11 / cos_rho
+        @wcsobj.cdelt2 = cd22 / cos_rho
+        
+        lambda = @wcsobj.cdelt2 / @wcsobj.cdelt1
+    return cd
 
   setProjection: (header) =>
     zenithal = ['AIR', 'ARC', 'AZP', 'NCP', 'SIN', 'STG', 'SZP', 'TAN', 'TAN-SIP', 'ZEA', 'ZPN']
