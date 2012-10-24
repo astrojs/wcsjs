@@ -330,7 +330,8 @@ class WCS.Mapper
         [crota, lambda] = [0, 1]
       else
         # TODO: Generalize for larger matrices
-        cdDet = WCS.Math.determinant(cd)
+        cdcpy = [cd[0], cd[1]]
+        cdDet = WCS.Math.determinant(cdcpy)
         cdSign = if cdDet < 0 then -1 else 1
         @wcsobj.cdelt[0] = Math.sqrt(Math.abs(cdDet)) * cdSign
         @wcsobj.cdelt[1] = Math.sqrt(Math.abs(cdDet))
