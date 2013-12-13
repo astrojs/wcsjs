@@ -1,10 +1,6 @@
 .DS_Store
-*.pyc
-*.fits
-*.FITS
-*.fit
-*.FIT
-data/
-wcslib.py
-wcslib.pyc
-*.fits.gz
+wcslib.*
+wcslib
+node_modules
+test/data/*.gz
+a.out

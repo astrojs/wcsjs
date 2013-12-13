@@ -1,18 +1,24 @@
 {
-  "name": "wcsjs",
-  "version": "0.0.2",
-  "description": "Astronomical coordinates in JavaScript",
-  "keywords": ["astronomy", "wcs", "astrometry", "shazaam"],
-  "homepage": "astrojs.org",
-  "author": {
-    "name": "Amit Kapadia",
-    "email": "amit@zooniverse.org",
-    "url": "https://www.zooniverse.org/"
-  },
-  "files": ["lib/wcs.js"],
-  "main": "lib/wcs.js",
+  "name": "wcs.js",
+  "version": "0.1.0",
+  "description": "Astronomical coordinates for various projections",
+  "author": "Amit Kapadia <akapad@gmail.com>",
+  "keywords": [
+    "astronomy",
+    "coordinates",
+    "emscripten",
+    "science"
+  ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:kapadia/wcsjs.git"
+    "url": "https://github.com/astrojs/wcsjs.git"
   },
+  "scripts": {
+    "test": "nodeunit test/wcsjs_test.js"
+  },
+  "devDependencies": {
+    "http-server": "0.5.x",
+    "uglify-js": "2.4.x",
+    "nodeunit": "0.8.x"
+  }
 }
