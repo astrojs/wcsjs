@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>wcsjs: pixel to sky</title>
+    <script src="/wcs.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+    (function() {
+      
+      String.prototype.splice = function(index, remove, string) {
+        return (this.slice(0, index) + string + this.slice(index + Math.abs(remove)));
+      };
+      
+      function toHeader(wcsObj) {
+        var header = [];
+        
+        line = "                                                                                ";
+        for (var card in wcsObj) {
+          var value = wcsObj[card];
+          
+          entry = line.splice(0, card.length, card);
+          entry = entry.splice(8, 1, "=");
+          
+          entry = entry.splice(10, value.toString().length, value);
+          header.push(entry);
+        }
+        
+        return header.join('\n');
+      }
+      
+      function getCoordinateExtent(w, width, height) {
+        var s1, s2;
+        
+        s1 = w.pix2sky(0, 0);
+        s2 = w.pix2sky(width - 1, height - 1);
+        
+        return {
+          ra: [s1[0], s2[0]],
+          dec: [s1[1], s2[1]]
+        };
+      }
+      
+      function onDOM() {
+        
+        // WCS cards
+        wcsCards = {
+            NAXIS: 2, NAXIS1: 3600, NAXIS2: 3600, CRPIX1: 1801.0, CRPIX2: 1801.0, CRVAL1: 22.3640190, CRVAL2: -73.5577379, CDELT1: 1.28258e-05,
+            CDELT2: 1.2825755e-05,  CD1_1: 6.1048001125e-06, CD1_2: -1.735201621e-05, CD2_1: -8.9583913706e-06, CD2_2: 2.8724746184e-06, CTYPE1: "RA---TAN",
+            CTYPE2: "DEC--TAN", CUNIT1: "deg", CUNIT2: "deg", EQUINOX: 2000, RADESYS: "ICRS"
+        };
+        var header = toHeader(wcsCards);
+        
+        var w = new wcs();
+        w.init(header);
+        
+        var world = w.pix2sky(0, 0);
+        
+        var imgEl = document.querySelector('img');
+        var width = imgEl.width;
+        var height = imgEl.height;
+        
+        imgEl.onmousemove = function(e) {
+          var sky = w.pix2sky(e.offsetX, e.offsetY);
+          console.log(sky);
+        }
+        
+        var extent = getCoordinateExtent(w, width, height);
+        console.log(extent);
+        
+      };
+      
+      window.addEventListener('DOMContentLoaded', onDOM, false);
+    })();
+    </script>
+  </head>
+  
+  <body>
+    <div class="main">
+      <h4>wcsjs: Coordinate Grid</h4>
+      <img src="http://chandra.si.edu/photo/2013/ngc602/ngc602.jpg.jpg">
+    </div>
+    
+  </body>
+</html>
