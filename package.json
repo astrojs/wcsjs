@@ -1,0 +1,24 @@
+{
+  "name": "wcs.js",
+  "version": "0.1.0",
+  "description": "Astronomical coordinates for various projections",
+  "author": "Amit Kapadia <akapad@gmail.com>",
+  "keywords": [
+    "astronomy",
+    "coordinates",
+    "emscripten",
+    "science"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/astrojs/wcsjs.git"
+  },
+  "scripts": {
+    "test": "nodeunit test/wcsjs_test.js"
+  },
+  "devDependencies": {
+    "http-server": "0.5.x",
+    "uglify-js": "2.4.x",
+    "nodeunit": "0.8.x"
+  }
+}
