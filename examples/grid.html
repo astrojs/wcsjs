@@ -3,7 +3,35 @@
   <head>
     <meta charset='utf-8'>
     <title>wcsjs: pixel to sky</title>
+    
+    <style>
+    .content {
+      margin: 3% 10%;
+      color: #202020;;
+      font-family: sans-serif;
+      font-size: 14px;
+    }
+    
+    .container {
+      font: 10px sans-serif;
+    }
+    
+    image {
+      opacity: 0.5;
+    }
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    
+    .label {
+      color: #FFF;
+    }
+    
+    </style>
     <script src="/wcs.js" type="text/javascript"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     
     <script type="text/javascript">
     (function() {
@@ -56,17 +84,111 @@
         
         var world = w.pix2sky(0, 0);
         
-        var imgEl = document.querySelector('img');
-        var width = imgEl.width;
-        var height = imgEl.height;
+        var imgWidth = imgHeight = 864;
         
-        imgEl.onmousemove = function(e) {
-          var sky = w.pix2sky(e.offsetX, e.offsetY);
-          console.log(sky);
+        var extent = getCoordinateExtent(w, imgWidth, imgHeight);
+        
+        var margin = {top: 20, right: 20, bottom: 30, left: 60};
+        width = imgWidth;
+        height = imgHeight;
+        
+        var x = d3.scale.linear()
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+        
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .ticks(10);
+            
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .ticks(10);
+        
+        var svg = d3.select(".container").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        console.log(width, height);
+        // Assuming north is up
+        x.domain(extent.ra);
+        y.domain(extent.dec);
+        
+        svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis)
+            .append("text")
+              .attr("class", "label")
+              .attr("x", width)
+              .attr("y", -6)
+              .style("text-anchor", "end")
+              .text("right ascension");
+              
+        svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis)
+            .append("text")
+              .attr("class", "label")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 6)
+              .attr("dy", ".71em")
+              .style("text-anchor", "end")
+              .text("declination");
+        
+        svg.append("image")
+            .attr("xlink:href", "http://chandra.si.edu/photo/2013/ngc602/ngc602.jpg")
+            // .attr("xlink:href", "/examples/ngc602.jpg")
+            .attr("x", "0")
+            .attr("y", "0")
+            .attr("width", "864px")
+            .attr("height", "864px");
+        
+        var xTicks = x.ticks(50);
+        var yTicks = y.ticks(50);
+        
+        var lineFn = d3.svg.line()
+              .x(function(d) { return d.x; })
+              .y(function(d) { return d.y; })
+              .interpolate("linear");
+        
+        for (var j = 0; j < yTicks.length; j++) {
+          var gridLine = [];
+          for (var i = 0; i < xTicks.length; i++) {
+            var imgcrd = w.sky2pix(xTicks[i], yTicks[j]);
+            var point = {
+              x: imgcrd[0],
+              y: imgcrd[1]
+            };
+            gridLine.push(point);
+          }
+          svg.append("path")
+            .attr("d", lineFn(gridLine))
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.5)
+            .attr("fill", "none");
         }
         
-        var extent = getCoordinateExtent(w, width, height);
-        console.log(extent);
+        for (var i = 0; i < xTicks.length; i++) {
+          var gridLine = [];
+          for (var j = 0; j < yTicks.length; j++) {
+            var imgcrd = w.sky2pix(xTicks[i], yTicks[j]);
+            var point = {
+              x: imgcrd[0],
+              y: imgcrd[1]
+            };
+            gridLine.push(point);
+          }
+          svg.append("path")
+            .attr("d", lineFn(gridLine))
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.5)
+            .attr("fill", "none");
+        }
         
       };
       
@@ -76,9 +198,11 @@
   </head>
   
   <body>
-    <div class="main">
-      <h4>wcsjs: Coordinate Grid</h4>
-      <img src="http://chandra.si.edu/photo/2013/ngc602/ngc602.jpg.jpg">
+    <div class="content">
+      <h4>wcsjs: Creating a Coordinate Grid</h4>
+      <p>This example shows how to use D3 to build coordinate axes for an astronomical image.</p>
+      <div class="container">
+      </div>
     </div>
     
   </body>
