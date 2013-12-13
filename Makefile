@@ -8,7 +8,7 @@ wcslib.js: wcslib
 	~/emscripten/emconfigure ./configure --prefix=~/emscripten/system; \
 	~/emscripten/emmake make; \
 	~/emscripten/emmake make install;
-	~/emscripten/emcc src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky']";
+	~/emscripten/emcc -O2 src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky']";
 
 wcslib: wcslib.tar.bz2
 	tar xjf wcslib.tar.bz2
@@ -22,5 +22,5 @@ clean:
 	rm wcslib.*
 	rm wcs.js
 
-go:
+tests:
 	gcc test/create_tests.c -lwcs -lcfitsio -lm
