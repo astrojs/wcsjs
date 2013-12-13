@@ -12,6 +12,7 @@
     var w = new wcs();
     w.init(headerString);
     var world = w.pix2sky(x, y);
+    var pixcrd = w.sky2pix(ra, dec);
     
 
 ### Browser
@@ -21,5 +22,6 @@
       var w = new wcs();
       w.init(headerString);
       var world = w.pix2sky(x, y);
+      var pixcrd = w.sky2pix(ra, dec);
     </script>
     

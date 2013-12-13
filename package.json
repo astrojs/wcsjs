@@ -1,6 +1,6 @@
 {
   "name": "wcs.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Astronomical coordinates for various projections",
   "author": "Amit Kapadia <akapad@gmail.com>",
   "keywords": [

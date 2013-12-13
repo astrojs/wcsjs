@@ -10,7 +10,7 @@ wcslib.js: wcslib
 	$(EMSCRIPTEN)/emconfigure ./configure --prefix=$(EMSCRIPTEN)/system; \
 	$(EMSCRIPTEN)/emmake make; \
 	$(EMSCRIPTEN)/emmake make install;
-	$(EMSCRIPTEN)/emcc -O2 src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky']";
+	$(EMSCRIPTEN)/emcc -O2 src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky', '_sky2pix']";
 
 wcslib: wcslib.tar.bz2
 	tar xjf wcslib.tar.bz2

@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>wcsjs: pixel to sky</title>
+    <title>wcsjs: sky to pixel</title>
     <script src="/wcs.js" type="text/javascript"></script>
     
     <script type="text/javascript">
@@ -17,12 +17,12 @@
         xhr.onload = function() {
           var w = new wcs();
           w.init(xhr.response);
-          var world = w.pix2sky(0, 0);
+          var pixcrd = w.sky2pix(270.120344, -72.676808);
           
-          console.log(world[0].toFixed(6) == 270.120344);
-          console.log(world[1].toFixed(6) == -72.676808);
+          console.log(Math.round(pixcrd[0]) === 0);
+          console.log(Math.round(pixcrd[1]) === 0);
           
-          console.log(world);
+          console.log(pixcrd);
         };
         xhr.send();
         
@@ -35,7 +35,7 @@
   
   <body>
     <div class="main">
-      <h4>wcsjs: pixel to sky</h4>
+      <h4>wcsjs: sky to pixel</h4>
     </div>
     
   </body>

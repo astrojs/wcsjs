@@ -9,7 +9,6 @@ exports['wcsjs_test'] = {
     done();
   },
 
-
   'AIR': function(test) {
     var header, w, world;
 
@@ -625,7 +624,5 @@ exports['wcsjs_test'] = {
 
     test.done();
   },
-
-
 
 };
