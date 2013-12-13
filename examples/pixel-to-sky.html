@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>wcsjs: pixel to sky</title>
+    <script src="/wcs.js"></script>
+    
+    <script>
+    (function() {
+      
+      function onDOM() {
+        
+        // Load a FITS header
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/test/data/1904-66_TAN');
+        xhr.responseType = 'text';
+        xhr.onload = function() {
+          var w = new wcs();
+          w.init(xhr.response);
+          var world = w.pix2sky(0, 0);
+          
+          console.log(world[0].toFixed(6) == 270.120344);
+          console.log(world[1].toFixed(6) == -72.676808);
+        };
+        xhr.send();
+        
+      };
+      
+      window.addEventListener('DOMContentLoaded', onDOM, false);
+    })();
+    </script>
+  </head>
+  
+  <body>
+    <div class="main">
+      <h4>wcsjs: pixel to sky</h4>
+    </div>
+    
+  </body>
+</html>
