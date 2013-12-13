@@ -1,14 +1,16 @@
 
+EMSCRIPTEN=$(HOME)/emscripten
+
 build: wcslib.js
 	cat src/start.js wcslib.js src/end.js > wcs.js
 	node_modules/.bin/uglifyjs wcs.js -o wcs.min.js
 
 wcslib.js: wcslib
 	cd wcslib; \
-	~/emscripten/emconfigure ./configure --prefix=~/emscripten/system; \
-	~/emscripten/emmake make; \
-	~/emscripten/emmake make install;
-	~/emscripten/emcc -O2 src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky']";
+	$(EMSCRIPTEN)/emconfigure ./configure --prefix=$(EMSCRIPTEN)/system; \
+	$(EMSCRIPTEN)/emmake make; \
+	$(EMSCRIPTEN)/emmake make install;
+	$(EMSCRIPTEN)/emcc -O2 src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky']";
 
 wcslib: wcslib.tar.bz2
 	tar xjf wcslib.tar.bz2
@@ -19,7 +21,7 @@ wcslib.tar.bz2:
 
 clean:
 	rm -rf wcslib
-	rm wcslib.*
+	rm wcslib.js
 	rm wcs.js
 
 tests:

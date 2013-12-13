@@ -34,7 +34,6 @@ int main(void) {
     wcspih(header, nkeyrec, 0, 0, &nreject, &nwcs, &wcs);
     wcsp2s(wcs, 3, 2, pixcrd, imgcrd, phi, theta, world, stat);
     
-    
     printf("'%s': function(test) {\n", projections[i]);
     printf("  var header, w, world;\n");
     printf("\n");
@@ -49,16 +48,12 @@ int main(void) {
       printf("  test.equal(world[1].toFixed(6), %.6f);\n", world[j+1]);
       printf("\n");
     }
+    
     printf("  test.done();\n");
     printf("},\n\n");
     
     fits_close_file(fptr, &status);
-    
   }
-  
-  // for (int j = 0; j < 6; j++) {
-  //   printf("%f\n", world[j]);
-  // }
   
   return 0;
 }
