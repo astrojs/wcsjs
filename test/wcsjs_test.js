@@ -12,645 +12,620 @@ exports['wcsjs_test'] = {
 
   'AIR': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_AIR'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.21688701395647);
-    test.equal(world[1], -73.66968983882300);
-    
+    test.equal(world[0].toFixed(6), 267.965502);
+    test.equal(world[1].toFixed(6), -73.736378);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.73187868548666);
-    test.equal(world[1], -71.89745170283852);
-    
+    test.equal(world[0].toFixed(6), 276.539194);
+    test.equal(world[1].toFixed(6), -71.973910);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.89619973906133);
-    test.equal(world[1], -69.59132515809009);
-    
+    test.equal(world[0].toFixed(6), 287.770534);
+    test.equal(world[1].toFixed(6), -69.677946);
+
     test.done();
   },
-
 
   'AIT': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_AIT'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.56813922635888);
-    test.equal(world[1], -73.49845984257067);
-    
+    test.equal(world[0].toFixed(6), 268.327518);
+    test.equal(world[1].toFixed(6), -73.563438);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.78835711116852);
-    test.equal(world[1], -71.77031590889941);
-    
+    test.equal(world[0].toFixed(6), 276.600858);
+    test.equal(world[1].toFixed(6), -71.844700);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.69649070191275);
-    test.equal(world[1], -69.51660568851483);
-    
+    test.equal(world[0].toFixed(6), 287.570468);
+    test.equal(world[1].toFixed(6), -69.601320);
+
     test.done();
   },
-
 
   'ARC': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_ARC'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 269.05673077773804);
-    test.equal(world[1], -73.46829958534701);
-    
+    test.equal(world[0].toFixed(6), 268.820971);
+    test.equal(world[1].toFixed(6), -73.533720);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 277.10945455391800);
-    test.equal(world[1], -71.73007205290968);
-    
+    test.equal(world[0].toFixed(6), 276.927124);
+    test.equal(world[1].toFixed(6), -71.804385);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.77594826264385);
-    test.equal(world[1], -69.49141133149553);
-    
+    test.equal(world[0].toFixed(6), 287.654957);
+    test.equal(world[1].toFixed(6), -69.575203);
+
     test.done();
   },
-
 
   'AZP': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_AZP'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 272.40060255082687);
-    test.equal(world[1], -73.01765518149499);
-    
+    test.equal(world[0].toFixed(6), 272.215089);
+    test.equal(world[1].toFixed(6), -73.083170);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 278.87925295958792);
-    test.equal(world[1], -71.34789253188616);
-    
+    test.equal(world[0].toFixed(6), 278.736450);
+    test.equal(world[1].toFixed(6), -71.418345);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.66327906114350);
-    test.equal(world[1], -69.44076556561157);
-    
+    test.equal(world[0].toFixed(6), 287.567992);
+    test.equal(world[1].toFixed(6), -69.516228);
+
     test.done();
   },
-
 
   'BON': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_BON'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 273.39341300383830);
-    test.equal(world[1], -73.62466633347393);
-    
+    test.equal(world[0].toFixed(6), 273.211114);
+    test.equal(world[1].toFixed(6), -73.695481);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 280.19105961874209);
-    test.equal(world[1], -71.72932922081986);
-    
+    test.equal(world[0].toFixed(6), 280.058990);
+    test.equal(world[1].toFixed(6), -71.806125);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 289.71914895922004);
-    test.equal(world[1], -69.33491479487026);
-    
+    test.equal(world[0].toFixed(6), 289.642880);
+    test.equal(world[1].toFixed(6), -69.418047);
+
     test.done();
   },
-
 
   'CAR': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_CAR'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.47850587888030);
-    test.equal(world[1], -73.37997130772084);
-    
+    test.equal(world[0].toFixed(6), 268.238659);
+    test.equal(world[1].toFixed(6), -73.444781);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.68511677167288);
-    test.equal(world[1], -71.66912914240467);
-    
+    test.equal(world[0].toFixed(6), 276.497144);
+    test.equal(world[1].toFixed(6), -71.742625);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.65430077296770);
-    test.equal(world[1], -69.49509785651212);
-    
+    test.equal(world[0].toFixed(6), 287.525496);
+    test.equal(world[1].toFixed(6), -69.577629);
+
     test.done();
   },
-
 
   'CEA': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_CEA'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.44085265462115);
-    test.equal(world[1], -73.37969380548566);
-    
+    test.equal(world[0].toFixed(6), 268.200859);
+    test.equal(world[1].toFixed(6), -73.444460);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.65254418535773);
-    test.equal(world[1], -71.67026610104271);
-    
+    test.equal(world[0].toFixed(6), 276.464298);
+    test.equal(world[1].toFixed(6), -71.743735);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.65633165394672);
-    test.equal(world[1], -69.49488577819591);
-    
+    test.equal(world[0].toFixed(6), 287.526504);
+    test.equal(world[1].toFixed(6), -69.577525);
+
     test.done();
   },
-
 
   'COD': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_COD'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 267.30957853599364);
-    test.equal(world[1], -74.13710817537566);
-    
+    test.equal(world[0].toFixed(6), 267.043666);
+    test.equal(world[1].toFixed(6), -74.207814);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.14258826990596);
-    test.equal(world[1], -72.25516349180113);
-    
+    test.equal(world[0].toFixed(6), 275.939691);
+    test.equal(world[1].toFixed(6), -72.336226);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.54581149797787);
-    test.equal(world[1], -69.84295046034813);
-    
+    test.equal(world[0].toFixed(6), 287.411910);
+    test.equal(world[1].toFixed(6), -69.934557);
+
     test.done();
   },
-
 
   'COE': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_COE'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 271.44128301856676);
-    test.equal(world[1], -73.70751697051337);
-    
+    test.equal(world[0].toFixed(6), 271.241993);
+    test.equal(world[1].toFixed(6), -73.779365);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 278.55130186095829);
-    test.equal(world[1], -71.85282148313993);
-    
+    test.equal(world[0].toFixed(6), 278.398897);
+    test.equal(world[1].toFixed(6), -71.930463);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.43332154482619);
-    test.equal(world[1], -69.64233769711701);
-    
+    test.equal(world[0].toFixed(6), 288.331976);
+    test.equal(world[1].toFixed(6), -69.726583);
+
     test.done();
   },
-
 
   'COO': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_COO'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 266.44709417242149);
-    test.equal(world[1], -74.17152274688496);
-    
+    test.equal(world[0].toFixed(6), 266.164212);
+    test.equal(world[1].toFixed(6), -74.241274);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 275.93630000357143);
-    test.equal(world[1], -72.30542638113086);
-    
+    test.equal(world[0].toFixed(6), 275.722354);
+    test.equal(world[1].toFixed(6), -72.386914);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.24124114503564);
-    test.equal(world[1], -69.82640564504693);
-    
+    test.equal(world[0].toFixed(6), 288.104664);
+    test.equal(world[1].toFixed(6), -69.919521);
+
     test.done();
   },
-
 
   'COP': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_COP'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 266.18968688018197);
-    test.equal(world[1], -74.06989101019846);
-    
+    test.equal(world[0].toFixed(6), 265.905403);
+    test.equal(world[1].toFixed(6), -74.138576);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 275.71279236566613);
-    test.equal(world[1], -72.24459255353753);
-    
+    test.equal(world[0].toFixed(6), 275.495937);
+    test.equal(world[1].toFixed(6), -72.324989);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.08062955119726);
-    test.equal(world[1], -69.83319876566866);
-    
+    test.equal(world[0].toFixed(6), 287.940427);
+    test.equal(world[1].toFixed(6), -69.925222);
+
     test.done();
   },
-
 
   'CSC': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_CSC'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 271.64205892089285);
-    test.equal(world[1], -73.16617799175344);
-    
+    test.equal(world[0].toFixed(6), 271.443713);
+    test.equal(world[1].toFixed(6), -73.231276);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 278.52560894324847);
-    test.equal(world[1], -71.45209202571939);
-    
+    test.equal(world[0].toFixed(6), 278.373032);
+    test.equal(world[1].toFixed(6), -71.523389);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.84563425399301);
-    test.equal(world[1], -69.38822760746797);
-    
+    test.equal(world[0].toFixed(6), 287.743796);
+    test.equal(world[1].toFixed(6), -69.465686);
+
     test.done();
   },
-
 
   'CYP': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_CYP'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 263.69300640787560);
-    test.equal(world[1], -75.95480262511792);
-    
+    test.equal(world[0].toFixed(6), 263.329497);
+    test.equal(world[1].toFixed(6), -76.039914);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 275.14092523159229);
-    test.equal(world[1], -73.71166421553414);
-    
+    test.equal(world[0].toFixed(6), 274.890941);
+    test.equal(world[1].toFixed(6), -73.812142);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.94305757348292);
-    test.equal(world[1], -70.82563302611403);
-    
+    test.equal(world[0].toFixed(6), 288.804748);
+    test.equal(world[1].toFixed(6), -70.938785);
+
     test.done();
   },
-
 
   'HPX': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_HPX'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 271.82370024341333);
-    test.equal(world[1], -73.37755255051934);
-    
+    test.equal(world[0].toFixed(6), 271.632311);
+    test.equal(world[1].toFixed(6), -73.445824);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 278.49475253086086);
-    test.equal(world[1], -71.59701232255669);
-    
+    test.equal(world[0].toFixed(6), 278.346118);
+    test.equal(world[1].toFixed(6), -71.670842);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.60086023511985);
-    test.equal(world[1], -69.50066848634343);
-    
+    test.equal(world[0].toFixed(6), 287.498652);
+    test.equal(world[1].toFixed(6), -69.580399);
+
     test.done();
   },
-
 
   'MER': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_MER'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.51628090049542);
-    test.equal(world[1], -73.38024288395212);
-    
+    test.equal(world[0].toFixed(6), 268.276581);
+    test.equal(world[1].toFixed(6), -73.445096);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.71775210407725);
-    test.equal(world[1], -71.66798431203884);
-    
+    test.equal(world[0].toFixed(6), 276.530056);
+    test.equal(world[1].toFixed(6), -71.741507);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.65228159165980);
-    test.equal(world[1], -69.49530868549388);
-    
+    test.equal(world[0].toFixed(6), 287.524493);
+    test.equal(world[1].toFixed(6), -69.577733);
+
     test.done();
   },
-
 
   'MOL': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_MOL'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 270.72846180802139);
-    test.equal(world[1], -74.16980073050065);
-    
+    test.equal(world[0].toFixed(6), 270.510770);
+    test.equal(world[1].toFixed(6), -74.244499);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 278.14374374757961);
-    test.equal(world[1], -72.21554279502313);
-    
+    test.equal(world[0].toFixed(6), 277.981184);
+    test.equal(world[1].toFixed(6), -72.297410);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.93735293150291);
-    test.equal(world[1], -69.86685492955003);
-    
+    test.equal(world[0].toFixed(6), 287.833261);
+    test.equal(world[1].toFixed(6), -69.956269);
+
     test.done();
   },
-
 
   'NCP': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_NCP'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.39150687810229);
-    test.equal(world[1], -73.90353552531403);
-    
+    test.equal(world[0].toFixed(6), 268.143390);
+    test.equal(world[1].toFixed(6), -73.970782);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.81017364989719);
-    test.equal(world[1], -72.10707434303899);
-    
+    test.equal(world[0].toFixed(6), 276.619647);
+    test.equal(world[1].toFixed(6), -72.184823);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.87135937209422);
-    test.equal(world[1], -69.74423740618809);
-    
+    test.equal(world[0].toFixed(6), 287.746656);
+    test.equal(world[1].toFixed(6), -69.833602);
+
     test.done();
   },
-
 
   'PAR': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_PAR'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 269.47944138195686);
-    test.equal(world[1], -73.49563038873099);
-    
+    test.equal(world[0].toFixed(6), 269.252432);
+    test.equal(world[1].toFixed(6), -73.561567);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 277.26915073243839);
-    test.equal(world[1], -71.74658209877160);
-    
+    test.equal(world[0].toFixed(6), 277.092530);
+    test.equal(world[1].toFixed(6), -71.821029);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.64809204078989);
-    test.equal(world[1], -69.50856755258873);
-    
+    test.equal(world[0].toFixed(6), 287.529273);
+    test.equal(world[1].toFixed(6), -69.592531);
+
     test.done();
   },
-
 
   'PCO': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_PCO'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 270.14393037504806);
-    test.equal(world[1], -73.51670585230482);
-    
+    test.equal(world[0].toFixed(6), 269.917957);
+    test.equal(world[1].toFixed(6), -73.583409);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 277.85266724198391);
-    test.equal(world[1], -71.73959531241584);
-    
+    test.equal(world[0].toFixed(6), 277.681693);
+    test.equal(world[1].toFixed(6), -71.814622);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.98288788377755);
-    test.equal(world[1], -69.47245686357836);
-    
+    test.equal(world[0].toFixed(6), 287.874190);
+    test.equal(world[1].toFixed(6), -69.556118);
+
     test.done();
   },
-
 
   'QSC': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_QSC'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 271.82788315326621);
-    test.equal(world[1], -73.08503647817108);
-    
+    test.equal(world[0].toFixed(6), 271.636827);
+    test.equal(world[1].toFixed(6), -73.151767);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 278.50397572515698);
-    test.equal(world[1], -71.38790291503825);
-    
+    test.equal(world[0].toFixed(6), 278.354803);
+    test.equal(world[1].toFixed(6), -71.458494);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.70321569326893);
-    test.equal(world[1], -69.54235062602707);
-    
+    test.equal(world[0].toFixed(6), 287.599966);
+    test.equal(world[1].toFixed(6), -69.617177);
+
     test.done();
   },
-
 
   'SFL': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_SFL'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.46737987111430);
-    test.equal(world[1], -73.50405652146377);
-    
+    test.equal(world[0].toFixed(6), 268.225742);
+    test.equal(world[1].toFixed(6), -73.568696);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.72488092427625);
-    test.equal(world[1], -71.78082820125013);
-    
+    test.equal(world[0].toFixed(6), 276.536241);
+    test.equal(world[1].toFixed(6), -71.855163);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.66540925177048);
-    test.equal(world[1], -69.50814226065356);
-    
+    test.equal(world[0].toFixed(6), 287.538837);
+    test.equal(world[1].toFixed(6), -69.593347);
+
     test.done();
   },
-
 
   'SIN': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_SIN'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.39150699215139);
-    test.equal(world[1], -73.90353552623822);
-    
+    test.equal(world[0].toFixed(6), 268.143390);
+    test.equal(world[1].toFixed(6), -73.970782);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 276.81017373148268);
-    test.equal(world[1], -72.10707433989337);
-    
+    test.equal(world[0].toFixed(6), 276.619647);
+    test.equal(world[1].toFixed(6), -72.184823);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.87135941566476);
-    test.equal(world[1], -69.74423740100356);
-    
+    test.equal(world[0].toFixed(6), 287.746656);
+    test.equal(world[1].toFixed(6), -69.833602);
+
     test.done();
   },
-
 
   'STG': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_STG'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 269.37825680266144);
-    test.equal(world[1], -73.25613046025055);
-    
+    test.equal(world[0].toFixed(6), 269.148414);
+    test.equal(world[1].toFixed(6), -73.320545);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 277.25469827540047);
-    test.equal(world[1], -71.54905963506775);
-    
+    test.equal(world[0].toFixed(6), 277.076315);
+    test.equal(world[1].toFixed(6), -71.621615);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.72937897955910);
-    test.equal(world[1], -69.37224062493648);
-    
+    test.equal(world[0].toFixed(6), 287.610210);
+    test.equal(world[1].toFixed(6), -69.453323);
+
     test.done();
   },
-
 
   'SZP': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_SZP'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 272.37781512101361);
-    test.equal(world[1], -73.41689969643966);
-    
+    test.equal(world[0].toFixed(6), 272.182173);
+    test.equal(world[1].toFixed(6), -73.485601);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 279.40878023595917);
-    test.equal(world[1], -71.59117395123121);
-    
+    test.equal(world[0].toFixed(6), 279.265155);
+    test.equal(world[1].toFixed(6), -71.665959);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.94678951859999);
-    test.equal(world[1], -69.32929133998724);
-    
+    test.equal(world[0].toFixed(6), 288.860445);
+    test.equal(world[1].toFixed(6), -69.409942);
+
     test.done();
   },
-
 
   'TAN': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_TAN'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 270.33283605009296);
-    test.equal(world[1], -72.61583231844779);
-    
+    test.equal(world[0].toFixed(6), 270.120344);
+    test.equal(world[1].toFixed(6), -72.676808);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 277.68828639763962);
-    test.equal(world[1], -71.01213461371206);
-    
+    test.equal(world[0].toFixed(6), 277.521567);
+    test.equal(world[1].toFixed(6), -71.079135);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.58930841018309);
-    test.equal(world[1], -69.02541742454821);
-    
+    test.equal(world[0].toFixed(6), 287.475655);
+    test.equal(world[1].toFixed(6), -69.098387);
+
     test.done();
   },
-
 
   'TSC': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_TSC'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 264.19960489634940);
-    test.equal(world[1], -74.14517586429187);
-    
+    test.equal(world[0].toFixed(6), 263.870522);
+    test.equal(world[1].toFixed(6), -74.215160);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 274.95765232987162);
-    test.equal(world[1], -72.29165255738322);
-    
+    test.equal(world[0].toFixed(6), 274.714562);
+    test.equal(world[1].toFixed(6), -72.374940);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.44628635706181);
-    test.equal(world[1], -69.78971543068342);
-    
+    test.equal(world[0].toFixed(6), 288.299769);
+    test.equal(world[1].toFixed(6), -69.884276);
+
     test.done();
   },
-
 
   'ZEA': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_ZEA'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 268.89429694487603);
-    test.equal(world[1], -73.57489559932927);
-    
+    test.equal(world[0].toFixed(6), 268.655533);
+    test.equal(world[1].toFixed(6), -73.640795);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 277.03622605821403);
-    test.equal(world[1], -71.82165091917852);
-    
+    test.equal(world[0].toFixed(6), 276.851898);
+    test.equal(world[1].toFixed(6), -71.896829);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 287.79936135442688);
-    test.equal(world[1], -69.55219469078314);
-    
+    test.equal(world[0].toFixed(6), 287.677457);
+    test.equal(world[1].toFixed(6), -69.637350);
+
     test.done();
   },
-
 
   'ZPN': function(test) {
     var header, w, world;
-    
+
     header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_ZPN'), 'utf8');
     w = new wcs();
     w.init(header);
-    
+
     world = w.pix2sky(0, 0);
-    test.equal(world[0], 263.47100070800735);
-    test.equal(world[1], -78.49768232899739);
-    
+    test.equal(world[0].toFixed(6), 263.127380);
+    test.equal(world[1].toFixed(6), -78.582290);
+
     world = w.pix2sky(24, 38);
-    test.equal(world[0], 274.64071255721075);
-    test.equal(world[1], -76.14274333453979);
-    
+    test.equal(world[0].toFixed(6), 274.388324);
+    test.equal(world[1].toFixed(6), -76.254536);
+
     world = w.pix2sky(45, 98);
-    test.equal(world[0], 288.54207571861173);
-    test.equal(world[1], -72.51760735389108);
-    
+    test.equal(world[0].toFixed(6), 288.392017);
+    test.equal(world[1].toFixed(6), -72.665303);
+
     test.done();
   },
+
+
 
 };

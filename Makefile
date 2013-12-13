@@ -5,7 +5,7 @@ build: wcslib.js
 
 wcslib.js: wcslib
 	cd wcslib; \
-	~/emscripten/emconfigure ./configure --prefix=/Users/amit/emscripten/system; \
+	~/emscripten/emconfigure ./configure --prefix=~/emscripten/system; \
 	~/emscripten/emmake make; \
 	~/emscripten/emmake make install;
 	~/emscripten/emcc src/wrapper.c -lwcs -lm -o wcslib.js -s EXPORTED_FUNCTIONS="['_getWcs', '_pix2sky']";
@@ -21,3 +21,6 @@ clean:
 	rm -rf wcslib
 	rm wcslib.*
 	rm wcs.js
+
+go:
+	gcc test/create_tests.c -lwcs -lcfitsio -lm
