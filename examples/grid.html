@@ -73,24 +73,39 @@
         
         // WCS cards
         wcsCards = {
-            NAXIS: 2, NAXIS1: 3600, NAXIS2: 3600, CRPIX1: 1801.0, CRPIX2: 1801.0, CRVAL1: 22.3640190, CRVAL2: -73.5577379, CDELT1: 1.28258e-05,
-            CDELT2: 1.2825755e-05,  CD1_1: 6.1048001125e-06, CD1_2: -1.735201621e-05, CD2_1: -8.9583913706e-06, CD2_2: 2.8724746184e-06, CTYPE1: "RA---TAN",
-            CTYPE2: "DEC--TAN", CUNIT1: "deg", CUNIT2: "deg", EQUINOX: 2000, RADESYS: "ICRS"
+            NAXIS: 2,
+            NAXIS1: 891,
+            NAXIS2: 893,
+            CRPIX1: 446.000000,
+            CRPIX2: 447.000000,
+            CRVAL1: 210.801868,
+            CRVAL2: 54.348171,
+            CD1_1: -0.0002798094,
+            CD1_2: 0.0000156364,
+            CD2_1: 0.0000155823,
+            CD2_2: 0.0002791902,
+            CTYPE1: "RA---TAN",
+            CTYPE2: "DEC--TAN",
+            CUNIT1: "deg",
+            CUNIT2: "deg",
+            EQUINOX: 2000,
+            RADESYS: "ICRS"
         };
         var header = toHeader(wcsCards);
         
         var w = new wcs();
         w.init(header);
+        var world = w.pix2sky(10, 10);
         
-        var world = w.pix2sky(0, 0);
-        
-        var imgWidth = imgHeight = 864;
+        var imgWidth = 891,
+            imgHeight = 893;
         
         var extent = getCoordinateExtent(w, imgWidth, imgHeight);
+        console.log(extent);
         
         var margin = {top: 20, right: 20, bottom: 30, left: 60};
-        width = imgWidth;
-        height = imgHeight;
+        var width = imgWidth;
+        var height = imgHeight;
         
         var x = d3.scale.linear()
             .range([0, width]);
@@ -113,7 +128,6 @@
             .attr("height", height + margin.top + margin.bottom)
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        console.log(width, height);
         // Assuming north is up
         x.domain(extent.ra);
         y.domain(extent.dec);
@@ -141,12 +155,22 @@
               .text("declination");
         
         svg.append("image")
-            .attr("xlink:href", "http://chandra.si.edu/photo/2013/ngc602/ngc602.jpg")
-            // .attr("xlink:href", "/examples/ngc602.jpg")
+            .attr("xlink:href", "/examples/m101.png")
             .attr("x", "0")
             .attr("y", "0")
-            .attr("width", "864px")
-            .attr("height", "864px");
+            .attr("width", imgWidth + "px")
+            .attr("height", imgHeight + "px");
+        
+        var group = svg.append("g");
+        group.append("clipPath")
+            .attr("id", "clip")
+          .append("rect")
+            .attr("width", imgWidth)
+            .attr("height", imgHeight);
+        
+        var gridGroup = group.append("g")
+          .attr("clip-path", "url(#clip)")
+          .attr("transform", "translate(0, 0)")
         
         var xTicks = x.ticks(50);
         var yTicks = y.ticks(50);
@@ -158,6 +182,7 @@
         
         for (var j = 0; j < yTicks.length; j++) {
           var gridLine = [];
+          
           for (var i = 0; i < xTicks.length; i++) {
             var imgcrd = w.sky2pix(xTicks[i], yTicks[j]);
             var point = {
@@ -166,9 +191,10 @@
             };
             gridLine.push(point);
           }
-          svg.append("path")
+          
+          gridGroup.append("path")
             .attr("d", lineFn(gridLine))
-            .attr("stroke", "black")
+            .attr("stroke", "#7FFF00")
             .attr("stroke-width", 0.5)
             .attr("fill", "none");
         }
@@ -183,11 +209,21 @@
             };
             gridLine.push(point);
           }
-          svg.append("path")
+          gridGroup.append("path")
             .attr("d", lineFn(gridLine))
-            .attr("stroke", "black")
+            .attr("stroke", "#7FFF00")
             .attr("stroke-width", 0.5)
             .attr("fill", "none");
+        }
+        
+        var img = document.querySelector('image');
+        var ra = document.querySelector(".ra");
+        var dec = document.querySelector(".dec");
+        img.onmousemove = function(e) {
+          world = w.pix2sky(e.offsetX, imgHeight - e.offsetY);
+          console.log(world);
+          ra.textContent = world[0].toFixed(6);
+          dec.textContent = world[1].toFixed(6);
         }
         
       };
@@ -201,6 +237,7 @@
     <div class="content">
       <h4>wcsjs: Creating a Coordinate Grid</h4>
       <p>This example shows how to use D3 to build coordinate axes for an astronomical image.</p>
+      <p><span class="ra"></span>, <span class="dec"></span>
       <div class="container">
       </div>
     </div>

@@ -23,6 +23,7 @@ clean:
 	rm -rf wcslib
 	rm wcslib.js
 	rm wcs.js
+	rm wcs.min.js
 
 tests:
 	gcc test/create_tests.c -lwcs -lcfitsio -lm
