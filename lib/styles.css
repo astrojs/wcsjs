@@ -1,0 +1,48 @@
+body {
+  margin: 0 auto;
+  color: #303030;
+  background-color: #FAFAFA;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+.content {
+  margin: 0 auto;
+  width: 90%;
+}
+
+span.abbr {
+  font-size: 12px;
+}
+
+.container {
+  font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.label {
+  color: #FFF;
+}
+
+.projection {
+  display: inline-block;
+}
+
+a {
+  color: #0172e6;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+h1 {
+  margin-top: 4%;
+}
+
+h2 {
+  margin: 4% 0 0 0;
+}
