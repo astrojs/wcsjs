@@ -35,7 +35,7 @@ int main(void) {
     wcsp2s(wcs, 3, 2, pixcrd, imgcrd, phi, theta, world, stat);
     
     printf("'%s': function(test) {\n", projections[i]);
-    printf("  var header, w, world;\n");
+    printf("  var header, w, world, pixel;\n");
     printf("\n");
     printf("  header = fs.readFileSync(path.join(__dirname, 'data', '1904-66_%s'), 'utf8');\n", projections[i]);
     printf("  w = new wcs();\n");
@@ -46,6 +46,11 @@ int main(void) {
       printf("  world = w.pix2sky(%d, %d);\n", pixcrd1[j], pixcrd1[j+1]);
       printf("  test.equal(world[0].toFixed(6), %.6f);\n", world[j]);
       printf("  test.equal(world[1].toFixed(6), %.6f);\n", world[j+1]);
+      printf("\n");
+      printf("  pixel = w.sky2pix(%f, %f);\n", world[j], world[j+1]);
+      printf("  test.equal(Math.round(pixel[0]), %d);\n", pixcrd1[j]);
+      printf("  test.equal(Math.round(pixel[1]), %d);\n", pixcrd1[j+1]);
+      
       printf("\n");
     }
     
