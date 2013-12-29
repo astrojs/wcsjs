@@ -24,13 +24,11 @@ def make_headers():
     headers = {}
     for f in glob.glob("*.fits.gz"):
         header = fits.getheader(f)
-        d = {}
-        for k, v in header.iteritems():
-            if k == 'HISTORY' or k == 'COMMENT':
-                continue
-            
-            d[k] = v
-        headers[f[8:11]] = d
+        
+        del header["HISTORY"]
+        del header["COMMENT"]
+        headers[f[8:11]] = header.tostring()
+        
     print json.dumps(headers)
 
 
