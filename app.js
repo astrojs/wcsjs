@@ -202,7 +202,7 @@
         });
         
         var lineFn = d3.svg.line()
-            .x(function(d) { return d.x; })
+            .x(function(d) { return d.x - 1; })
             .y(function(d) { return 384 - d.y; })
             .interpolate("linear");
         

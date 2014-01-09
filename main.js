@@ -35775,22 +35775,9 @@ run();
         var xAxisEl = svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")");
-        xAxisEl.append("text")
-          .attr("class", "label")
-          .attr("x", width)
-          .attr("y", -6)
-          .style("text-anchor", "end")
-          .text("declination");
         
         var yAxisEl = svg.append("g")
             .attr("class", "y axis");
-        yAxisEl.append("text")
-            .attr("class", "label")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("right ascention");
         
         var imgEl = svg.append("image")
           .attr("xlink:href", "images/1904-66_" + scope.projection + ".png")
@@ -35905,7 +35892,7 @@ run();
         });
         
         var lineFn = d3.svg.line()
-            .x(function(d) { return d.x; })
+            .x(function(d) { return d.x - 1; })
             .y(function(d) { return 384 - d.y; })
             .interpolate("linear");
         
