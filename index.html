@@ -2,205 +2,88 @@
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>wcsjs</title>
+    <title>Graticules</title>
     
-    <link rel="stylesheet" href="lib/styles.css" type="text/css">
-    <!--
-    <script src="/lib/d3.v3.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/lib/wcs.js" type="text/javascript"></script>
-    <script src="/lib/main.js" type="text/javascript"></script>
-    -->
+    <link rel="stylesheet" href="bower_components/foundation/css/foundation.css" type="text/css">
+    <link rel="stylesheet" href="styles.css" type="text/css">
+    
+<!--     
+    <script src="bower_components/angular/angular.js" type="text/javascript" charset="utf-8"></script>
+    <script src="bower_components/d3/d3.js" type="text/javascript" charset="utf-8"></script>
+    <script src="wcs.js" type="text/javascript" charset="utf-8"></script>
     <script src="app.js" type="text/javascript" charset="utf-8"></script>
-
+    
+     -->
+    <script src="main.js" type="text/javascript" charset="utf-8"></script>
+    
   </head>
   
-  <body>
-    <a href="https://github.com/astrojs/wcsjs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="lib/forkme.png" alt="Fork me on GitHub"></a>
-    <div class="content">
-      <h1>wcsjs</h1>
-      <p>wcsjs is a javascript library for handling world coordinate systems used in astronomy. the library is a direct port of <a href="http://www.atnf.csiro.au/people/mcalabre/WCS/">LIBWCS</a>, and supports many commonly used projections.</p>
-      <p>Here are examples of all support projections, where the coordinate grids have been dynamically created with <code>wcsjs</code>.</p>
-      
-      <div class="category">
-        <h2>Zenithal Projections</h2>
-        
-        <div class="projection">
-          <h3>Zenithal Perspective <span class="abbr">(AZP)</span></h3>
-          <div class="grid" data-projection="AZP"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Slant Zenithal Perspective <span class="abbr">(SZP)</span></h3>
-          <div class="grid" data-projection="SZP"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Gnomonic <span class="abbr">(TAN)</span></h3>
-          <div class="grid" data-projection="TAN"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Stereographic <span class="abbr">(STG)</span></h3>
-          <div class="grid" data-projection="STG"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Generalized Orthographic <span class="abbr">(SIN)</span></h3>
-          <div class="grid" data-projection="SIN"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>North Celestial Pole <span class="abbr">(NCP)</span></h3>
-          <div class="grid" data-projection="NCP"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Zenithal Equidistant <span class="abbr">(ARC)</span></h3>
-          <div class="grid" data-projection="ARC"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Zenithal Polynomial <span class="abbr">(ZPN)</span></h3>
-          <div class="grid" data-projection="ZPN"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Zenithal Equal Area <span class="abbr">(ZEA)</span></h3>
-          <div class="grid" data-projection="ZEA"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Airy's <span class="abbr">(AIR)</span></h3>
-          <div class="grid" data-projection="AIR"></div>
-        </div>
+  <body ng-app="GraticulesApp">
+    <a href="https://github.com/astrojs/wcsjs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme.png" alt="Fork me on GitHub"></a>
+    
+    <div class="row">
+      <div class="large-12 columns">
+        <h1>Graticules <small>an example of wcsjs</small></h1>
+        <hr />
       </div>
+    </div>
+    
+    <!-- Main Page Content and Sidebar -->
+    <div class="row">
       
-      <div class="category">
-        <h2>Cylindrical Projections</h2>
+      <!-- Main Blog Content -->
+      <div ng-controller="GraticuleCtrl" class="large-12 columns" role="content">
         
-        <div class="projection">
-          <h3>Cylindrical Perspective <span class="abbr">(CYP)</span></h3>
-          <div class="grid" data-projection="CYP"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Cylindrical Equal Area <span class="abbr">(CEA)</span></h3>
-          <div class="grid" data-projection="CEA"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Plate Carrée <span class="abbr">(CAR)</span></h3>
-          <div class="grid" data-projection="CAR"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Mercator <span class="abbr">(MER)</span></h3>
-          <div class="grid" data-projection="MER"></div>
-        </div>
-      </div>
-      
-      <div class="category">
-        <h2>Pseudo-cylindrical Projections</h2>
-        
-        <div class="projection">
-          <h3>Sanson-Flamsteed <span class="abbr">(SFL)</span></h3>
-          <div class="grid" data-projection="SFL"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Parabolic <span class="abbr">(PAR)</span></h3>
-          <div class="grid" data-projection="PAR"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Mollweide <span class="abbr">(MOL)</span></h3>
-          <div class="grid" data-projection="MOL"></div>
-        </div>
-      </div>
-      
-      <div class="category">
-        <h2>Conventional Projections</h2>
-        
-        <div class="projection">
-          <h3>Aitoff <span class="abbr">(AIT)</span></h3>
-          <div class="grid" data-projection="AIT"></div>
-        </div>
+        <article>
+          
+          <h3>Projections</h3>
+          
+          <ul class="button-group">
+            <li ng-repeat="(abbv, projection) in projections" ng-click="onProjection(abbv)"><a href="#!" class="tiny button">{{abbv}}</a></li>
+          </ul>
+          
+          <div class="row">
+            <div class="large-8 columns">
+              <h4>{{name}}</h4>
+              <graticule></graticule>
+            </div>
+            
+            <div class="large-4 columns">
+              <h5>&nbsp;</h5>
+              <form>
+                <fieldset>
+                  <legend><h5>Number of Graticules</h5></legend>
+                  <label><h6>Declination</h6></label>
+                  <input type="range" min="4" max="14" step="5" ng-model="nGraticulesX">
+                  
+                  <label><h6>Right Ascension</h6></label>
+                  <input type="range" min="4" max="14" step="5" ng-model="nGraticulesY">
+                </fieldset>
+              </form>
+              
+              <div class="panel callout radius">
+                <h5>Coordinates</h5>
+                
+                <ul class="small-block-grid-2">
+                  <li><h4><small>right ascention</small></h4></li>
+                  <li><h4><small>{{ra}}</small></h4></li>
+                  <li><h4><small>declination</small></h4></li>
+                  <li><h4><small>{{dec}}</small></h4></li>
+                  
+                  <li><h4><small>x</small></h4></li>
+                  <li><h4><small>{{x}}</small></h4></li>
+                  <li><h4><small>y</small></h4></li>
+                  <li><h4><small>{{y}}</small></h4></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
         
       </div>
-      
-      <div class="category">
-        <h2>Conic Projections</h2>
-        
-        <div class="projection">
-          <h3>Conic Perspective <span class="abbr">(COP)</span></h3>
-          <div class="grid" data-projection="COP"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Conic Equal Area <span class="abbr">(COE)</span></h3>
-          <div class="grid" data-projection="COE"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Conic Equidistant <span class="abbr">(COD)</span></h3>
-          <div class="grid" data-projection="COD"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Conic Orthomorphic <span class="abbr">(COO)</span></h3>
-          <div class="grid" data-projection="COO"></div>
-        </div>
-        
-      </div>
-      
-      <div class="category">
-        <h2>Polyconic Projections</h2>
-        
-        <div class="projection">
-          <h3>Bonne's <span class="abbr">(BON)</span></h3>
-          <div class="grid" data-projection="BON"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Polyconic <span class="abbr">(PCO)</span></h3>
-          <div class="grid" data-projection="PCO"></div>
-        </div>
-        
-      </div>
-      
-      <div class="category">
-        <h2>Quad-cube projections</h2>
-        
-        <div class="projection">
-          <h3>Tangential Spherical Cube <span class="abbr">(TSC)</span></h3>
-          <div class="grid" data-projection="TSC"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>COBE Quad-Cube <span class="abbr">(CSC)</span></h3>
-          <div class="grid" data-projection="CSC"></div>
-        </div>
-        
-        <div class="projection">
-          <h3>Quadrilateral Spherical Cube <span class="abbr">(QSC)</span></h3>
-          <div class="grid" data-projection="QSC"></div>
-        </div>
-        
-      </div>
-      
-      <div class="category">
-        <h2>HEALPix projection</h2>
-        
-        <div class="projection">
-          <h3>HEALPix <span class="abbr">(HPX)</span></h3>
-          <div class="grid" data-projection="HPX"></div>
-        </div>
-        
-      </div>
-      
-      
-      <p class="projection">
       
     </div>
+    
   </body>
+  
 </html>

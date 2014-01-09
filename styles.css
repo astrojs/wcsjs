@@ -1,0 +1,41 @@
+
+input[type="range"] {
+  width: 100%;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+text {
+  font-size: 11px;
+}
+
+button, .button {
+  background-color: #0071e5;
+}
+
+button:hover, button:focus, .button:hover, .button:focus {
+  background-color: #005DD6;
+}
+
+svg image, svg path {
+  cursor: crosshair;
+}
+
+svg path:hover {
+  stroke: #FFF10D;
+  stroke-width: 2px;
+}
+
+ul li {
+  line-height: 16px;
+}
+
+@media only screen {
+  .small-block-grid-2 > li {
+    padding-bottom: 0;
+  }
+}

@@ -5,3 +5,4 @@ node_modules
 test/data/*.gz
 a.out
 test/
+bower_components/

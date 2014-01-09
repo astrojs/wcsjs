@@ -1,0 +1,9 @@
+{
+  "name": "Graticules",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular": "1.2.x",
+    "foundation": "zurb/bower-foundation#~5.0.2",
+    "d3": "~3.3.13"
+  }
+}

@@ -1,6 +1,6 @@
 
 all:
-	cat lib/d3.v3.min.js lib/wcs.js lib/main.js > app.js
+	cat bower_components/angular/angular.js bower_components/d3/d3.js wcs.js app.js > main.js
 	# node_modules/.bin/uglifyjs app.js -o app.js
 
 clean:
