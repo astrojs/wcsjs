@@ -111,7 +111,7 @@
     return [pixcrd[0], pixcrd[1]];
   }
   
-  wcs.version = '0.2.0';
+  wcs.version = '0.2.1';
   
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = wcs;
