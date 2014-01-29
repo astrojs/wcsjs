@@ -4,7 +4,7 @@
 
 
 struct wcsprm* getWcs(char *header, int nkeyrec) {
-  int relax = 0, ctrl = 0;
+  int relax = WCSHDR_all, ctrl = 0;
   int nreject, nwcs;
   struct wcsprm *wcs;
   
