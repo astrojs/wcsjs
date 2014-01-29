@@ -5841,13 +5841,6 @@ run();
     this._sky2pix = Module.cwrap('sky2pix', 'number', ['number', 'number', 'number', 'number']);
   }
   
-  // // TODO: Expand on WCS keywords
-  // var wcsKeywords = [
-  //     'NAXIS', 'NAXIS1', 'NAXIS2', 'DATE-OBS', 'EQUINOX', 'WCSAXES', 'RADESYS',
-  //     'CTYPE1', 'CRPIX1', 'CRVAL1', 'CUNIT1', 'CTYPE2', 'CRPIX2', 'CRVAL2',
-  //     'CUNIT2', 'CD1_1', 'CD1_2', 'CD2_1', 'CD2_2', 'CDELT1', 'CDELT2', 'LONPOLE',
-  //     'LATPOLE', 'PV2_1', 'PV2_2', 'PV2_3'];
-      
   var wcsRegEx = [
     /NAXIS\d*/, 'DATE-OBS', 'EQUINOX', 'WCSAXES', 'RADESYS',
     /CTYPE\d+/, /CRPIX\d+/, /CRVAL\d+/, /CUNIT\d+/, /CDELT\d+/,
@@ -5883,7 +5876,6 @@ run();
     header = string2buffer(headerStr);
     
     // Allocate string on Emscripten heap and get byte offset
-    // nHeaderBytes = header.length * header.BYTES_PER_ELEMENT;
     nHeaderBytes = header.byteLength;
     headerPtr = Module._malloc(nHeaderBytes);
     headerHeap = new Uint8Array(Module.HEAPU8.buffer, headerPtr, nHeaderBytes);
