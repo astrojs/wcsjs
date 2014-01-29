@@ -5879,7 +5879,7 @@ run();
     });
     headerStr = headerArray.join('\n');
     
-    nkeyrec = parseInt( (headerStr.length - 1) / 80 );
+    nkeyrec = headerArray.length;
     header = string2buffer(headerStr);
     
     // Allocate string on Emscripten heap and get byte offset
@@ -5914,7 +5914,7 @@ run();
     return [pixcrd[0], pixcrd[1]];
   }
   
-  wcs.version = '0.2.0';
+  wcs.version = '0.2.1';
   
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = wcs;

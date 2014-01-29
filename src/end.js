@@ -76,7 +76,7 @@
     });
     headerStr = headerArray.join('\n');
     
-    nkeyrec = parseInt( (headerStr.length - 1) / 80 );
+    nkeyrec = headerArray.length;
     header = string2buffer(headerStr);
     
     // Allocate string on Emscripten heap and get byte offset
