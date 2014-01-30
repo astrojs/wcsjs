@@ -1,0 +1,41 @@
+SIMPLE  =                    T / Written by IDL:  Thu Jan 30 14:45:14 2014      
+BITPIX  =                  -32 /Real*4 (floating point)                         
+NAXIS   =                    2 /                                                
+NAXIS1  =                  303 /                                                
+NAXIS2  =                  303 /                                                
+CTYPE1  = 'GLON-TAN'           /                                                
+CTYPE2  = 'GLAT-TAN'           /                                                
+CRPIX1  =        1291.00000000 /                                                
+CRPIX2  =       -593.000000000 /                                                
+CRVAL1  =        66.1101660079 / Galactic longitude of reference pixel          
+CRVAL2  =        0.52575501710 / Galactic latitude of reference pixel           
+CDELT1  =       -0.00088888889 /                                                
+CDELT2  =        0.00088888889 /                                                
+CROTA2  =              0.00000 /                                                
+RPE_APPL=                    0 /RPE correction switch                           
+WAVELEN =                   70 /Wavelength of observation in mirons             
+RPE_AL  =                    0 /No RPE correction applied                       
+RPE_AC  =                    0 /No RPE correction applied                       
+BUNIT   = 'MJy/sr  '           /                                                
+EXTEND  =                    T /                                                
+MED_WIN = '20      '           /                                                
+MED_STEP= '20      '           /                                                
+FLAG_PER= '38      '           /                                                
+MASK_CL = '3       '           /                                                
+MASK_GR = '3       '           /                                                
+REGS_LON=       0.643280078285 /gal lon shift in arcsec                         
+REGS_LAT=       -2.47859498949 /gal lat shift in arcsec                         
+OFSET_AP=                    1 /                                                
+OFSET_VA=             -25.9185 /from intercal IRAS-Planck-HSO                   
+GAIN_AP =                    0 /                                                
+GAIN_VA =                    1 /from intercal IRAS-Planck-HSO                   
+EQUINOX =              2000.00 / Equinox of Ref. Coord.                         
+LONPOLE =        180.000000000 / Native longitude of Celestial pole             
+LATPOLE =        0.52575501707 / Celestial latitude of native pole              
+HISTORY PUTAST: Jan 30 14:45:13 2014 World Coordinate System parameters written 
+HISTORY HEULER: Jan 30 14:45:13 2014 Converted to Celestial coordinates         
+HISTORY HEXTRACT: Thu Jan 30 14:45:14 2014                                      
+HISTORY Original image size was 3454 by 3244                                    
+HISTORY Extracted Image: [434:736,2216:2518]                                    
+HISTORY PUTAST: Jan 30 14:45:14 2014 World Coordinate System parameters written 
+HISTORY HEULER: Jan 30 14:45:14 2014 Converted to Galactic coordinates          

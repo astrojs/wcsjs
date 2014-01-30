@@ -5844,7 +5844,7 @@ run();
   var wcsRegEx = [
     /NAXIS\d*/, 'DATE-OBS', 'EQUINOX', 'WCSAXES', 'RADESYS',
     /CTYPE\d+/, /CRPIX\d+/, /CRVAL\d+/, /CUNIT\d+/, /CDELT\d+/,
-    /CD.+/, 'LONPOLE', 'LATPOLE', /PV.+/
+    /CD.+/, 'LONPOLE', 'LATPOLE', /PV.+/, /CROTA\d+/
   ];
   
   // Initialize a WCS object using either a string or object of key value pairs
@@ -5906,7 +5906,7 @@ run();
     return [pixcrd[0], pixcrd[1]];
   }
   
-  wcs.version = '0.2.1';
+  wcs.version = '0.2.2';
   
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = wcs;

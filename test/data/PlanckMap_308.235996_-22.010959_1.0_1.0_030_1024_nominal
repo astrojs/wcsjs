@@ -1,0 +1,23 @@
+SIMPLE  =                    T / file does conform to FITS standard             
+BITPIX  =                  -32 / number of bits per data pixel                  
+NAXIS   =                    2 / number of data axes                            
+NAXIS1  =                   60 / length of data axis 1                          
+NAXIS2  =                   60 / length of data axis 2                          
+EXTEND  =                    T / FITS dataset may contain extensions            
+COMMENT   FITS (Flexible Image Transport System) format is defined in 'Astronomy
+COMMENT   and Astrophysics', volume 376, page 359; bibcode: 2001A&A...376..359H 
+COMMENT  --------------------------------------------                           
+CREATOR = 'PROJECTMAP'                                                          
+VERSION = '0.1     '                                                            
+INPUTMAP= 'LFI_SkyMap_030_1024_R1.10_nominal.fits'                              
+COMMENT  --------------------------------------------                           
+PROJ    = 'CAR     '                                                            
+CTYPE1  = 'GLON-CAR'                                                            
+CTYPE2  = 'GLAT-CAR'                                                            
+CRPIX1  =                 30.5                                                  
+CRPIX2  =                 30.5                                                  
+CRVAL1  =           308.235996                                                  
+CRVAL2  =           -22.010959                                                  
+CDELT1  =            -0.016667                                                  
+CDELT2  =             0.016667                                                  
+UNITS   = 'K_CMB   '                                                            

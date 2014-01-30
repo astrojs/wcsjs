@@ -60,7 +60,7 @@ int main(void) {
     fits_close_file(fptr, &status);
   }
   
-  fits_open_image(&fptr, "examples/m101.fits", READONLY, &status);
+  fits_open_image(&fptr, "examples/PlanckMap_308.235996_-22.010959_1.0_1.0_030_1024_nominal.fits", READONLY, &status);
   fits_hdr2str(fptr, 1, NULL, 0, &header, &nkeyrec, &status);
   wcspih(header, nkeyrec, 0, 0, &nreject, &nwcs, &wcs);
   wcsp2s(wcs, 3, 2, pixcrd, imgcrd, phi, theta, world, stat);

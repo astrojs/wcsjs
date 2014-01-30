@@ -81,7 +81,75 @@ exports['wcsjs_test'] = {
   setUp: function(done) {
     done();
   },
+  
+  'HIGAL_BLUE0671p118_070_RM': function(test) {
+    var header, w, world, pixel;
+    
+    header = fs.readFileSync(path.join(__dirname, 'data', 'HIGAL_BLUE0671p118_070_RM'), 'utf8');
+    w = new wcs();
+    w.init(header);
+    
+    world = w.pix2sky(0, 0);
+    test.equal(world[0].toFixed(6), 67.257713);
+    test.equal(world[1].toFixed(6), 1.052640);
+    
+    pixel = w.sky2pix(67.257713, 1.052640);
+    test.equal(Math.round(pixel[0]), 0);
+    test.equal(Math.round(pixel[1]), 0);
+    
+    world = w.pix2sky(24, 38);
+    test.equal(world[0].toFixed(6), 67.236392);
+    test.equal(world[1].toFixed(6), 1.086416);
+    
+    pixel = w.sky2pix(67.236392, 1.086416);
+    test.equal(Math.round(pixel[0]), 24);
+    test.equal(Math.round(pixel[1]), 38);
+    
+    world = w.pix2sky(45, 98);
+    test.equal(world[0].toFixed(6), 67.217739);
+    test.equal(world[1].toFixed(6), 1.139741);
+    
+    pixel = w.sky2pix(67.217739, 1.139741);
+    test.equal(Math.round(pixel[0]), 45);
+    test.equal(Math.round(pixel[1]), 98);
 
+    test.done();
+  },
+  
+  'PlanckMap_308.235996_-22.010959_1.0_1': function(test) {
+    var header, w, world, pixel;
+    
+    header = fs.readFileSync(path.join(__dirname, 'data', 'PlanckMap_308.235996_-22.010959_1.0_1.0_030_1024_nominal'), 'utf8');
+    w = new wcs();
+    w.init(header);
+    
+    world = w.pix2sky(0, 0);
+    test.equal(world[0].toFixed(6), 308.786276);
+    test.equal(world[1].toFixed(6), -22.518388);
+    
+    pixel = w.sky2pix(308.786276, -22.518388);
+    test.equal(Math.round(pixel[0]), 0);
+    test.equal(Math.round(pixel[1]), 0);
+    
+    world = w.pix2sky(24, 38);
+    test.equal(world[0].toFixed(6), 308.352746);
+    test.equal(world[1].toFixed(6), -21.885915);
+    
+    pixel = w.sky2pix(308.352746, -21.885915);
+    test.equal(Math.round(pixel[0]), 24);
+    test.equal(Math.round(pixel[1]), 38);
+    
+    world = w.pix2sky(45, 98);
+    test.equal(world[0].toFixed(6), 307.977378);
+    test.equal(world[1].toFixed(6), -20.885732);
+    
+    pixel = w.sky2pix(307.977378, -20.885732);
+    test.equal(Math.round(pixel[0]), 45);
+    test.equal(Math.round(pixel[1]), 98);
+    
+    test.done();
+  },
+  
   'AIR': function(test) {
     var header, w, world, pixel;
 
