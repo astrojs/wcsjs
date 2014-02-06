@@ -4,78 +4,50 @@ var fs = require('fs');
 var path = require('path');
 var wcs = require('../wcs.js');
 
-// exports['wcsjs_init'] = {
-//   
-//   setUp: function(done) {
-//     this.header = {"BPA": 0.0, "RESTFRQ": 1420405750.0, "CRVAL2": -90.0, "CTYPE1": "RA---TAN", "CRPIX2": -0.5630437201085, "CRVAL1": 0.0, "SIMPLE": "T", "CDELT1": -0.06666666666667, "CDELT2": 0.06666666666667, "NAXIS2": 192, "LONPOLE": 180.0, "CTYPE2": "DEC--TAN", "NAXIS": 2, "NAXIS1": 192, "BMIN": 0.2399999936422, "BUNIT": "JY/BEAM", "BITPIX": -32, "BMAJ": 0.2399999936422, "EQUINOX": 2000.0, "LATPOLE": -90.0, "CRPIX1": -268.0658087122};
-//     this.header = {
-//       "SIMPLE": "T",
-//       "BITPIX": -32,
-//       "NAXIS": 2,
-//       "NAXIS1": 192,
-//       "NAXIS2": 192,
-//       "BUNIT": "JY/BEAM",
-//       "CTYPE1": "RA---TAN",
-//       "CRPIX1": -268.0658087122,
-//       "CDELT1": -0.06666666666667,
-//       "CRVAL1": 0.0,
-//       "CTYPE2": "DEC--TAN",
-//       "CRPIX2": -0.5630437201085,
-//       "CDELT2": 0.06666666666667,
-//       "CRVAL2": -90.0,
-//       "LONPOLE": 180.0,
-//       "LATPOLE": -90.0,
-//       "EQUINOX": 2000.0,
-//       "BMAJ": 0.2399999936422,
-//       "BMIN": 0.2399999936422,
-//       "BPA": 0.0,
-//       "RESTFRQ": 1420405750.0,
-//     };
-//     done();
-//   },
-//   
-//   'can initialize from JSON description': function(test) {
-//     
-//     String.prototype.splice = function(index, remove, string) {
-//       return (this.slice(0, index) + string + this.slice(index + Math.abs(remove)));
-//     };
-//     
-//     function toHeader(wcsObj) {
-//       var header = [];
-//       var line = "                                                                                ";
-//       
-//       for (var card in wcsObj) {
-//         var value = wcsObj[card];
-//         if (typeof value === "string") {
-//           console.log(value);
-//         }
-//         
-//         var entry = line.splice(0, card.length, card);
-//         entry = entry.splice(8, 1, "=");
-//         
-//         entry = entry.splice(10, value.toString().length, value);
-//         header.push(entry);
-//       }
-//       
-//       return header.join('\n');
-//     }
-//     
-//     var headerStr = toHeader(this.header);
-//     console.log(headerStr);
-//     
-//     var w = new wcs();
-//     w.init(headerStr);
-//     
-//     var world = w.pix2sky(0, 0);
-//     world = world.map(function(d) { return d.toFixed(6); });
-//     
-//     test.equal(world[0], 270.120344);
-//     test.equal(world[1], -72.676808);
-//     
-//     test.done();
-//   }
-//   
-// };
+exports['wcsjs_init'] = {
+  
+  setUp: function(done) {
+    this.header = {
+      "SIMPLE": "T",
+      "BITPIX": -32,
+      "NAXIS": 2,
+      "NAXIS1": 192,
+      "NAXIS2": 192,
+      "BUNIT": "JY/BEAM",
+      "CTYPE1": "RA---TAN",
+      "CRPIX1": -268.0658087122,
+      "CDELT1": -0.06666666666667,
+      "CRVAL1": 0.0,
+      "CTYPE2": "DEC--TAN",
+      "CRPIX2": -0.5630437201085,
+      "CDELT2": 0.06666666666667,
+      "CRVAL2": -90.0,
+      "LONPOLE": 180.0,
+      "LATPOLE": -90.0,
+      "EQUINOX": 2000.0,
+      "BMAJ": 0.2399999936422,
+      "BMIN": 0.2399999936422,
+      "BPA": 0.0,
+      "RESTFRQ": 1420405750.0,
+    };
+    done();
+  },
+  
+  'can initialize from JSON description': function(test) {
+    
+    var w = new wcs();
+    w.init(this.header);
+    
+    var world = w.pix2sky(0, 0);
+    world = world.map(function(d) { return d.toFixed(6); });
+    
+    test.equal(world[0], 270.120344);
+    test.equal(world[1], -72.676808);
+    
+    test.done();
+  }
+  
+};
 
 exports['wcsjs_test'] = {
   setUp: function(done) {

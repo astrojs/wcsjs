@@ -5802,6 +5802,12 @@ run();
 // {{POST_RUN_ADDITIONS}}
 // {{MODULE_ADDITIONS}}
   
+  function wcs() {
+    this._getWCS = Module.cwrap('getWcs', 'number', ['String', 'number']);
+    this._pix2sky = Module.cwrap('pix2sky', 'number', ['number', 'number', 'number', 'number']);
+    this._sky2pix = Module.cwrap('sky2pix', 'number', ['number', 'number', 'number', 'number']);
+  }
+  
   function string2buffer(str) {
     var buffer = new ArrayBuffer(str.length);
     var view = new Uint8Array(buffer);
@@ -5812,52 +5818,59 @@ run();
     return buffer;
   }
   
-  // function toHeader(wcsObj) {
-  //   var header = [];
-  //   
-  //   // 80 character line
-  //   var line = "                                                                                ";
-  //   
-  //   for (var card in wcsObj) {
-  //     var value = wcsObj[card];
-  //     
-  //     if (typeof value === "string") {
-  //       console.log(value);
-  //     }
-  //     
-  //     var entry = line.splice(0, card.length, card);
-  //     entry = entry.splice(8, 1, "=");
-  //     
-  //     entry = entry.splice(10, value.toString().length, value);
-  //     header.push(entry);
-  //   }
-  //   
-  //   return header.join('\n');
-  // }
+  function splice(str1, index, remove, str2) {
+    return (str1.slice(0, index) + str2 + str1.slice(index + Math.abs(remove)));
+  }
   
-  function wcs() {
-    this._getWCS = Module.cwrap('getWcs', 'number', ['String', 'number']);
-    this._pix2sky = Module.cwrap('pix2sky', 'number', ['number', 'number', 'number', 'number']);
-    this._sky2pix = Module.cwrap('sky2pix', 'number', ['number', 'number', 'number', 'number']);
+  function toHeader(wcsObj) {
+    var header = [];
+    var line = "                                                                                ";
+    
+    for (var card in wcsObj) {
+      var value = wcsObj[card];
+      
+      if (typeof value === "string" && value !== 'T' && value !== 'F') {
+        value = "'" + value + "'";
+      }
+      
+      var entry = splice(line, 0, card.length, card);
+      entry = splice(entry, 8, 1, "=");
+      entry = splice(entry, 10, value.toString().length, value);
+      
+      header.push(entry);
+    }
+    
+    return header.join('\n');
   }
   
   var wcsRegEx = [
-    /NAXIS\d*/, 'DATE-OBS', 'EQUINOX', 'WCSAXES', 'RADESYS',
-    /CTYPE\d+/, /CRPIX\d+/, /CRVAL\d+/, /CUNIT\d+/, /CDELT\d+/,
-    /CD.+/, 'LONPOLE', 'LATPOLE', /PV.+/, /CROTA\d+/
+    'DATE-OBS',
+    'EQUINOX',
+    'WCSAXES',
+    'RADESYS',
+    'LONPOLE',
+    'LATPOLE',
+    /NAXIS\d*/,
+    /CTYPE\d+/,
+    /CRPIX\d+/,
+    /CRVAL\d+/,
+    /CUNIT\d+/,
+    /CDELT\d+/,
+    /CD.+/,
+    /PV.+/,
+    /CROTA\d+/
   ];
   
   // Initialize a WCS object using either a string or object of key value pairs
-  wcs.prototype.init = function(headerStr) {
-    var nkeyrec, header, nHeaderBytes, headerPtr, headerHeap;
+  wcs.prototype.init = function(header) {
+    var headerStr, nkeyrec, nHeaderBytes, headerPtr, headerHeap;
     
-    // TODO: Allow init to accept objects
     if (typeof header === "object") {
-      // Construct a header string from the header object, filtering based on WCS keywords
+      header = toHeader(header);
     }
     
     // Split the string into an array and filter based on the WCS regular expressions
-    var headerArray = headerStr.match(/.{1,80}/g);
+    var headerArray = header.match(/.{1,80}/g);
     headerArray = headerArray.filter(function(line) {
       
       // Extract the keyword
@@ -5906,7 +5919,7 @@ run();
     return [pixcrd[0], pixcrd[1]];
   }
   
-  wcs.version = '0.2.2';
+  wcs.version = '0.2.3';
   
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = wcs;
