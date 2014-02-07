@@ -5828,6 +5828,9 @@ run();
     
     for (var card in wcsObj) {
       var value = wcsObj[card];
+      if (value === undefined || value === null) {
+        continue;
+      }
       
       if (typeof value === "string" && value !== 'T' && value !== 'F') {
         value = "'" + value + "'";
