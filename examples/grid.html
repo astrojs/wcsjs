@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <title>wcsjs: pixel to sky</title>
     
     <style>
@@ -30,7 +30,7 @@
     }
     
     </style>
-    <script src="/wcs.js" type="text/javascript"></script>
+    <script src="../wcs.js" type="text/javascript"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     
     <script type="text/javascript">
@@ -170,7 +170,7 @@
         
         var gridGroup = group.append("g")
           .attr("clip-path", "url(#clip)")
-          .attr("transform", "translate(0, 0)")
+          .attr("transform", "translate(0, 0)");
         
         var xTicks = x.ticks(50);
         var yTicks = y.ticks(50);
@@ -224,9 +224,9 @@
           console.log(world);
           ra.textContent = world[0].toFixed(6);
           dec.textContent = world[1].toFixed(6);
-        }
-        
       };
+        
+      }
       
       window.addEventListener('DOMContentLoaded', onDOM, false);
     })();
@@ -237,7 +237,7 @@
     <div class="content">
       <h4>wcsjs: Creating a Coordinate Grid</h4>
       <p>This example shows how to use D3 to build coordinate axes for an astronomical image.</p>
-      <p><span class="ra"></span>, <span class="dec"></span>
+      <p><span class="ra"></span>, <span class="dec"></span></p>
       <div class="container">
       </div>
     </div>

@@ -1,6 +1,9 @@
 # wcsjs
 
-`wcsjs` is a Javascript port of Mark Calabretta's [WCSLIB](http://www.atnf.csiro.au/people/mcalabre/WCS/) using [Emscripten](https://github.com/kripken/emscripten/wiki). The library works in either NodeJS or in the browser.
+[wcsjs](https://github.com/astrojs/wcsjs) is a Javascript port
+of Mark Calabretta's [WCSLIB](http://www.atnf.csiro.au/people/mcalabre/WCS/)
+using [Emscripten](http://kripken.github.io/emscripten-site/).
+The library works in either NodeJS or in the browser.
 
 ## Usage
 
